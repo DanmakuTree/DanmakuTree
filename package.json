@@ -54,10 +54,10 @@
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.0"
   },
-  "license": "no-lisence",
+  "license": "GPL-2.0",
   "main": "./dist/main.js",
   "name": "danmaku-tree",
-  "private": true,
+  "private": false,
   "productName": "DanmakuTree",
   "repository": {
     "type": "git",
