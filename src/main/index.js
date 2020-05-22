@@ -32,11 +32,11 @@ if (!isDev) {
   // process.env.ELECTRON_ENABLE_LOGGING = true
 
   require('electron-debug')({
-    showDevTools: false,
+    showDevTools: false
   })
 }
 
-async function installDevTools() {
+async function installDevTools () {
   try {
     /* eslint-disable */
     require('vue-devtools').install()
@@ -46,7 +46,7 @@ async function installDevTools() {
   }
 }
 
-function createWindow() {
+function createWindow () {
   /**
    * Initial window options
    */
@@ -60,9 +60,9 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       nodeIntegrationInWorker: false,
-      webSecurity: false,
+      webSecurity: false
     },
-    show: false,
+    show: false
   })
 
   // eslint-disable-next-line
@@ -146,16 +146,16 @@ const template = [
       {
         label: 'Home',
         accelerator: 'CommandOrControl+H',
-        click() {
+        click () {
           sendMenuEvent({ route: '/' })
-        },
+        }
       },
       { type: 'separator' },
       { role: 'minimize' },
       { role: 'togglefullscreen' },
       { type: 'separator' },
-      { role: 'quit', accelerator: 'Alt+F4' },
-    ],
+      { role: 'quit', accelerator: 'Alt+F4' }
+    ]
   },
   {
     role: 'help',
@@ -164,23 +164,23 @@ const template = [
         label: 'Get Help',
         role: 'help',
         accelerator: 'F1',
-        click() {
+        click () {
           sendMenuEvent({ route: '/help' })
-        },
+        }
       },
       {
         label: 'About',
         role: 'about',
         accelerator: 'CommandOrControl+A',
-        click() {
+        click () {
           sendMenuEvent({ route: '/about' })
-        },
-      },
-    ],
-  },
+        }
+      }
+    ]
+  }
 ]
 
-function setMenu() {
+function setMenu () {
   if (process.platform === 'darwin') {
     template.unshift({
       label: app.name,
@@ -193,16 +193,16 @@ function setMenu() {
         { role: 'hideothers' },
         { role: 'unhide' },
         { type: 'separator' },
-        { role: 'quit' },
-      ],
+        { role: 'quit' }
+      ]
     })
 
     template.push({
-      role: 'window',
+      role: 'window'
     })
 
     template.push({
-      role: 'help',
+      role: 'help'
     })
 
     template.push({ role: 'services' })
@@ -211,3 +211,5 @@ function setMenu() {
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 }
+
+var platform = require('./Platform')

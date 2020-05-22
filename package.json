@@ -5,10 +5,12 @@
   },
   "dependencies": {
     "material-design-icons": "^3.0.1",
+    "uuid": "^8.1.0",
     "vue": "^2.6.11",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.1.6",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "ws": "^7.3.0"
   },
   "description": "An danmaku tool",
   "devDependencies": {
@@ -28,9 +30,14 @@
     "electron-builder": "^22.6.0",
     "electron-debug": "^3.0.1",
     "electron-rebuild": "^1.11.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-html": "^6.0.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
     "eslint-plugin-vue": "^6.2.2",
     "fast-glob": "^3.2.2",
     "file-loader": "^6.0.0",
@@ -72,7 +79,7 @@
     "dev-runner": "node _scripts/dev-runner.js",
     "electron-builder-install": "electron-builder install-app-deps",
     "electron-rebuild": "electron-rebuild",
-    "lint": "eslint --fix --ext .js,.ts,.vue ./ && npm run prettier",
+    "lint": "eslint --fix --ext .js,.ts,.vue ./",
     "pack": "run-p pack:main pack:renderer pack:web pack:workers",
     "pack:main": "webpack --mode=production --env.NODE_ENV=production --hide-modules --config _scripts/webpack.main.config.js",
     "pack:renderer": "webpack --mode=production --env.NODE_ENV=production --hide-modules --config _scripts/webpack.renderer.config.js",
@@ -81,9 +88,7 @@
     "postinstall": "electron-rebuild",
     "rebuild:electron": "run-s electron-builder-install electron-rebuild",
     "rebuild:node": "npm rebuild",
-    "release": "run-s test build",
-    "test": "run-s rebuild:node pack:workers jest",
-    "test:watch": "run-s rebuild:node pack:workers jest:watch"
+    "release": "run-s test build"
   },
   "version": "0.0.1"
 }
