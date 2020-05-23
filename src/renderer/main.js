@@ -15,20 +15,8 @@ new Vue({
   el: '#app',
   router,
   store,
-  render: (h) => h(App),
+  render: (h) => h(App)
 })
-
-// to avoild accesing electorn api from web app build
-if (window && window.process && window.process.type === 'renderer') {
-  const { ipcRenderer } = require('electron')
-
-  // handle menu event updates from main script
-  ipcRenderer.on('change-view', (event, data) => {
-    if (data.route) {
-      router.push(data.route)
-    }
-  })
-}
 
 // sample context menu
 // const { remote } = require('electron')

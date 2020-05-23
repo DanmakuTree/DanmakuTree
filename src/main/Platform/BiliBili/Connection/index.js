@@ -1,4 +1,4 @@
 import 'net'
 import 'ws'
 
-class Connection 
+class Connection {}

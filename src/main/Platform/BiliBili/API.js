@@ -1,7 +1,7 @@
 import axios from 'axios'
 import crypto from 'crypto'
 import https from 'https'
-import ProgramConsts from '../Consts'
+import ProgramConsts from '../../Consts'
 import BiliBiliConsts from './Consts'
 
 export class API {

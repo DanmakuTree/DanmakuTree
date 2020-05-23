@@ -11,7 +11,7 @@ const {
   productName,
 } = require('../package.json')
 
-const externals = Object.keys(dependencies).concat(Object.keys(devDependencies))
+// const externals = Object.keys(dependencies).concat(Object.keys(devDependencies))
 const isDevMode = process.env.NODE_ENV === 'development'
 const whiteListedModules = ['vue']
 
@@ -23,11 +23,11 @@ const config = {
     renderer: path.join(__dirname, '../src/renderer/main.js'),
   },
   output: {
-    libraryTarget: 'commonjs2',
+    libraryTarget: 'umd',
     path: path.join(__dirname, '../dist'),
     filename: '[name].js',
   },
-  externals: externals.filter((d) => !whiteListedModules.includes(d)),
+  // externals: externals.filter(d => !whiteListedModules.includes(d)),
   module: {
     rules: [
       {
@@ -109,10 +109,7 @@ const config = {
     new HtmlWebpackPlugin({
       excludeChunks: ['processTaskWorker'],
       filename: 'index.html',
-      template: path.resolve(__dirname, '../src/index.ejs'),
-      nodeModules: isDevMode
-        ? path.resolve(__dirname, '../node_modules')
-        : false,
+      template: path.resolve(__dirname, '../src/index.ejs')
     }),
     new VueLoaderPlugin(),
     new webpack.DefinePlugin({
@@ -125,14 +122,14 @@ const config = {
   ],
   resolve: {
     alias: {
-      vue$: 'vue/dist/vue.common.js',
+      vue$: 'vue/dist/vue.esm.js',
       '@': path.join(__dirname, '../src/'),
       src: path.join(__dirname, '../src/'),
       icons: path.join(__dirname, '../_icons/'),
     },
     extensions: ['.ts', '.js', '.vue', '.json'],
   },
-  target: 'electron-renderer',
+  target: 'web',
 }
 
 /**
