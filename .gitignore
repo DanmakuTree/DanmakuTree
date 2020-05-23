@@ -14,5 +14,6 @@ data/tmp/
 tmp/
 .cache
 dist
+.idea
 coverage
 __coverage__
