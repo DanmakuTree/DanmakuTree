@@ -48,17 +48,17 @@ const config = {
   },
   linux: {
     icon: '_icons/icon.png',
-    target: ['deb', 'snap', 'AppImage'],
+    target: ['deb', 'AppImage','7z'],
   },
   mac: {
     category: 'public.app-category.utilities',
     icon: '_icons/icon.icns',
-    target: ['dmg', 'zip'],
+    target: ['dmg', '7z'],
     type: 'distribution',
   },
   win: {
     icon: '_icons/icon.ico',
-    target: ['nsis', 'zip', 'portable'],
+    target: ['nsis', '7z', 'portable'],
   },
   nsis: {
     allowToChangeInstallationDirectory: true,

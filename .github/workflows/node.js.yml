@@ -27,3 +27,22 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+    - run: ls build
+    # - name: Creating 7z compression files (of build-linux-AppImage)
+    #   uses: edgarrc/action-7z@v1.0.4
+    #   with:
+    #     args: 7z a -t7z -mx=9 build/DanmakuTree-0.0.1.AppImage.7z ./build/DanmakuTree-0.0.1.AppImage
+    # - name: Creating 7z compression files (of build-linux-unpacked)
+    #   uses: edgarrc/action-7z@v1.0.4
+    #   with:
+    #     args: 7z a -t7z -mx=9 build/linux-unpacked.7z ./build/linux-unpacked
+    - name: Upload build-linux-AppImage artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-linux-AppImage
+        path: build/DanmakuTree-*.AppImage
+    - name: Upload build-linux-unpacked artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-linux-unpacked
+        path: build/danmaku-tree-*.7z
