@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "js-event-bus": "^1.0.3",
     "material-design-icons": "^3.0.1",
     "uuid": "^8.1.0",
     "vue": "^2.6.11",
