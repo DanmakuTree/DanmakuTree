@@ -49,6 +49,7 @@ const config = {
   linux: {
     icon: '_icons/icon.png',
     target: ['deb', 'AppImage','7z'],
+    maitainer: 'DanmakuTree <visit-our-github-org@no-email.com>'
   },
   mac: {
     category: 'public.app-category.utilities',
