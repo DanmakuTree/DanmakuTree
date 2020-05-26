@@ -28,7 +28,8 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
     - run: dir build
-    - name: Upload build-win-unpacked artifact
+    - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        path: build/DanmakuTree-*-win.7z
+        name: win-unpacked
+        path: build/DanmakuTree-*-win.7z 

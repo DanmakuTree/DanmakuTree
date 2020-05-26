@@ -36,11 +36,13 @@ jobs:
     #   uses: edgarrc/action-7z@v1.0.4
     #   with:
     #     args: 7z a -t7z -mx=9 build/linux-unpacked.7z ./build/linux-unpacked
-    - name: Upload build-linux-AppImage artifact
+    - name: Upload Linux AppImage Artifact
       uses: actions/upload-artifact@v2
       with:
+        name: linux-AppImage
         path: build/DanmakuTree-*.AppImage
-    - name: Upload build-linux-unpacked artifact
+    - name: Upload Linux Unpacked Artifact
       uses: actions/upload-artifact@v2
       with:
+        name: linux-unpacked
         path: build/danmaku-tree-*.7z
