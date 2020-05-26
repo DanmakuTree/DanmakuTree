@@ -31,5 +31,4 @@ jobs:
     - name: Upload build-win-unpacked artifact
       uses: actions/upload-artifact@v2
       with:
-        name: build-win-unpacked
         path: build/DanmakuTree-*-win.7z
