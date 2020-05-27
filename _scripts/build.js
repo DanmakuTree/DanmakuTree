@@ -59,7 +59,7 @@ const config = {
   },
   win: {
     icon: '_icons/icon.ico',
-    target: ['nsis', '7z', 'portable'],
+    target: ['nsis', '7z'],
   },
   nsis: {
     allowToChangeInstallationDirectory: true,
