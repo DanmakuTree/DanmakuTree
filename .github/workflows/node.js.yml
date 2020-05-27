@@ -71,16 +71,19 @@ jobs:
         name: ${{ matrix.os }}-compressed.7z
         path: build/*.7z
     - name: Upload .dmg file (if any exists)
+      if: ${{ runner.os == 'macOS' }}
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.os }}.dmg
         path: build/*.dmg
     - name: Upload .exe file (if any exists)
+      if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.os }}.exe
         path: build/*.exe    # TODO: should exclude the setup .exe
     - name: Upload .AppImage file (if any exists)
+      if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.os }}.AppImage
