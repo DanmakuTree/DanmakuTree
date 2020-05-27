@@ -17,3 +17,4 @@ dist
 .idea
 coverage
 __coverage__
+act
