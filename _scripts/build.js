@@ -48,17 +48,18 @@ const config = {
   },
   linux: {
     icon: '_icons/icon.png',
-    target: ['deb', 'snap', 'AppImage'],
+    target: ['deb', 'AppImage','7z'],
+    maintainer: 'DanmakuTree <visit-our-github-org@no-email.com>'
   },
   mac: {
     category: 'public.app-category.utilities',
     icon: '_icons/icon.icns',
-    target: ['dmg', 'zip'],
+    target: ['dmg', '7z'],
     type: 'distribution',
   },
   win: {
     icon: '_icons/icon.ico',
-    target: ['nsis', 'zip', 'portable'],
+    target: ['nsis', '7z'],
   },
   nsis: {
     allowToChangeInstallationDirectory: true,

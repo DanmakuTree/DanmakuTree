@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: ALL OS Build
 
 on:
   push:
@@ -11,12 +11,11 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
         node-version: [12.x]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
@@ -27,3 +26,64 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+    - run: ls build
+    # macos-latest artifacts, include: 
+      # Run ls build
+      # DanmakuTree-0.0.1-mac.7z         √
+      # DanmakuTree-0.0.1.dmg            √
+      # DanmakuTree-0.0.1.dmg.blockmap
+      # latest-mac.yml
+      # mac
+    # windows-latest artifacts, include: 
+#       Run ls build
+#     Directory: D:\a\DanmakuTree\DanmakuTree\build
+# Mode                 LastWriteTime         Length Name
+# ----                 -------------         ------ ----
+# d----           5/27/2020 10:09 AM                win-unpacked
+# -a---           5/27/2020 10:12 AM       57848903 DanmakuTree 0.0.1.exe                   √
+# -a---           5/27/2020 10:12 AM       58070490 DanmakuTree Setup 0.0.1.exe             x
+# -a---           5/27/2020 10:12 AM          61458 DanmakuTree Setup 0.0.1.exe.blockmap
+# -a---           5/27/2020 10:11 AM       57449897 DanmakuTree-0.0.1-win.7z                √
+# -a---           5/27/2020 10:12 AM            350 latest.yml
+    # ubuntu-latest artifacts, include:  
+      # Run ls build
+      # DanmakuTree-0.0.1.AppImage       √
+      # danmaku-tree-0.0.1.7z            √
+      # danmaku-tree_0.0.1_amd64.deb
+      # latest-linux.yml
+      # linux-unpacked   
+    # in conclusion, artifacts file format will be: 
+      # .7z for macos, windows, ubuntu   √
+          # DanmakuTree-0.0.1-mac.7z     .
+          # DanmakuTree-0.0.1-win.7z     .
+          # danmaku-tree-0.0.1.7z        .
+      # .dmg for macos                   √
+          # DanmakuTree-0.0.1.dmg        .
+      # .exe for windows                 √
+          # DanmakuTree 0.0.1.exe        .
+          # DanmakuTree Setup 0.0.1.exe  x
+      # .AppImage for ubuntu             √
+          # DanmakuTree-0.0.1.AppImage   .
+    - name: Upload .7z file (if any exists)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-compressed.7z
+        path: build/*.7z
+    - name: Upload .dmg file (if any exists)
+      if: ${{ runner.os == 'macOS' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}.dmg
+        path: build/*.dmg
+    - name: Upload .exe file (if any exists)
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}.exe
+        path: build/*.exe    # TODO: should exclude the setup .exe
+    - name: Upload .AppImage file (if any exists)
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}.AppImage
+        path: build/*.AppImage  
