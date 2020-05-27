@@ -29,13 +29,13 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
     - run: ls build
-    # - name: Upload Linux AppImage Artifact
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: linux-AppImage
-    #     path: build/DanmakuTree-*.AppImage
-    # - name: Upload Linux Unpacked Artifact
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: linux-unpacked
-    #     path: build/danmaku-tree-*.7z
+    - name: Upload macOS dmg Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: macOS-dmg
+        path: build/DanmakuTree-*.AppImage
+    - name: Upload macOS Unpacked Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: macOS-unpacked
+        path: build/DanmakuTree-*-mac.7z
