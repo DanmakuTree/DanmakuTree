@@ -6,12 +6,30 @@ import { inflateSync } from 'zlib'
 import { Warpper } from './Warpper'
 
 export class RoomConnection extends EventEmitter {
-  constructor (roomId, uid = 0, token = null, address = 'ws://broadcastlv.chat.bilibili.com:2244/sub') {
+  constructor (roomId) {
     super()
     this.roomId = roomId
     this.encoder = new Encoder()
     this.warpper = new Warpper()
     this.version = 2
+    this.heartbeatTimer = null
+    this.status = 'waitConfig'
+    this.onOpen = this.onOpen.bind(this)
+    this.onMessage = this.onMessage.bind(this)
+    this.onError = this.onError.bind(this)
+    this.onClose = this.onClose.bind(this)
+  }
+
+  connect (roomId, uid = 0, token = null, address = 'ws://broadcastlv.chat.bilibili.com:2244/sub') {
+    if (this.connection != null) {
+      this.connection.removeAllListeners('open')
+      this.connection.removeAllListeners('message')
+      this.connection.removeAllListeners('error')
+      this.connection.removeAllListeners('close')
+      this.connection.on('error', () => {})
+      this.connection.close()
+      this.connection = null
+    }
     this.authInfo = {
       uid,
       roomid: roomId,
@@ -21,25 +39,23 @@ export class RoomConnection extends EventEmitter {
       type: 2,
       key: token
     }
+    this.status = 'connecting'
     this.shouldClose = false
     this.connection = new WebSocket(address)
     this.emit('connecting')
-    this.onOpen = this.onOpen.bind(this)
-    this.onData = this.onMessage.bind(this)
-    this.onError = this.onError.bind(this)
-    this.onClose = this.onClose.bind(this)
     this.listen()
   }
 
   listen () {
     this.connection.on('open', this.onOpen)
     this.connection.on('message', this.onMessage)
-    this.connection.on('open', this.onOpen)
-    this.connection.on('open', this.onOpen)
+    this.connection.on('error', this.onError)
+    this.connection.on('error', this.onClose)
     this.on('authSucceeded', this.onAuthSucceeded)
   }
 
   onOpen () {
+    this.status = 'authing'
     this.connection.send(this.encoder.encode({
       protocolVersion: this.version,
       operation: 7,
@@ -60,6 +76,7 @@ export class RoomConnection extends EventEmitter {
           })
           break
         case 8: // authSuccess
+          this.status = 'connected'
           this.emit('authSuccess')
           break
         case 5: // message
@@ -91,28 +108,21 @@ export class RoomConnection extends EventEmitter {
 
   onClose (code, reason) {
     clearInterval(this.heartbeatTimer)
+    this.status = 'closed'
     this.emit('close', code, reason)
     this.heartbeatTimer = null
+    this.connection.removeAllListeners('open')
+    this.connection.removeAllListeners('message')
+    this.connection.removeAllListeners('error')
+    this.connection.removeAllListeners('close')
+    this.connection.on('error', () => {})
     this.connection = null
     if (!this.shouldClose) {
-      this.emit('needReconnect', this.roomId)
+      setTimeout(() => {
+        this.status = 'waitConfig'
+        this.emit('needReconnect', this.roomId)
+      }, 1000)
     }
-  }
-
-  reconnect (uid = 0, token = null, address = 'ws://broadcastlv.chat.bilibili.com:2244/sub') {
-    this.authInfo = {
-      uid,
-      roomid: this.roomId,
-      protover: 2,
-      platform: 'web',
-      clientver: '1.11.0',
-      type: 2,
-      key: token
-    }
-    this.shouldClose = false
-    this.connection = new WebSocket(address)
-    this.emit('connecting')
-    this.listen()
   }
 
   disconnect () {

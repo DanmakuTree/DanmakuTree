@@ -1,12 +1,13 @@
 import axios from 'axios'
 import crypto from 'crypto'
 import https from 'https'
-import ProgramConsts from '../../Consts'
+import { isDev } from '../../Consts'
 import BiliBiliConsts from './Consts'
 
 export class API {
   constructor () {
     this.accessKey = ''
+    this.uid = 0
     this.buvid = RandomID(64)
     this.axios = axios.create({
       baseURL: 'https://api.live.bilibili.com',
@@ -17,7 +18,7 @@ export class API {
         Buvid: RandomID(37)
         // env: 'prod'
       },
-      httpsAgent: (ProgramConsts.isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
+      httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
     })
     this.loginInfo = null
   }
@@ -306,14 +307,17 @@ export class API {
       platform: BiliBiliConsts.platform,
       player
     }
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
+      Origin: 'https://live.bilibili.com',
+      Referer: 'https://live.bilibili.com'
+    }
+    if (this.loginInfo && this.loginInfo.cookie_info) {
+      headers.Cookie = this.loginInfo.cookie_info.cookies.map((e) => { return e.name_jct + '=' + e.value }).join(';')
+    }
     return (await this.axios.get('/room/v1/Danmu/getConf', {
       params: new URLSearchParams(data),
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
-        Origin: 'https://live.bilibili.com',
-        Referer: 'https://live.bilibili.com',
-        Cookie: this.loginInfo.cookie_info.cookies.map((e) => { return e.name_jct + '=' + e.value }).join(';')
-      }
+      headers
     })).data
   }
 
@@ -392,3 +396,5 @@ function RSAPassword (password, pubkey, hash) {
   const encrypt = crypto.publicEncrypt(padding, Buffer.from(data)).toString('base64')
   return encodeURIComponent(encrypt)
 }
+
+export default new API()

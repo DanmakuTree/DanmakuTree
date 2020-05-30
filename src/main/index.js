@@ -4,6 +4,7 @@ import { configure, getLogger } from 'log4js'
 import { platform } from './Platform'
 import eventBus from './EventBus'
 import { isDev, isDebug, MainWindowPage, MainPreloadScript, CaptchaPreloadScript, ModulePreloadScript } from './Consts'
+import { API } from './Platform/BiliBili/API'
 
 // set app name
 app.name = productName
