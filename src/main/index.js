@@ -1,10 +1,11 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { productName } from '../../package.json'
 import { configure, getLogger } from 'log4js'
-import { platform } from './Platform'
+import { platform, Platform } from './Platform'
 import eventBus from './EventBus'
 import { isDev, isDebug, MainWindowPage, MainPreloadScript, CaptchaPreloadScript, ModulePreloadScript } from './Consts'
 import { API } from './Platform/BiliBili/API'
+import { WebInterface } from './WebInterface'
 
 // set app name
 app.name = productName
@@ -150,6 +151,11 @@ app.on('activate', () => {
   }
 })
 
+var webInterface = new WebInterface()
+
+webInterface.registry('Platform', new Platform())
+
+ipcMain.handle('APICall', webInterface.getHandler())
 /**
  * Auto Updater
  *

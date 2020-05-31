@@ -1,7 +1,8 @@
 import WebSocket from 'ws'
 import { EventEmitter } from 'events'
 import Encoder from './Encoder'
-import eventBus from '../../../../EventBus'
+import Decoder from './Decoder'
+import { eventBus } from '../../../../EventBus'
 import { inflateSync } from 'zlib'
 import { Warpper } from './Warpper'
 
@@ -10,14 +11,20 @@ export class RoomConnection extends EventEmitter {
     super()
     this.roomId = roomId
     this.encoder = new Encoder()
+    this.decoder = new Decoder()
     this.warpper = new Warpper()
     this.version = 2
     this.heartbeatTimer = null
+    this.connection = null
     this.status = 'waitConfig'
     this.onOpen = this.onOpen.bind(this)
     this.onMessage = this.onMessage.bind(this)
     this.onError = this.onError.bind(this)
     this.onClose = this.onClose.bind(this)
+    this.heartbeat = this.heartbeat.bind(this)
+    this.onAuthSucceeded = this.onAuthSucceeded.bind(this)
+    this.send = this.send.bind(this)
+    this.on('authSuccess', this.onAuthSucceeded)
   }
 
   connect (roomId, uid = 0, token = null, address = 'ws://broadcastlv.chat.bilibili.com:2244/sub') {
@@ -50,17 +57,17 @@ export class RoomConnection extends EventEmitter {
     this.connection.on('open', this.onOpen)
     this.connection.on('message', this.onMessage)
     this.connection.on('error', this.onError)
-    this.connection.on('error', this.onClose)
-    this.on('authSucceeded', this.onAuthSucceeded)
+    this.connection.on('close', this.onClose)
   }
 
   onOpen () {
     this.status = 'authing'
-    this.connection.send(this.encoder.encode({
+    this.emit('authing')
+    this.send({
       protocolVersion: this.version,
       operation: 7,
       body: Buffer.isBuffer(this.authInfo) ? this.authInfo : Buffer.from((JSON.stringify(this.authInfo) || ''))
-    }))
+    })
   }
 
   onMessage (data) {
@@ -78,6 +85,7 @@ export class RoomConnection extends EventEmitter {
         case 8: // authSuccess
           this.status = 'connected'
           this.emit('authSuccess')
+
           break
         case 5: // message
           if (packet.protocolVersion === 2) {
@@ -91,7 +99,7 @@ export class RoomConnection extends EventEmitter {
                 eventBus.emit(`Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`, null, transformMessage)
               }
             } catch (error) {
-              this.emit('decodeError', error)
+              this.emit('decodeError', error, packet)
             }
           }
           break
@@ -99,6 +107,7 @@ export class RoomConnection extends EventEmitter {
           this.emit('unknownOperation', packet)
           break
       }
+      data = data.slice(packet.packageLength)
     }
   }
 
@@ -133,7 +142,7 @@ export class RoomConnection extends EventEmitter {
   }
 
   send (packet) {
-    return this.connection.write(this.encoder.encode(packet))
+    return this.connection.send(this.encoder.encode(packet))
   }
 
   /**
@@ -149,7 +158,7 @@ export class RoomConnection extends EventEmitter {
 
   onAuthSucceeded (body) {
     this.heartbeat()
-    this.heartbeatTimer = setInterval(this.heartbeat.bind(this), 30 * 1000)
+    this.heartbeatTimer = setInterval(this.heartbeat, 30 * 1000)
   }
 
   /**

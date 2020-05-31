@@ -1,5 +1,5 @@
 import { WebInterfaceBase } from '../WebInterfaceBase'
-import { BiliBili } from './BiliBili'
+import BiliBili from './BiliBili'
 export class Platform extends WebInterfaceBase {
   constructor () {
     super()

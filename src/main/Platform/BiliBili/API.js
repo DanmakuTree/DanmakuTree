@@ -21,6 +21,7 @@ export class API {
       httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
     })
     this.loginInfo = null
+    this.cookies = null
   }
 
   /**

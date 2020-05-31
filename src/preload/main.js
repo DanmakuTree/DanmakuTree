@@ -9,7 +9,7 @@
         return APIStructure(itemName + '.' + name)
       },
       set: function (obj, prop, value) {
-        return value
+        throw new SyntaxError('You should not set anything.')
       },
       apply: function (target, thisArg, argumentsList) {
         console.log(itemName + ' apply ', thisArg, argumentsList, ipcRenderer)
