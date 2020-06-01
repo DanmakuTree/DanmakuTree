@@ -12,7 +12,7 @@ const { spawn } = require('child_process')
 
 const mainConfig = require('./webpack.main.config')
 const rendererConfig = require('./webpack.renderer.config')
-const workersConfig = require('./webpack.workers.config')
+const preloadConfig = require('./webpack.preload.config')
 
 let electronProcess = null
 let manualRestart = null
@@ -64,7 +64,7 @@ async function restartElectron() {
 }
 
 function startMain() {
-  const webpackSetup = webpack([mainConfig, workersConfig])
+  const webpackSetup = webpack([mainConfig])
 
   webpackSetup.compilers.forEach((compiler) => {
     const { name } = compiler
@@ -109,15 +109,18 @@ function startMain() {
 }
 
 function startRenderer(callback) {
-  const compiler = webpack(rendererConfig)
-  const { name } = compiler
+  const webpackSetup = webpack([rendererConfig,preloadConfig])
 
-  compiler.hooks.afterEmit.tap('afterEmit', () => {
-    console.log(chalk.gray(`\nCompiled ${name} script!`))
-    console.log(chalk.gray(`\nWatching file changes for ${name} script...`))
+  webpackSetup.compilers.forEach((compiler)=>{
+    const { name } = compiler
+
+    compiler.hooks.afterEmit.tap('afterEmit', () => {
+      console.log(chalk.gray(`\nCompiled ${name} script!`))
+      console.log(chalk.gray(`\nWatching file changes for ${name} script...`))
+    })
   })
 
-  const server = new WebpackDevServer(compiler, {
+  const server = new WebpackDevServer(webpackSetup, {
     contentBase: path.join(__dirname, '../'),
     hot: true,
     noInfo: true,

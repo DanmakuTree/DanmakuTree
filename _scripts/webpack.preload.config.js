@@ -11,15 +11,17 @@ const externals = Object.keys(dependencies).concat(Object.keys(devDependencies))
 const isDevMode = process.env.NODE_ENV === 'development'
 
 const config = {
-  name: 'workers',
+  name: 'preload',
   mode: process.env.NODE_ENV,
   devtool: isDevMode ? '#cheap-module-eval-source-map' : false,
   entry: {
-    workerSample: path.join(__dirname, '../src/utilities/workerSample.ts'),
+    main: path.join(__dirname, '../src/preload/main.js'),
+    captcha: path.join(__dirname, '../src/preload/captcha.js'),
+    plugin: path.join(__dirname, '../src/preload/plugin.js')
   },
   output: {
     libraryTarget: 'commonjs2',
-    path: path.join(__dirname, '../dist'),
+    path: path.join(__dirname, '../dist/preload'),
     filename: '[name].js',
   },
   externals: externals,
@@ -53,7 +55,7 @@ const config = {
     },
     extensions: ['.ts', '.js', '.json'],
   },
-  target: 'node',
+  target: 'electron-preload',
 }
 
 /**

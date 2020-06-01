@@ -1,5 +1,11 @@
-import { app, BrowserWindow, Menu } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { productName } from '../../package.json'
+import { configure, getLogger } from 'log4js'
+import { platform, Platform } from './Platform'
+import eventBus from './EventBus'
+import { isDev, isDebug, MainWindowPage, MainPreloadScript, CaptchaPreloadScript, ModulePreloadScript } from './Consts'
+import { API } from './Platform/BiliBili/API'
+import { WebInterface } from './WebInterface'
 
 // set app name
 app.name = productName
@@ -10,9 +16,44 @@ app.allowRendererProcessReuse = true
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = false
 
 const gotTheLock = app.requestSingleInstanceLock()
-const isDev = process.env.NODE_ENV === 'development'
-const isDebug = process.argv.includes('--debug')
 let mainWindow
+
+app.setAppLogsPath()
+
+/**
+ * @type {Logger}
+ */
+var logger
+var logConfig = {
+  appenders: {
+    file: {
+      type: 'dateFile',
+      filename: app.getPath('logs') + '/main',
+      pattern: 'yyyy-MM-dd.log',
+      alwaysIncludePattern: true,
+      layout: {
+        type: 'pattern',
+        pattern: '[%d{hh:mm:ss}][%p][%c] %m'
+      }
+    },
+    console: {
+      type: 'console',
+      layout: {
+        type: 'pattern',
+        pattern: '[%d{hh:mm:ss}]%[[%p]%][%c] %[%m%]'
+      }
+    }
+  },
+  categories: {
+    default: {
+      appenders: [
+        'console',
+        'file'
+      ],
+      level: 'ALL'
+    }
+  }
+}
 
 // only allow single instance of application
 if (!isDev) {
@@ -30,19 +71,20 @@ if (!isDev) {
   }
 } else {
   // process.env.ELECTRON_ENABLE_LOGGING = true
-
   require('electron-debug')({
     showDevTools: false
   })
 }
-
+configure(logConfig)
+logger = getLogger('Main')
 async function installDevTools () {
   try {
     /* eslint-disable */
+    logger.info("Installing Vue-Devtools")
     require('vue-devtools').install()
     /* eslint-enable */
   } catch (err) {
-    console.log(err)
+    logger.error('Install Vue-Devtools fail,', err)
   }
 }
 
@@ -60,20 +102,20 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: false,
       nodeIntegrationInWorker: false,
-      webSecurity: false
+      webSecurity: false,
+      webviewTag: true,
+      preload: MainPreloadScript
     },
+    fullscreenable: false,
+    maximizable: false,
+    resizable: false,
+    frame: false,
     show: false
   })
 
-  // eslint-disable-next-line
-  setMenu()
-
   // load root file/url
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:9080')
-  } else {
-    mainWindow.loadFile(`${__dirname}/index.html`)
-
+  mainWindow.loadURL(MainWindowPage)
+  if (!isDev) {
     global.__static = require('path')
       .join(__dirname, '/static')
       .replace(/\\/g, '\\\\')
@@ -81,12 +123,13 @@ function createWindow () {
 
   // Show when loaded
   mainWindow.on('ready-to-show', () => {
+    logger.info('MainWindow Ready')
     mainWindow.show()
     mainWindow.focus()
   })
 
   mainWindow.on('closed', () => {
-    console.log('\nApplication exiting...')
+    logger.info('Application exiting...')
   })
 }
 
@@ -115,6 +158,11 @@ app.on('activate', () => {
   }
 })
 
+var webInterface = new WebInterface()
+
+webInterface.registry('Platform', new Platform())
+
+ipcMain.handle('APICall', webInterface.getHandler())
 /**
  * Auto Updater
  *
@@ -134,82 +182,3 @@ app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
  */
-
-const sendMenuEvent = async (data) => {
-  mainWindow.webContents.send('change-view', data)
-}
-
-const template = [
-  {
-    label: app.name,
-    submenu: [
-      {
-        label: 'Home',
-        accelerator: 'CommandOrControl+H',
-        click () {
-          sendMenuEvent({ route: '/' })
-        }
-      },
-      { type: 'separator' },
-      { role: 'minimize' },
-      { role: 'togglefullscreen' },
-      { type: 'separator' },
-      { role: 'quit', accelerator: 'Alt+F4' }
-    ]
-  },
-  {
-    role: 'help',
-    submenu: [
-      {
-        label: 'Get Help',
-        role: 'help',
-        accelerator: 'F1',
-        click () {
-          sendMenuEvent({ route: '/help' })
-        }
-      },
-      {
-        label: 'About',
-        role: 'about',
-        accelerator: 'CommandOrControl+A',
-        click () {
-          sendMenuEvent({ route: '/about' })
-        }
-      }
-    ]
-  }
-]
-
-function setMenu () {
-  if (process.platform === 'darwin') {
-    template.unshift({
-      label: app.name,
-      submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'services' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' }
-      ]
-    })
-
-    template.push({
-      role: 'window'
-    })
-
-    template.push({
-      role: 'help'
-    })
-
-    template.push({ role: 'services' })
-  }
-
-  const menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
-}
-
-var platform = require('./Platform')
