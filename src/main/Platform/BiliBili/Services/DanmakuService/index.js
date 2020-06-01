@@ -13,11 +13,13 @@ export class DanmakuService extends WebInterfaceBase {
      */
     this.rooms = []
     this.logger = getLogger('DanmakuService')
-    var methodList = ['connect', 'forceReconnect', 'disconnect', 'onReconnect', 'getRoomList', 'listen', 'unlisten', 'stop']
+    var methodList = ['connect', 'forceReconnect', 'disconnect', 'onReconnect', 'getRoomList', 'listen', 'unlisten', 'stop', 'setReconnectTimer']
     methodList.forEach((e) => {
       this[e] = this[e].bind(this)
     })
     this.available.push('connect', 'forceReconnect', 'disconnect', 'getRoomList')
+    this.reconnectList = []
+    this.reconnectTimer = null
   }
 
   async connect (roomId) {
@@ -28,27 +30,32 @@ export class DanmakuService extends WebInterfaceBase {
     if (this.rooms.find((v) => { return v.roomId === roomId })) {
       throw new Error('Already Connected')
     }
+    var connection = new RoomConnection(roomId)
+    this.listen(connection)
+    this.rooms.push(connection)
     API.getDanmuConf(roomId).then((res) => {
       if (res.code === 0) {
-        var connection = new RoomConnection(roomId)
         var address = `wss://${res.data.host_server_list[0].host}:${res.data.host_server_list[0].wss_port}/sub`
         connection.connect(roomId, API.uid, res.data.token, address)
-        this.listen(connection)
-        this.rooms.push(connection)
       } else {
+        this.reconnectList.push(roomId)
+        this.setReconnectTimer()
         eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, res)
       }
     }).catch((error) => {
+      this.reconnectList.push(roomId)
+      this.setReconnectTimer()
       eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, error)
     })
+    eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
   }
 
   async forceReconnect (roomId) {
-    await this.disconnect(roomId)
+    await this.disconnect(roomId, true)
     return this.connect(roomId)
   }
 
-  async disconnect (roomId) {
+  async disconnect (roomId, force = false) {
     roomId = parseInt(roomId)
     if (roomId < 0 || Number.isNaN(roomId) || !Number.isFinite(roomId)) {
       throw new Error('Bad RoomId')
@@ -58,11 +65,20 @@ export class DanmakuService extends WebInterfaceBase {
       oldConnection.disconnect()
       const index = this.rooms.findIndex((e) => { return e === oldConnection })
       this.rooms.splice(index, 1)
+      this.unlisten(oldConnection)
+      if (!force) {
+        oldConnection.once('close', () => {
+          this.logger.info(`Room ${oldConnection.roomId} close`)
+          eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
+        })
+      }
     }
+    eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
   }
 
   onReconnect (roomId) {
-    // todo
+    this.reconnectList.push(roomId)
+    this.setReconnectTimer()
   }
 
   getRoomList () {
@@ -99,7 +115,41 @@ export class DanmakuService extends WebInterfaceBase {
     connection.on('error', () => {})
   }
 
-  stop () {}
+  setReconnectTimer () {
+    if (this.reconnectTimer === null) {
+      this.reconnectTimer = setInterval(() => {
+        if (this.reconnectList.length > 0) {
+          var target = this.reconnectList.shift()
+          var connection = this.rooms.find((v) => { return v.roomId === target })
+          if (connection != null && connection.status === 'waitConfig' && !connection.shouldClose) {
+            API.getDanmuConf(target).then((res) => {
+              if (res.code === 0) {
+                if (connection.status === 'waitConfig' && !connection.shouldClose) {
+                  var address = `wss://${res.data.host_server_list[0].host}:${res.data.host_server_list[0].wss_port}/sub`
+                  connection.connect(target, API.uid, res.data.token, address)
+                }
+              } else {
+                eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, res)
+                this.reconnectList.push(target)
+              }
+            }).catch((error) => {
+              eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, error)
+            })
+          }
+        } else {
+
+        }
+      }, 1000)
+    }
+  }
+
+  stop () {
+    this.rooms.forEach((e) => {
+      this.disconnect(e.roomId)
+    })
+    clearInterval(this.reconnectTimer)
+    this.reconnectTimer = null
+  }
 }
 
 export default new DanmakuService()

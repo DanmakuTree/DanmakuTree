@@ -127,10 +127,8 @@ export class RoomConnection extends EventEmitter {
     this.connection.on('error', () => {})
     this.connection = null
     if (!this.shouldClose) {
-      setTimeout(() => {
-        this.status = 'waitConfig'
-        this.emit('needReconnect', this.roomId)
-      }, 1000)
+      this.status = 'waitConfig'
+      this.emit('needReconnect', this.roomId)
     }
   }
 

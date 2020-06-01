@@ -20,6 +20,10 @@ let mainWindow
 
 app.setAppLogsPath()
 
+/**
+ * @type {Logger}
+ */
+var logger
 var logConfig = {
   appenders: {
     file: {
@@ -72,14 +76,15 @@ if (!isDev) {
   })
 }
 configure(logConfig)
-
+logger = getLogger('Main')
 async function installDevTools () {
   try {
     /* eslint-disable */
+    logger.info("Installing Vue-Devtools")
     require('vue-devtools').install()
     /* eslint-enable */
   } catch (err) {
-    console.log(err)
+    logger.error('Install Vue-Devtools fail,', err)
   }
 }
 
@@ -101,6 +106,7 @@ function createWindow () {
       webviewTag: true,
       preload: MainPreloadScript
     },
+    fullscreenable: false,
     maximizable: false,
     resizable: false,
     frame: false,
@@ -117,12 +123,13 @@ function createWindow () {
 
   // Show when loaded
   mainWindow.on('ready-to-show', () => {
+    logger.info('MainWindow Ready')
     mainWindow.show()
     mainWindow.focus()
   })
 
   mainWindow.on('closed', () => {
-    console.log('\nApplication exiting...')
+    logger.info('Application exiting...')
   })
 }
 
