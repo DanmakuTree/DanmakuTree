@@ -77,7 +77,7 @@ export class RoomConnection extends EventEmitter {
       const packet = this.decoder.decode(data)
       switch (packet.operation) {
         case 3: // heartbeatReply
-          eventBus.emit(`Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`, null, {
+          eventBus.emit(`Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`, {
             type: 'online',
             data: {
               online: packet.body.readInt32BE(0)
@@ -95,15 +95,15 @@ export class RoomConnection extends EventEmitter {
           } else {
             try {
               var msg = JSON.parse(packet.body.toString())
-              eventBus.emit(`Playform.BiliBIli.Service.DanmakuService.RawMessage.${this.roomId}`, null, {
-                eventName: `Playform.BiliBIli.Service.DanmakuService.RawMessage.${this.roomId}`,
-                data: [msg]
+              eventBus.emit('Playform.BiliBIli.Service.DanmakuService.RawMessage', {
+                roomId: this.roomId,
+                data: msg
               })
               var transformMessage = this.warpper.warp(msg)
               if (transformMessage) {
-                eventBus.emit(`Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`, null, {
-                  eventName: `Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`,
-                  data: [transformMessage]
+                eventBus.emit('Platform.BiliBili.Service.DanmakuService.Message', {
+                  roomId: this.roomId,
+                  data: transformMessage
                 })
               }
             } catch (error) {

@@ -40,12 +40,12 @@ export class DanmakuService extends WebInterfaceBase {
       } else {
         this.reconnectList.push(roomId)
         this.setReconnectTimer()
-        eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, res)
+        eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', res)
       }
     }).catch((error) => {
       this.reconnectList.push(roomId)
       this.setReconnectTimer()
-      eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, error)
+      eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', error)
     })
     eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
   }
@@ -129,11 +129,11 @@ export class DanmakuService extends WebInterfaceBase {
                   connection.connect(target, API.uid, res.data.token, address)
                 }
               } else {
-                eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, res)
+                eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', res)
                 this.reconnectList.push(target)
               }
             }).catch((error) => {
-              eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, error)
+              eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', error)
             })
           }
         } else {
