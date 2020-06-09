@@ -17,7 +17,7 @@ const config = {
   entry: {
     main: path.join(__dirname, '../src/preload/main.js'),
     captcha: path.join(__dirname, '../src/preload/captcha.js'),
-    plugin: path.join(__dirname, '../src/preload/plugin.js')
+    plugin: path.join(__dirname, '../src/preload/module.js')
   },
   output: {
     libraryTarget: 'commonjs2',

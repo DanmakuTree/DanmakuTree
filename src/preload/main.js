@@ -50,5 +50,13 @@ window.API = {
   Platform: APIStructure('Platform'),
   CurrentWindows: new CurrentWindows(),
   Module: APIStructure('Module'),
-  Main: APIStructure('Main')
+  Main: APIStructure('Main'),
+  eventhandler (...args) { console.log(...args) }
 }
+ipcRenderer.on(event, (e) => {
+  try {
+    window.API.eventhandler(e.name, ...e.data)
+  } catch (error) {
+    console.log(error)
+  }
+})
