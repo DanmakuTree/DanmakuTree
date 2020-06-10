@@ -77,10 +77,13 @@ export class RoomConnection extends EventEmitter {
       const packet = this.decoder.decode(data)
       switch (packet.operation) {
         case 3: // heartbeatReply
-          eventBus.emit(`Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`, {
-            type: 'online',
+          eventBus.emit('Platform.BiliBili.Service.DanmakuService.Message', {
+            roomId: this.roomId,
             data: {
-              online: packet.body.readInt32BE(0)
+              type: 'online',
+              data: {
+                online: packet.body.readInt32BE(0)
+              }
             }
           })
           break
@@ -95,7 +98,7 @@ export class RoomConnection extends EventEmitter {
           } else {
             try {
               var msg = JSON.parse(packet.body.toString())
-              eventBus.emit('Playform.BiliBIli.Service.DanmakuService.RawMessage', {
+              eventBus.emit('Platform.BiliBili.Service.DanmakuService.RawMessage', {
                 roomId: this.roomId,
                 data: msg
               })
