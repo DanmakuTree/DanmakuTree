@@ -4,7 +4,7 @@ export function isValidName (name) {
   if (typeof name !== 'string') {
     return false
   }
-  if (name.length <= 3) {
+  if (name.length < 1) {
     return false
   }
   const match = name.match(regexp)

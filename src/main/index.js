@@ -1,11 +1,12 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, webContents } from 'electron'
 import { productName } from '../../package.json'
 import { configure, getLogger } from 'log4js'
-import { platform, Platform } from './Platform'
-import eventBus from './EventBus'
+import { Platform } from './Platform'
+import { eventBus } from './EventBus'
 import { isDev, isDebug, MainWindowPage, MainPreloadScript, CaptchaPreloadScript, ModulePreloadScript } from './Consts'
-import { API } from './Platform/BiliBili/API'
 import { WebInterface } from './WebInterface'
+import { WebInterfaceBase } from './WebInterfaceBase'
+import Services from './Services'
 
 // set app name
 app.name = productName
@@ -16,6 +17,10 @@ app.allowRendererProcessReuse = true
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = false
 
 const gotTheLock = app.requestSingleInstanceLock()
+
+/**
+ * @type {BrowserWindow}
+ */
 let mainWindow
 
 app.setAppLogsPath()
@@ -75,8 +80,10 @@ if (!isDev) {
     showDevTools: false
   })
 }
+
 configure(logConfig)
 logger = getLogger('Main')
+
 async function installDevTools () {
   try {
     /* eslint-disable */
@@ -162,7 +169,21 @@ var webInterface = new WebInterface()
 
 webInterface.registry('Platform', new Platform())
 
+var main = new WebInterfaceBase()
+main.Services = Services
+main.available.push('Services')
+
+webInterface.registry('Main', main)
+
 ipcMain.handle('APICall', webInterface.getHandler())
+
+eventBus.on('ALLPUBLIC', (e) => {
+  try {
+    mainWindow.webContents.send('event', e)
+  } catch (error) {
+    logger.info(`send ${e.name} event fail`, error)
+  }
+})
 /**
  * Auto Updater
  *

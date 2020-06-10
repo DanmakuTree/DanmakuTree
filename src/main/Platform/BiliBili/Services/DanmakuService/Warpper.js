@@ -1,51 +1,59 @@
 
 export const defaultMap = {
   DANMU_CMD (message) {
-    var result = {
-      type: 'message',
-      data: {
-        comment: message.info[1],
-        danmakuSetting: {
-          ka: message.info[0][0],
-          mode: message.info[0][1], // 4:bottom 6:reverse 1:scroll 5:top
-          fontsize: message.info[0][2],
-          color: message.info[0][3],
-          sendTime: message.info[0][4],
-          dmid: message.info[0][5],
-          // [0][6].[0][7],[0][8]
-          type: message.info[0][9],
-          chatBubbleType: message.info[0][10]
-        },
-        userInfo: {
-          uid: message.info[2][0],
-          uname: message.info[2][1],
-          isAdmin: !!message.info[2][2],
-          isVip: !!message.info[2][3],
-          isSvip: !!message.info[2][4],
-          rank: message.info[2][5],
-          verify: !!message.info[2][6],
-          usernameColor: message.info[2][7] || ''
-        },
-        medal: {
-          level: message.info[3][0],
-          label: message.info[3][1] || '--',
-          anchorUsername: message.info[3][2] || '--',
-          shortRoomID: message.info[3][3], // not right
-          unknown: message.info[3][4] || null, // in official code......
-          special: message.info[3][5] || ''
-        },
-        linkLevel: {
-          level: message.info[4][0],
-          // [4][1] [4][2]
-          rank: message.info[4][3]
-        },
-        title: message.info[5],
-        guardLevel: message.info[7],
-        validation: {
-          ts: message.info[9].ts || 0,
-          ct: message.info[9].ct || ''
-        }
+    var result = { type: 'message', data: {} }
+    result.data.comment = message.info[1]
+    result.data.user = {
+      uid: message.info[2][0],
+      username: message.info[2][1],
+      isAdmin: !!message.info[2][2],
+      platformVIPLevel: (message.info[2][4]) ? 2 : ((message.info[2][3]) ? 1 : 0),
+      userLevel: message.info[4][0] || 0,
+      roomVIPLevel: message.info[7],
+      medal: {
+        level: 0,
+        label: '',
+        anchorUsername: '',
+        roomId: 0
+      },
+      title: message.info[5]
+    }
+    result.data.validation = {
+      ts: message.info[9].ts || 0,
+      ct: message.info[9].ct || ''
+    }
+    if (message[3] && message[3].length > 0) {
+      result.data.user.medal = {
+        level: message.info[3][0] || 0,
+        label: message.info[3][1] || '',
+        anchorUsername: message.info[3][2] || '',
+        roomId: message.info[3][3]
       }
+    }
+    return result
+  },
+  SEND_GIFT (message) {
+    var result = { type: 'gift', data: {} }
+    result.data.gift = {
+      giftId: message.data.giftId,
+      giftName: message.data.giftName,
+      coinType: message.data.coin_type,
+      num: message.data.num,
+      price: message.data.price
+    }
+    result.data.user = {
+      uid: message.data.uid,
+      username: message.data.uname,
+      face: message.data.face
+    }
+    return result
+  },
+  WELCOME (message) {
+    var result = { type: 'platformVIPwelcome', data: {} }
+    result.data.user = {
+      uid: message.data.uid,
+      username: message.data.uname,
+      platformVIPLevel: (message.data.svip ? 2 : (message.data.vip ? 1 : 0))
     }
     return result
   }
@@ -57,11 +65,12 @@ export class Warpper {
 
   warp (message) {
     try {
-      if (message.cmd && this.map[message.cmd]) {
-        const type = typeof this.map[message.cmd]
+      const cmd = message.cmd.split(':')[0]
+      if (cmd && this.map[cmd]) {
+        const type = typeof this.map[cmd]
         switch (type) {
           case 'function':
-            return this.map[message.cmd](message)
+            return this.map[cmd](message)
           default:
             break
         }

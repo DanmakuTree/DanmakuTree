@@ -4,6 +4,9 @@ import API from '../../API'
 import { eventBus } from '../../../../EventBus'
 import { getLogger } from 'log4js'
 
+eventBus.registerPublicEvent('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
+eventBus.registerPublicEvent('`Platform.BiliBili.Service.DanmakuService.Message.*')
+eventBus.registerPublicEvent('`Platform.BiliBili.Service.DanmakuService.RawMessage.*')
 export class DanmakuService extends WebInterfaceBase {
   constructor () {
     super()
@@ -40,12 +43,12 @@ export class DanmakuService extends WebInterfaceBase {
       } else {
         this.reconnectList.push(roomId)
         this.setReconnectTimer()
-        eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, res)
+        eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', res)
       }
     }).catch((error) => {
       this.reconnectList.push(roomId)
       this.setReconnectTimer()
-      eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, error)
+      eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', error)
     })
     eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
   }
@@ -129,11 +132,11 @@ export class DanmakuService extends WebInterfaceBase {
                   connection.connect(target, API.uid, res.data.token, address)
                 }
               } else {
-                eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, res)
+                eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', 'fail to getConfig', res)
                 this.reconnectList.push(target)
               }
             }).catch((error) => {
-              eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', null, error)
+              eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.error', 'fail to getConfig', error)
             })
           }
         } else {

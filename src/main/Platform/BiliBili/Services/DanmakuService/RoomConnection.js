@@ -28,13 +28,15 @@ export class RoomConnection extends EventEmitter {
   }
 
   connect (roomId, uid = 0, token = null, address = 'ws://broadcastlv.chat.bilibili.com:2244/sub') {
-    if (this.connection != null) {
+    if (this.connection !== null) {
       this.connection.removeAllListeners('open')
       this.connection.removeAllListeners('message')
       this.connection.removeAllListeners('error')
       this.connection.removeAllListeners('close')
       this.connection.on('error', () => {})
       this.connection.close()
+      this.clearInterval(this.heartbeatTimer)
+      this.heartbeatTimer = null
       this.connection = null
     }
     this.authInfo = {
@@ -75,7 +77,7 @@ export class RoomConnection extends EventEmitter {
       const packet = this.decoder.decode(data)
       switch (packet.operation) {
         case 3: // heartbeatReply
-          eventBus.emit(`Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`, null, {
+          eventBus.emit(`Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`, {
             type: 'online',
             data: {
               online: packet.body.readInt32BE(0)
@@ -93,10 +95,16 @@ export class RoomConnection extends EventEmitter {
           } else {
             try {
               var msg = JSON.parse(packet.body.toString())
-              eventBus.emit(`Playform.BiliBIli.Service.DanmakuService.RawMessage.${this.roomId}`)
+              eventBus.emit('Playform.BiliBIli.Service.DanmakuService.RawMessage', {
+                roomId: this.roomId,
+                data: msg
+              })
               var transformMessage = this.warpper.warp(msg)
               if (transformMessage) {
-                eventBus.emit(`Platform.BiliBili.Service.DanmakuService.Message.${this.roomId}`, null, transformMessage)
+                eventBus.emit('Platform.BiliBili.Service.DanmakuService.Message', {
+                  roomId: this.roomId,
+                  data: transformMessage
+                })
               }
             } catch (error) {
               this.emit('decodeError', error, packet)
