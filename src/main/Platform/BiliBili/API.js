@@ -4,43 +4,45 @@ import https from 'https'
 import { isDev } from '../../Consts'
 import BiliBiliConsts from './Consts'
 import { WebInterfaceBase } from '../../WebInterfaceBase'
-
+// import { promises as fspromise } from 'fs'
+// const readFile = fspromise.readFile
+// const writeFile = fspromise.writeFile
 export class API extends WebInterfaceBase {
   constructor () {
     super()
-    this.version = '0.0.2'
+    this.version = '0.9.0'
     this.accessKey = ''
     this.uid = 0
     this.bili_jct = ''
-    this.buvid = RandomID(64)
-    this.mobileAxios = axios.create({
-      baseURL: 'https://api.live.bilibili.com',
-      timeout: 5000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 BiliLiveDroid/2.0.0 bililive',
-        // 'APP-KEY': 'android',
-        'Buvid': RandomID(37)
-        // env: 'prod'
-      },
-      httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
-    })
-    this.webAxios = axios.create({
-      baseURL: 'https://api.live.bilibili.com',
-      timeout: 5000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
-        'Origin': 'https://live.bilibili.com',
-        'Referer': 'https://live.bilibili.com'
-      },
-      httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
-    })
-    this.loginInfo = null
     this.cookies = null
-    const methodList = ['getLoginKey', 'setCookies', 'mobilelogin', 'getUserLiveInfo', 'getAreaList', 'getMyChooseArea', 'getCoverList', 'setCover', 'getLiverCustomTags', 'setLiverCustomTags', 'updateRoomInfo', 'setRoomTitle', 'setRoomArea', 'startLive', 'stopLive', 'getRoomVoiceJoinAbility', 'setRoomVoiceJoinSwitch', 'getVoiceJoinConfig', 'setVoiceJoinConfig', 'getVoiceJoinWaitList', 'pickVoiceJoinUser', 'rejectVoiceJoinUser', 'searchVoiceJoinUser', 'stopVoiceJoin', 'getDanmuConf', 'getRtmpStream']
+    this.buvid = RandomID(64)
+    this.mobileAxios = createMobileAxios()
+    this.webAxios = createWebAxios()
+    /**
+     * @type {'NONE'|'WEB'|'MOBILE'}
+     */
+    this.loginType = 'NONE' // "WEB" "MOBILE"
+    const methodList = [
+      'getLoginKey', 'setCookies', 'mobilelogin', 'getUserLiveInfo', 'getUserLiveInfo1', 'saveLoginInfo',
+      'getAreaList', 'getMyChooseArea', 'getCoverList', 'setCover', 'getTitleList', 'getMyInfo', 'getReleation',
+      'getLiverCustomTags', 'setLiverCustomTags', 'updateRoomInfo', 'getUserInfoNav', 'getFollowingList', 'getFollowersList',
+      'setRoomTitle', 'setRoomArea', 'startLive', 'stopLive', 'getUserCard', 'getUserLiveCard', 'getInfoByRoom', 'getRoomInfoByUid',
+      'getDanmuConf', 'getRtmpStream', 'getInfoByUser', 'getRoomGiftList', 'getGiftConfig', 'getWebServerRank',
+      'getWebGuardRank', 'getWebMedalRank', 'getRoomInfo', 'getRoomAdminByRoom', 'getRoomAdminByAnchor', 'sendRoomMessage', 'blockRoomUser',
+      'removeRoomBlockUserByUid', 'getRoomAdminByUid', 'getBlockUserListBySearch', 'addRoomAdmin', 'removeRoomAdmin']
     methodList.forEach((e) => {
       this[e] = this[e].bind(this)
       this.available.push(e)
     })
+    // readFile('./login.json', { encoding: 'utf-8' }).then((e) => {
+    //   e = JSON.parse(e)
+    //   this.accessKey = e.accessKey
+    //   this.uid = e.uid
+    //   this.bili_jct = e.bili_jct
+    //   this.cookies = e.cookies
+    //   this.loginType = e.loginType
+    //   this.webAxios = createWebAxios(this.cookies)
+    // }).catch((e) => { console.log(e) })
   }
 
   /**
@@ -76,24 +78,15 @@ export class API extends WebInterfaceBase {
     const loginRes = (await this.mobileAxios.post('https://passport.bilibili.com/api/v3/oauth2/login',
       sign(data, BiliBiliConsts.loginAppKey, BiliBiliConsts.loginSecretkey, BiliBiliConsts.platform))).data
     if (loginRes.code === 0) {
-      this.loginInfo = loginRes.data
       this.accessKey = loginRes.data.token_info.access_token
-      this.cookies = this.loginInfo.cookie_info.cookies.map((e) => { return e.name_jct + '=' + e.value }).join(';')
-      this.bili_jct = this.loginInfo.cookie_info.cookies.find((v) => { return v.name === 'bili_jct' }).value
-      this.uid = this.loginInfo.token_info.mid
-      this.webAxios = axios.create({
-        baseURL: 'https://api.live.bilibili.com',
-        timeout: 5000,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
-          'Origin': 'https://live.bilibili.com',
-          'Referer': 'https://live.bilibili.com',
-          'cookie': this.cookies
-        },
-        httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
-      })
+      this.cookies = loginRes.data.cookie_info.cookies.map((e) => { return e.name + '=' + e.value }).join(';')
+      this.bili_jct = loginRes.data.cookie_info.cookies.find((v) => { return v.name === 'bili_jct' }).value
+      this.uid = loginRes.data.token_info.mid
+      this.webAxios = createWebAxios(this.cookies)
+      this.loginType = 'MOBILE'
       loginRes.data = {}
     }
+    this.saveLoginInfo()
     return loginRes
   }
 
@@ -102,49 +95,41 @@ export class API extends WebInterfaceBase {
    * @param {String} cookies cookies
    */
   async setCookies (cookies) {
-    this.loginInfo = null // 清除移动登录信息，避免交叉
-    this.cookies = cookies
-    this.webAxios = axios.create({
-      baseURL: 'https://api.live.bilibili.com',
-      timeout: 5000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
-        'Origin': 'https://live.bilibili.com',
-        'Referer': 'https://live.bilibili.com',
-        'cookie': this.cookies
-      },
-      httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
-    })
+    this.cookies = cookies.map((e) => { return e.name_jct + '=' + e.value }).join(';')
+    this.uid = cookies.find((v) => { return v.name === 'DedeUserID' }).value
+    this.webAxios = createWebAxios(cookies)
+    this.loginType = 'WEB'
+    this.saveLoginInfo()
     return true
   }
 
   /**
-   * 获取用户直播信息
+   * 获取自己直播信息
    * app端口 Web兼容
    */
   async getUserLiveInfo () {
-    if (this.cookies === null) {
+    if (this.loginType === 'NONE') {
       return { code: -101, message: '账号未登录', ttl: 1 }
     }
-    if (this.loginInfo) {
+    if (this.loginType === 'MOBILE') {
       const data = {
         access_key: this.accessKey,
-        uId: this.loginInfo.token_info.mid
+        uId: this.uid
       }
       return (await this.mobileAxios.get('/xlive/app-blink/v1/room/GetInfo', {
         params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
       })).data
     } else {
-      return (await this.webAxios.get('/xlive/app-blink/v1/room/GetInfo'), {
-        param: {
+      return (await this.webAxios.get('/xlive/app-blink/v1/room/GetInfo', {
+        params: {
           platform: 'pc'
         }
-      }).data
+      })).data
     }
   }
 
   /**
-   * 获取用户直播信息
+   * 获取自己直播信息(User Only)
    * web接口
    */
   async getUserLiveInfo1 () {
@@ -152,11 +137,122 @@ export class API extends WebInterfaceBase {
   }
 
   /**
-   * 获取用户信息
+   * 获取自己用户信息
    * web接口，主站接口
    */
   async getUserInfoNav () {
-    return (await this.webAxios.get('https://api.bilibili.com/x/web-interface/nav')).data
+    return (await this.webAxios.get('https://api.bilibili.com/x/web-interface/nav', {
+      headers: {
+        'Origin': 'https://www.bilibili.com',
+        'Referer': 'https://www.bilibili.com'
+      }
+    })).data
+  }
+
+  /**
+   * 获取自己用户信息
+   * web接口，主站接口
+   */
+  async getMyInfo () {
+    return (await this.webAxios.get('https://api.bilibili.com/x/space/myinfo', {
+      headers: {
+        'Origin': 'https://space.bilibili.com',
+        'Referer': 'https://space.bilibili.com'
+      }
+    })).data
+  }
+
+  /**
+   * 获取双方关系
+   * @param {Number} userId 对方uid
+   */
+  async getReleation (userId) {
+    return (await this.webAxios.get('https://api.bilibili.com/x/space/acc/relation', {
+      headers: {
+        'Origin': 'https://space.bilibili.com',
+        'Referer': 'https://space.bilibili.com/' + userId
+      },
+      params: {
+        mid: userId
+      }
+    })).data
+  }
+
+  /**
+   * 拉取关注列表
+   * @param {Number} userId 用户UID
+   * @param {Number} pageNumber 页数
+   * @param {Number} pageSize 单页数量
+   * @param {String} order 顺序
+   */
+  async getFollowingList (userId, pageNumber = 1, pageSize = 20, order = 'desc') {
+    return (await this.webAxios.get('https://api.bilibili.com/x/relation/followings', {
+      headers: {
+        'Origin': 'https://space.bilibili.com',
+        'Referer': 'https://space.bilibili.com/' + userId
+      },
+      params: {
+        vmid: userId,
+        pn: pageNumber,
+        ps: pageSize,
+        order: order
+      }
+    })).data
+  }
+
+  /**
+   * 拉取粉丝列表
+   * @param {Number} userId 用户UID
+   * @param {Number} pageNumber 页数
+   * @param {Number} pageSize 单页数量
+   * @param {String} order 顺序
+   */
+  async getFollowersList (userId, pageNumber = 1, pageSize = 20, order = 'desc') {
+    return (await this.webAxios.get('https://api.bilibili.com/x/relation/followers', {
+      headers: {
+        'Origin': 'https://space.bilibili.com',
+        'Referer': 'https://space.bilibili.com/' + userId
+      },
+      params: {
+        vmid: userId,
+        pn: pageNumber,
+        ps: pageSize,
+        order: order
+      }
+    })).data
+  }
+
+  /**
+   * 拉取用户卡片
+   * @param {Number} userId UID
+   * @param {Number} photo 是否拉取头图
+   */
+  async getUserCard (userId, photo = 1) {
+    return (await this.webAxios.get('https://api.bilibili.com/x/web-interface/card', {
+      headers: {
+        'Origin': 'https://t.bilibili.com',
+        'Referer': 'https://t.bilibili.com/'
+      },
+      params: {
+        mid: userId,
+        photo
+      }
+    })).data
+  }
+
+  /**
+   * 获取用户直播卡片
+   * app接口,web用
+   * @param {Number} uid 对方uid
+   * @param {Number} anchorUid 主播uid
+   */
+  async getUserLiveCard (uid, anchorUid = this.uid) {
+    return (await this.webAxios.get('/xlive/app-room/v1/card/card_user', {
+      params: {
+        ruid: anchorUid,
+        uid
+      }
+    })).data
   }
 
   /**
@@ -181,12 +277,133 @@ export class API extends WebInterfaceBase {
   }
 
   /**
+   * 根据房间号获取信息(大杂烩)
+   * web接口
+   * @param {Number} roomId 房间号
+   */
+  async getInfoByRoom (roomId) {
+    return (await this.webAxios.get('/xlive/web-room/v1/index/getInfoByRoom', {
+      params: {
+        'room_id': roomId
+      }
+    })).data
+  }
+
+  /**
+   * 获取用户在房间的信息(大杂烩)
+   * web接口
+   * @param {Number} roomId 房间号
+   */
+  async getInfoByUser (roomId) {
+    return (await this.webAxios.get('/xlive/web-room/v1/index/getInfoByUser', {
+      params: {
+        'room_id': roomId
+      }
+    })).data
+  }
+
+  /**
+   * 获取房间礼物列表(能送出)
+   * @param {Number} roomId 房间号
+   * @param {Number} areaId 分区号
+   * @param {Number} areaParentId 大分区号
+   * @param {String} platform 平台
+   */
+  async getRoomGiftList (roomId, areaId, areaParentId, platform = 'pc') {
+    return (await this.webAxios.get('/gift/v3/live/room_gift_list', {
+      params: {
+        'roomid': roomId,
+        'area_v2_id': areaId,
+        'area_v2_parent_id': areaParentId,
+        platform
+      }
+    })).data
+  }
+
+  /**
+   * 获取礼物设置
+   * @param {Number} roomId 房间号（目前没啥用）
+   * @param {String} platform 平台
+   */
+  async getGiftConfig (roomId = 1, platform = 'pc') {
+    return (await this.webAxios.get('/gift/v4/Live/giftConfig', {
+      params: {
+        roomid: roomId,
+        platform
+      }
+    })).data
+  }
+
+  /**
+   * 拉取房间信息
+   * web接口
+   * @param {Number} roomId 房间号
+   */
+  async getRoomInfoByUid (userId) {
+    return (await this.webAxios.get('/room/v1/Room/getRoomInfoOld', {
+      headers: {
+        'Origin': 'https://space.bilibili.com',
+        'Referer': 'https://space.bilibili.com/' + userId
+      },
+      params: {
+        mid: userId
+      }
+    })).data
+  }
+
+  /**
+   * 拉取网页七日榜
+   * @param {Number} roomid 房间号
+   * @param {Number} anchorUid 主播UID
+   */
+  async getWebServerRank (roomid, anchorUid) {
+    return (await this.webAxios.get('/rankdb/v1/RoomRank/webSevenRank', {
+      params: {
+        roomid: roomid,
+        ruid: anchorUid
+      }
+    })).data
+  }
+
+  /**
+   * 拉取舰队列表
+   * @param {Number} roomId 房间号
+   * @param {Number} anchorUid 主播uid
+   * @param {Number} page 页数
+   * @param {Numbe} page_size 页数
+   */
+  async getWebGuardRank (roomId, anchorUid, page = 1, page_size = 29) {
+    return (await this.webAxios.get('/xlive/app-room/v1/guardTab/topList', {
+      params: {
+        roomid: roomId,
+        ruid: anchorUid,
+        page,
+        page_size
+      }
+    })).data
+  }
+
+  /**
+   * 拉取粉丝榜
+   * @param {Number} roomId 房间号
+   * @param {Number} anchorUid 主播UID
+   */
+  async getWebMedalRank (roomId, anchorUid) {
+    return (await this.webAxios.get('/rankdb/v1/RoomRank/webMedalRank', {
+      params: {
+        roomid: roomId,
+        ruid: anchorUid
+      }
+    })).data
+  }
+
+  /**
    * 拉取分区列表
    * 双端接口
    * @param {Number} showPinyin 显示拼音(app未测支持情况)
    */
   async getAreaList (showPinyin = 1) {
-    if (this.loginInfo) {
+    if (this.loginType === 'MOBILE') {
       const data = {
         access_key: this.accessKey
       }
@@ -194,11 +411,11 @@ export class API extends WebInterfaceBase {
         params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
       })).data
     } else {
-      return (await this.webAxios.get('/room/v1/Area/getList'), {
+      return (await this.webAxios.get('/room/v1/Area/getList', {
         params: {
           'show_pinyin': showPinyin
         }
-      }).data
+      })).data
     }
   }
 
@@ -208,7 +425,7 @@ export class API extends WebInterfaceBase {
    * @param {Number} roomId 房间号
    */
   async getMyChooseArea (roomId) {
-    if (this.loginInfo) {
+    if (this.loginType === 'MOBILE') {
       const data = {
         access_key: this.accessKey,
         roomid: roomId
@@ -228,7 +445,7 @@ export class API extends WebInterfaceBase {
    * @param {String}
    */
   async getCoverList (roomId, type = 'all_cover') {
-    if (this.loginInfo) {
+    if (this.loginType === 'MOBILE') {
       const data = {
         'access_key': this.accessKey,
         'room_id': roomId
@@ -242,7 +459,7 @@ export class API extends WebInterfaceBase {
           'room_id': roomId,
           'type': type
         }
-      }))
+      })).data
     }
   }
 
@@ -253,12 +470,17 @@ export class API extends WebInterfaceBase {
    */
   async setCover (roomId, picId) {
     const data = {
-      access_key: this.accessKey,
       room_id: roomId,
       pic_id: picId
     }
-    return (await this.mobileAxios.post('/room/v1/Cover/update',
-      sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform))).data
+    if (this.loginType === 'MOBILE') {
+      data.access_key = this.accessKey
+      return (await this.mobileAxios.post('/room/v1/Cover/update',
+        sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform))).data
+    } else {
+      data.csrf_token = this.bili_jct
+      return (await this.webAxios.post('/room/v1/Cover/update', new URLSearchParams(data))).data
+    }
   }
 
   /**
@@ -268,43 +490,62 @@ export class API extends WebInterfaceBase {
    */
   async getLiverCustomTags (areaId, parentAreaId) {
     const data = {
-      access_key: this.accessKey,
       area_id: areaId,
       parent_area_id: parentAreaId
     }
-    return (await this.mobileAxios.get('/room/v3/Area/getLiverCustomTags', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
+    if (this.loginType === 'MOBILE') {
+      data.access_key = this.accessKey
+      return (await this.mobileAxios.get('/room/v3/Area/getLiverCustomTags', {
+        params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
+      })).data
+    } else {
+      return (await this.webAxios.get('/room/v3/Area/getLiverCustomTags', {
+        params: data
+      })).data
+    }
   }
 
   /**
-   * 设置房间分区自定义标签
+   * 设置房间分区自定义标签 开播之后调用
+   * app端接口 web端有效
    * @param {Number} roomId 房间号
    * @param {Number} tagId tagId
    */
   async setLiverCustomTags (roomId, tagId) {
     const data = {
-      access_key: this.accessKey,
       room_id: roomId,
       tag_id: tagId
     }
-    return (await this.mobileAxios.get('/room/v3/Area/setLiverCustomTag', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
+    if (this.loginType === 'MOBILE') {
+      data.access_key = this.accessKey
+      return (await this.mobileAxios.get('/room/v3/Area/setLiverCustomTag', {
+        params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
+      })).data
+    } else {
+      data.csrf_token = this.bili_jct
+      return (await this.webAxios.post('/room/v3/Area/setLiverCustomTag', new URLSearchParams(data))).data
+    }
   }
 
   /**
    * 更新房间信息
+   * 双端接口
    * @param {object} data 数据
    */
   async updateRoomInfo (data) {
-    data.access_key = this.accessKey
-    return (await this.mobileAxios.post('/room/v1/Room/update', sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    )).data
+    if (this.loginType === 'MOBILE') {
+      data.access_key = this.accessKey
+      return (await this.mobileAxios.post('/room/v1/Room/update', sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
+      )).data
+    } else {
+      data.csrf_token = this.bili_jct
+      return (await this.webAxios.post('/room/v1/Room/update', new URLSearchParams(data))).data
+    }
   }
 
   /**
    * 设置房间标题
+   * based on updateRoomInfo
    * @param {Number} roomId 房间号
    * @param {String} title 房间标题
    */
@@ -317,6 +558,7 @@ export class API extends WebInterfaceBase {
 
   /**
    * 设置房间分区
+   * based on updateRoomInfo
    * @param {Number} roomId 房间号
    * @param {Number} parentAreaId 大分区ID
    * @param {Number} areaId 分区ID
@@ -337,13 +579,19 @@ export class API extends WebInterfaceBase {
    */
   async startLive (roomId, areaId, type = 2) {
     const data = {
-      access_key: this.accessKey,
       area_v2: areaId,
       room_id: roomId,
-      build: 4700011,
       type
     }
-    return (await this.mobileAxios.post('/room/v1/Room/startLive', sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform))).data
+    if (this.loginType === 'MOBILE') {
+      data.access_key = this.accessKey
+      this.build = 4700011
+      return (await this.mobileAxios.post('/room/v1/Room/startLive', sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform))).data
+    } else {
+      data.platform = 'pc'
+      data.csrf_token = this.bili_jct
+      return (await this.webAxios.post('/room/v1/Room/startLive', new URLSearchParams(data))).data
+    }
   }
 
   /**
@@ -352,157 +600,15 @@ export class API extends WebInterfaceBase {
    */
   async stopLive (roomId) {
     const data = {
-      access_key: this.accessKey,
       room_id: roomId
     }
-    return (await this.mobileAxios.post('/room/v1/Room/stopLive', sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform))).data
-  }
-
-  /**
-   * 获取语音连麦能力
-   * @param {Number} roomId 房间号
-   */
-  async getRoomVoiceJoinAbility (roomId) {
-    const data = {
-      access_key: this.accessKey,
-      room_id: roomId
+    if (this.loginType === 'MOBILE') {
+      data.access_key = this.accessKey
+      return (await this.mobileAxios.post('/room/v1/Room/stopLive', sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform))).data
+    } else {
+      data.csrf_token = this.bili_jct
+      return (await this.webAxios.post('/room/v1/Room/stopLive', new URLSearchParams(data))).data
     }
-    return (await this.mobileAxios.get('/av/v1/VoiceJoinAnchor/RoomCan', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
-  }
-
-  /**
-   * 设置语音连麦开关
-   * @param {Number} roomId 房间号
-   * @param {number|boolean} status 开关
-   */
-  async setRoomVoiceJoinSwitch (roomId, status) {
-    const data = {
-      access_key: this.accessKey,
-      room_id: roomId,
-      status: typeof status === 'number' ? status : (status ? 1 : 2)
-    }
-    return (await this.mobileAxios.get('/av/v1/VoiceJoinAnchor/RoomSwitch', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
-  }
-
-  /**
-   * 获取语音连麦设置
-   * @param {Number} roomId 房间号
-   */
-  async getVoiceJoinConfig (roomId) {
-    const data = {
-      access_key: this.accessKey,
-      room_id: roomId
-    }
-    return (await this.mobileAxios.get('/av/v1/VoiceJoinAnchor/getConfig', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
-  }
-
-  /**
-   * 设置语音连麦
-   * @param {Number} roomId 房间号
-   * @param {Number} type 限制类型
-   * @param {Number} guard 舰长等级
-   * @param {Number} medalStart 粉丝勋章等级
-   * @param {Number[]} users 用户列表
-   */
-  async setVoiceJoinConfig (roomId, type, guard, medalStart, users = []) {
-    const data = {
-      access_key: this.accessKey,
-      room_id: roomId,
-      type,
-      guard,
-      medal_start: medalStart,
-      users: users.concat(',')
-    }
-    return (await this.mobileAxios.post('/av/v1/VoiceJoinAnchor/setConfig',
-      sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform))).data
-  }
-
-  /**
-   * 获取语音连麦等候列表
-   * @param {Number} roomId 房间号
-   */
-  async getVoiceJoinWaitList (roomId) {
-    const data = {
-      access_key: this.accessKey,
-      room_id: roomId
-    }
-    return (await this.mobileAxios.get('/av/v1/VoiceJoinAnchor/Lists', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
-  }
-
-  /**
-   * 选择语音连麦用户
-   * @param {Number} roomId 房间号
-   * @param {Number} uid UID
-   */
-  async pickVoiceJoinUser (roomId, uid) {
-    const data = {
-      access_key: this.accessKey,
-      room_id: roomId,
-      uid
-    }
-    return (await this.mobileAxios.get('/av/v1/VoiceJoinAnchor/PickUser', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
-  }
-
-  /**
-   * 拒绝或并封禁用户
-   * @param {*} roomId 房间号
-   * @param {*} uid UID
-   * @param {1|2} type 类型type=2 只拒绝， type=1 拒绝并封禁24小时，期间无法连麦
-   * @param {Number} category 未知,默认1
-   */
-  async rejectVoiceJoinUser (roomId, uid, type = 2, category = 1) {
-    const data = {
-      access_key: this.accessKey,
-      room_id: roomId,
-      uid,
-      type,
-      category
-    }
-    return (await this.mobileAxios.get('/av/v1/VoiceJoinAnchor/Reject', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    }))
-  }
-
-  /**
-   * 搜索语音连麦用户
-   * @param {Number} searchUid 搜索用户UID
-   * @param {Number} AnchorUid 主播UID
-   */
-  async searchVoiceJoinUser (searchUid, AnchorUid) {
-    const data = {
-      access_key: this.accessKey,
-      anchor_id: AnchorUid,
-      uid: searchUid
-    }
-    return (await this.mobileAxios.get('/av/v1/VoiceJoinAnchor/SearchUser', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
-  }
-
-  /**
-   * 停止与观众连麦
-   * @param {Number} roomId 房间号
-   * @param {String} voiceChannel 连麦频道
-   */
-  async stopVoiceJoin (roomId, voiceChannel) {
-    const data = {
-      access_key: this.accessKey,
-      room_id: roomId,
-      voice_channel: voiceChannel
-    }
-    return (await this.mobileAxios.get('/av/v1/VoiceJoinAnchor/Stop', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
-    })).data
   }
 
   /**
@@ -518,13 +624,8 @@ export class API extends WebInterfaceBase {
       platform: BiliBiliConsts.platform,
       player
     }
-    const headers = {}
-    if (this.loginInfo && this.loginInfo.cookie_info) {
-      headers.Cookie = this.loginInfo.cookie_info.cookies.map((e) => { return e.name_jct + '=' + e.value }).join(';')
-    }
     return (await this.webAxios.get('/room/v1/Danmu/getConf', {
-      params: new URLSearchParams(data),
-      headers
+      params: new URLSearchParams(data)
     })).data
   }
 
@@ -534,12 +635,163 @@ export class API extends WebInterfaceBase {
    */
   async getRtmpStream (roomId) {
     const data = {
-      access_key: this.accessKey,
       room_id: roomId
     }
-    return (await this.mobileAxios.get('/live_stream/v1/StreamList/get_stream_by_roomId', {
-      params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
+    if (this.loginType === 'MOBILE') {
+      data.access_key = this.accessKey
+      return (await this.mobileAxios.get('/live_stream/v1/StreamList/get_stream_by_roomId', {
+        params: sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform)
+      })).data
+    } else {
+      return (await this.webAxios.get('/live_stream/v1/StreamList/get_stream_by_roomId', {
+        params: data
+      })).data
+    }
+  }
+
+  /**
+   * 通过房间拉取房管列表
+   * @param {Number} roomId 房间号
+   * @param {Number} page 页码
+   * @param {Number} pageSize 单页大小
+   */
+  async getRoomAdminByRoom (roomId, page = 1, pageSize = 100) {
+    return (await this.webAxios.get('/xlive/web-room/v1/roomAdmin/get_by_room', {
+      params: {
+        roomid: roomId,
+        page,
+        pageSize
+      }
     })).data
+  }
+
+  /**
+   * 通过主播Uid拉取房管列表
+   * @param {Number} roomId 房间号
+   * @param {Number} page 页码
+   */
+  async getRoomAdminByAnchor (anchorId, page = 1) {
+    return (await this.webAxios.get('/live_user/v1/RoomAdmin/get_by_anchor', {
+      params: {
+        anchor_id: anchorId,
+        page: page
+      }
+    })).data
+  }
+
+  /**
+   * 发送弹幕
+   * @param {Number} roomId 房间号
+   * @param {String} msg 弹幕
+   * @param {Number} color 颜色（疑似无效
+   * @param {Number} mode 模式（疑似无效
+   */
+  async sendRoomMessage (roomId, msg = '', color = 0xffffff, mode = 1) {
+    return this.webAxios.post('https://api.live.bilibili.com/msg/send', new URLSearchParams({
+      'color': Number(Number(color).toString(10)),
+      'fontsize': 25,
+      mode,
+      msg,
+      'rnd': Math.floor(new Date().getTime() / 1000),
+      'roomid': roomId,
+      'bubble': 0,
+      'csrf_token': this.bili_jct,
+      'csrf': this.bili_jct
+    })).data
+  }
+
+  /**
+   * 封禁用户
+   * app端接口强行web用
+   * @param {Number} roomId 房间号
+   * @param {Number} userId 用户UID
+   * @param {Number} hour 封禁时间
+   * @param {String} msg 封禁消息（app端有存
+   * @param {Number} msg_time 消息发送时间（app端有存
+   */
+  async blockRoomUser (roomId, userId, hour = 720, msg = '', msg_time = 0) {
+    return (await this.webAxios.post('/banned_service/v1/Silent/room_block_user', new URLSearchParams({
+      'roomid': roomId,
+      'type': 1,
+      'content': userId,
+      hour,
+      msg,
+      msg_time,
+      'csrf_token': this.bili_jct
+    }))).data
+  }
+
+  /**
+   * 解禁用户
+   * @param {Number} roomId 房间号
+   * @param {Number} userId 用户UID
+   */
+  async removeRoomBlockUserByUid (roomId, userId) {
+    return (await this.webAxios.post('/banned_service/v1/Silent/del_block_by_uid', new URLSearchParams({
+      'roomid': roomId,
+      'type': 1,
+      'uid': userId,
+      'csrf_token': this.bili_jct
+    }))).data
+  }
+
+  /**
+   * 拉取自己是房管的列表
+   * @param {Number} page 页数
+   */
+  async getRoomAdminByUid (page = 1) {
+    return (await this.webAxios.get('/xlive/app-ucenter/v1/roomAdmin/get_by_uid', {
+      params: {
+        page
+      }
+    })).data
+  }
+
+  /**
+   * 拉取禁言名单，支持搜索
+   * app
+   * @param {Number} roomid
+   * @param {Number} page
+   * @param {Number} pageSize
+   * @param {Number|String} search 搜索
+   */
+  async getBlockUserListBySearch (roomid, page = 1, pageSize = 20, search = '') {
+    return (await this.webAxios.get('/banned_service/v2/Silent/get_block_list', {
+      params: {
+        roomid,
+        page,
+        page_size: pageSize,
+        search
+      }
+    })).data
+  }
+
+  /**
+   * 任命房管
+   * @param {Number} userId 新房管UID
+   */
+  async addRoomAdmin (userId) {
+    return (await this.webAxios.post('/live_user/v1/RoomAdmin/add', new URLSearchParams({
+      'admin': userId,
+      'csrf_token': this.bili_jct
+    }))).data
+  }
+
+  async removeRoomAdmin (userId) {
+    return (await this.webAxios.post('/xlive/app-ucenter/v1/roomAdmin/dismiss', new URLSearchParams({
+      'uid': userId,
+      'csrf': this.bili_jct
+    }))).data
+  }
+
+  saveLoginInfo () {
+    // writeFile('./login.json', JSON.stringify({
+    //   accessKey: this.accessKey,
+    //   cookies: this.cookies,
+    //   bili_jct: this.bili_jct,
+    //   uid: this.uid,
+    //   loginType: this.loginType
+    // }))
   }
 }
 
@@ -606,6 +858,36 @@ function RSAPassword (password, pubkey, hash) {
   const data = hash + password
   const encrypt = crypto.publicEncrypt(padding, Buffer.from(data)).toString('base64')
   return encodeURIComponent(encrypt)
+}
+
+function createMobileAxios () {
+  return axios.create({
+    baseURL: 'https://api.live.bilibili.com',
+    timeout: 5000,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
+      'Origin': 'https://live.bilibili.com',
+      'Referer': 'https://live.bilibili.com'
+    },
+    httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
+  })
+}
+
+function createWebAxios (cookies) {
+  var headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
+    'Origin': 'https://live.bilibili.com',
+    'Referer': 'https://live.bilibili.com'
+  }
+  if (cookies) {
+    headers.cookie = cookies
+  }
+  return axios.create({
+    baseURL: 'https://api.live.bilibili.com',
+    timeout: 5000,
+    headers,
+    httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
+  })
 }
 
 export default new API()

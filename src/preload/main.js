@@ -53,7 +53,7 @@ window.API = {
   Main: APIStructure('Main'),
   eventhandler (...args) { console.log(...args) }
 }
-ipcRenderer.on(event, (e) => {
+ipcRenderer.on('event', (sender, e) => {
   try {
     window.API.eventhandler(e.name, ...e.data)
   } catch (error) {

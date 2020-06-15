@@ -5,8 +5,8 @@ import { eventBus } from '../../../../EventBus'
 import { getLogger } from 'log4js'
 
 eventBus.registerPublicEvent('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
-eventBus.registerPublicEvent('`Platform.BiliBili.Service.DanmakuService.Message.*')
-eventBus.registerPublicEvent('`Platform.BiliBili.Service.DanmakuService.RawMessage.*')
+eventBus.registerPublicEvent('Platform.BiliBili.Service.DanmakuService.Message')
+eventBus.registerPublicEvent('Platform.BiliBili.Service.DanmakuService.RawMessage')
 export class DanmakuService extends WebInterfaceBase {
   constructor () {
     super()
