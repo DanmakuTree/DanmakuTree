@@ -1,6 +1,6 @@
 
 export const defaultMap = {
-  DANMU_CMD (message) {
+  DANMU_MSG (message) {
     var result = { type: 'message', data: {} }
     result.data.comment = message.info[1]
     result.data.user = {
