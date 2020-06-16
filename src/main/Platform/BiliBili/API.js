@@ -15,7 +15,6 @@ export class API extends WebInterfaceBase {
     this.uid = 0
     this.bili_jct = ''
     this.cookies = null
-    this.buvid = RandomID(64)
     this.mobileAxios = createMobileAxios()
     this.webAxios = createWebAxios()
     /**
@@ -865,9 +864,8 @@ function createMobileAxios () {
     baseURL: 'https://api.live.bilibili.com',
     timeout: 5000,
     headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36',
-      'Origin': 'https://live.bilibili.com',
-      'Referer': 'https://live.bilibili.com'
+      'User-Agent': 'Mozilla/5.0 BiliLiveDroid/2.0.0 bililive',
+      'Buvid': RandomID(37)
     },
     httpsAgent: (isDev ? new https.Agent({ rejectUnauthorized: false }) : undefined)
   })
