@@ -102,9 +102,9 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     backgroundColor: '#fff',
     width: 960,
-    height: 540,
+    height: 600,
     minWidth: 960,
-    minHeight: 540,
+    minHeight: 600,
     // useContentSize: true,
     webPreferences: {
       nodeIntegration: false,
