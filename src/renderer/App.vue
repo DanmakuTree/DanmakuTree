@@ -1,19 +1,18 @@
 <template>
-  <div id="app" class="container-fluid">
-    <Transition mode="out-in" name="slide-up">
-      <!-- <keep-alive> -->
-      <RouterView />
-      <!-- </keep-alive> -->
-    </Transition>
+  <div id="app">
+    <router-view/>
   </div>
 </template>
 
 <script>
-import Vue from 'vue'
+  import Vue from 'vue'
 
-export default Vue.extend({
-  name: 'ImageParsing',
-})
+  export default Vue.extend({
+    name: 'App'
+  })
 </script>
-
-<style lang="scss"></style>
+<style scoped>
+  #app{
+    overflow: hidden;
+  }
+</style>

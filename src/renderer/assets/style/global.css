@@ -1,0 +1,134 @@
+body{
+  padding: 0;
+  margin: 0;
+  user-select:none;
+  background-color: transparent!important;
+}
+ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flip-list-move {
+  transition: transform 1s;
+}
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
+.list-enter-active{
+  transition: all 0.3s;
+}
+.list-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.list-complete-enter, .list-complete-leave-to
+  /* .list-complete-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-complete-leave-active {
+  position: absolute;
+}
+.sub_header{
+  font-family: PingFangSC-Regular,sans-serif;
+  font-size: 11px;
+  color: #696974;
+}
+.title-h4{
+  font-family: PingFangSC-Medium,sans-serif;
+  font-size: 12px;
+  color: #171725;
+  letter-spacing: 0;
+}
+.title-h5-middle{
+  font-family: Poppins-Medium,sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #171725;
+}
+.sub_header_4{
+  font-family: PingFangSC-Regular,sans-serif;
+  font-size: 12px;
+  /*color: #92929D;*/
+  color: rgba(0, 0, 0, 0.65);
+  letter-spacing: 0;
+}
+.h2{
+  font-family: Poppins-SemiBold,sans-serif;
+  font-size: 18px;
+  color: #171725;
+}
+.slide-menu{
+  font-family: Poppins-Medium,sans-serif;
+  font-size: 14px;
+  color: #171725;
+}
+.card-little{
+  text-align: center;
+  padding: 20px 0;
+  border-radius: 16px;
+  background: white;
+  width: 160px;
+  height: 124px;
+  display: block;
+}
+.card-r{
+  border-radius: 16px;
+  background: white;
+}
+.card-border{
+  border: 1px solid #E2E2EA;
+  border-radius: 15px;
+  background: #FAFAFB;
+}
+table{
+  font-size:11px !important;
+}
+td{
+  padding: 0!important;
+}
+th{
+  height: 30px!important;
+  padding: 0!important;
+  background: #FAFAFB!important;
+}
+table tr th:first-child{
+  border-top-left-radius: 8px;
+  padding-left: 12px !important;
+  border-bottom-left-radius: 8px;
+}
+table tr th:last-child{
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+th{
+  border: none!important;
+  font-family: Poppins-SemiBold,sans-serif;
+  font-size: 9px;
+  color: #44444F;
+}
+
+td{
+  border: none!important;
+}
+tr{
+  height: 40px!important;
+}
+tr:last-child td{
+  border:none;
+  /*border-bottom: 1px solid #F1F1F5!important;*/
+}
+.ant-checkbox-input{
+  width: 16px!important;
+  height: 16px!important;
+}

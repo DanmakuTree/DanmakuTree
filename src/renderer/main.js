@@ -1,9 +1,12 @@
-import 'material-design-icons/iconfont/material-icons.css'
 import Vue from 'vue/dist/vue.esm'
-import App from './App.vue'
+import App from './App'
 import router from './router/index'
 import store from './store/index'
-import vuetify from './plugins/vuetify'
+import Antd from 'ant-design-vue'
+import './assets/style/global.css'
+import echarts from 'echarts'
+import 'ant-design-vue/dist/antd.css'
+import './assets/font/iconfont.css'
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -11,28 +14,13 @@ Vue.config.devtools = isDev
 Vue.config.performance = isDev
 Vue.config.productionTip = isDev
 
-// tslint:disable-next-line: no-unused-expression
-new Vue({
+Vue.prototype.$echarts = echarts
+
+Vue.use(Antd)
+
+export default new Vue({
   el: '#app',
   router,
-  vuetify,
   store,
   render: (h) => h(App)
 })
-
-// sample context menu
-// const { remote } = require('electron')
-// const { Menu, MenuItem } = remote
-// const menu = new Menu()
-// menu.append(new MenuItem({ label: 'Home' }))
-// menu.append(new MenuItem({ type: 'separator' }))
-// menu.append(new MenuItem({ label: 'Other' }))
-
-// window.addEventListener(
-//   'contextmenu',
-//   (e) => {
-//     e.preventDefault()
-//     menu.popup({ window: remote.getCurrentWindow() })
-//   },
-//   false
-// )
