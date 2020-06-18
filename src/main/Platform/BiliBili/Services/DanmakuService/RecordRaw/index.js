@@ -1,7 +1,9 @@
 import { promises as fspromise } from 'fs'
 import { defaultMap as DM } from '../Warpper'
 
-const readFile = fspromise.readFile
+const fs = require('fs');
+const readline = require('readline');
+// const readFile = fspromise.readFile
 const writeFile = fspromise.writeFile
 const appendFile = fspromise.appendFile
 
@@ -30,11 +32,19 @@ recorderRaw.rawParsedCMD = function(e){
     }).catch(console.log)
 }
 recorderRaw.compare = function(){
-    //todo
-    readFile('./record/parsedcmd.log').then((data)=>{
-        var a=data.toString().split('\n');
-        var b=[];
-        a.forEach((e)=>{b[e]=true});
+    // fixed, readline could avoid the escape of line ender.
+    var b=[];
+    const rl = readline.createInterface({
+        input: fs.createReadStream('record/parsedcmd.log'),
+        crlfDelay: Infinity
+    });
+
+    rl.on('line', (line) => {
+        // console.log(`Line from file: ${line}`);
+        b[line]=true
+    });
+
+    rl.once('close', () =>{
         console.log("MessageCMD after parsed Summary:\n",b);
         var c=[];
         var i=0;
@@ -59,6 +69,7 @@ recorderRaw.compare = function(){
             }
             if (i==Object.keys(b).length){
                 // on the exit of key-value for loop
+                // c.sort(); // do not need
                 writeFile('./record/difference',c.join('\n')).then(console.log).catch(console.log)
             }
         }
