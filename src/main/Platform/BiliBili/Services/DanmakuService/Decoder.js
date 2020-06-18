@@ -65,4 +65,4 @@ class Decoder {
     return result
   }
 }
-module.exports = Decoder
+export default Decoder

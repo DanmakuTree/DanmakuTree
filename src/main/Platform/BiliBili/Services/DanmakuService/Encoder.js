@@ -87,4 +87,4 @@ class Encoder {
     return result
   }
 }
-module.exports = Encoder
+export default Encoder
