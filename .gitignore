@@ -19,3 +19,4 @@ coverage
 __coverage__
 act
 login.json
+record/*
