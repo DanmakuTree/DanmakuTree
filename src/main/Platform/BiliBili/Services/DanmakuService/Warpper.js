@@ -3,6 +3,8 @@ export const defaultMap = {
   DANMU_MSG (message) {
     var result = { type: 'message', data: {} }
     result.data.comment = message.info[1]
+    result.data.longtimestamp = message.info[0][4]
+    result.data.timestamp = message.info[9].ts || 0
     result.data.user = {
       uid: message.info[2][0],
       username: message.info[2][1],
