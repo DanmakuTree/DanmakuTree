@@ -6,7 +6,7 @@
   >
     <span slot="name" slot-scope="text">
       <span class="icon iconfont iconic_Checkbox" style="color: #3DD598"></span>
-      <span style="overflow: hidden;text-overflow:ellipsis;white-space:nowrap;width: 270px;display: inline-block">
+      <span style="overflow: hidden;text-overflow:ellipsis;white-space:nowrap;width: 220px;display: inline-block">
         {{ text }}
       </span>
     </span>
@@ -14,7 +14,7 @@
       {{types}}
     </span>
     <span slot="action" slot-scope="text, record">
-      ...
+      链接，重新链接
     </span>
   </a-table>
 </template>
@@ -24,7 +24,7 @@
     {
       title: '直播间标题',
       dataIndex: 'title',
-      width: 300,
+      width: 280,
       key: 'title',
       scopedSlots: { customRender: 'name' }
     },

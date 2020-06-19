@@ -61,7 +61,7 @@
           {
             title: '历史弹幕',
             icon: 'iconic_File',
-            to: '/main/roomlsist/1'
+            to: '/main/history'
           },
           {
             title: '插件中心',

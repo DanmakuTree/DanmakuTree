@@ -12,16 +12,7 @@
       <nav-menu/>
 
       <div style="flex: 1;overflow: scroll;display: flex">
-        <div id="float-bar">
-          <div style="width: 32px;height: 32px;background: black;border-radius: 8px;margin-right: 16px"></div>
-          <div style="width: 32px;height: 32px;background: black;border-radius: 8px;margin-right: 16px"></div>
-          <div style="width: 32px;height: 32px;background: black;border-radius: 8px;margin-right: 16px"></div>
-          <div style="width: 32px;height: 32px;background: black;border-radius: 8px;margin-right: 16px"></div>
-          <div style="width: 32px;height: 32px;border-radius: 8px;margin-right: 16px;border: 1px dashed #E2E2EA">
-          </div>
-          <div style="flex:1"></div>
-<!--          <my-input />-->
-        </div>
+        <float-bar/>
         <Transition mode="out-in" name="list">
           <router-view />
         </Transition>
@@ -33,12 +24,12 @@
 
 <script>
   import NavMenu from '../components/NavMenu/NavMenu'
-  import input from '../components/form/input'
+  import floatbar from '../components/floatbar'
   export default {
     name: 'Main',
     components: {
       'nav-menu': NavMenu,
-      'my-input': input
+      'float-bar': floatbar
     },
     computed: {
       routerTitle () {
@@ -69,20 +60,6 @@
     border-bottom: 1px solid #e2e2ea;
     overflow: hidden;
     padding:0 20px;
-  }
-  #float-bar{
-    display: flex;
-    align-items: center;
-    position: absolute;
-    padding: 0 20px;
-    z-index: 9;
-    border-top:1px solid #e2e2ea;
-    box-sizing: border-box;
-    /*backdrop-filter: blur(20px);*/
-    background: rgba(255,255,255,1);
-    width: 760px;
-    height: 60px;
-    bottom: 0;
   }
   .content {
     flex: 1;

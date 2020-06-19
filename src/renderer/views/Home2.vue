@@ -9,21 +9,6 @@
         <div class="title-h4" style="margin-bottom: 10px">实时弹幕数量</div>
         <my-linecharts/>
       </div>
-<!--      <div class="card-r sub_header_4" style="width: 200px;display: flex;flex-direction: column;padding: 16px">-->
-<!--        <div style="flex: 1"/>-->
-<!--        <div class="item-d">-->
-<!--          <span style="vertical-align: middle;font-weight: bold!important;color: #ff9f3d">shugen:</span>-->
-<!--          <span style="vertical-align: middle;margin-left: 4px;">主播女装我就买舰长(´Д` )</span>-->
-<!--        </div>-->
-<!--        <div class="item-d">-->
-<!--          <span style="vertical-align: middle;font-weight: bold!important;">骑驴的杨戬:</span>-->
-<!--          <span style="vertical-align: middle;">全明星.以前打过吗，我去康康</span>-->
-<!--        </div>-->
-<!--        <div class="item-d">-->
-<!--          <span style="vertical-align: middle;font-weight: bold!important;">阿澜lie:</span>-->
-<!--          <span style="vertical-align: middle;">这报点真就网吧乱喊呗</span>-->
-<!--        </div>-->
-<!--      </div>-->
     </div>
     <div style="display: flex;justify-content: space-between;margin-top: 32px">
       <div class="card-little">

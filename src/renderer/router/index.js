@@ -4,6 +4,7 @@ import Home from '../views/Home'
 import Home2 from '../views/Home2'
 // import API from '../views/API'
 import roomlist from '../views/roomlist'
+import History from '../views/History'
 import Main from '../views/Main'
 import notFound from '../views/404'
 // import Plugin from '../views/Plugin'
@@ -60,6 +61,13 @@ const router = new Router({
             icon: 'fa-home'
           },
           component: Home2
+        },
+        {
+          path: 'history',
+          meta: {
+            title: '弹幕历史'
+          },
+          component: History
         },
         {
           path: 'roomlist',

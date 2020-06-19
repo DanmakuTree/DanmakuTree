@@ -121,6 +121,9 @@ th{
 td{
   border: none!important;
 }
+td:first-child{
+  padding-left: 12px!important;
+}
 tr{
   height: 40px!important;
 }
