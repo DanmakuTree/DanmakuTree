@@ -19,14 +19,13 @@
 <!--        <d-item/>-->
 <!--      </div>-->
     </div>
-    <div style="padding: 20px;background: white;border-radius: 16px">
-      <div class="test1">
-        <span>次房间列表</span>
-        <span style="flex: 1"/>
-        <my-input/>
-      </div>
-      <my-table/>
-    </div>
+<!--    <div style="padding: 20px;background: white;border-radius: 16px">-->
+<!--      <div class="test1">-->
+<!--        <span style="flex: 1"/>-->
+<!--        <my-input/>-->
+<!--      </div>-->
+<!--      <my-table/>-->
+<!--    </div>-->
 
   </div>
 </template>
