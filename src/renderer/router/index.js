@@ -1,15 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home'
-import Home2 from '../views/Home2'
-// import API from '../views/API'
 import roomlist from '../views/roomlist'
 import History from '../views/History'
-import Main from '../views/Main'
 import notFound from '../views/404'
-// import Plugin from '../views/Plugin'
 import RouteLoading from '../components/RouteLoading'
 import RouteError from '../components/RouteError'
+
 Vue.use(Router)
 
 /**
@@ -44,48 +41,39 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      redirect: '/main/home'
+      redirect: '/home'
     },
     {
       path: '/plugin',
       component: () => lazyLoadView(import('../components/plugins/danmaku/index'))
     },
     {
-      path: '/main',
-      component: Main,
-      children: [
-        {
-          path: 'home',
-          meta: {
-            title: '首页',
-            icon: 'fa-home'
-          },
-          component: Home2
-        },
-        {
-          path: 'history',
-          meta: {
-            title: '弹幕历史'
-          },
-          component: History
-        },
-        {
-          path: 'roomlist',
-          meta: {
-            title: '房间列表'
-          },
-          component: () => lazyLoadView(import('../views/roomlist'))
-        },
-        {
-          path: '*',
-          component: notFound
-        }
-      ]
+      path: '/home',
+      meta: {
+        title: '首页',
+        icon: 'fa-home'
+      },
+      component: Home
+    },
+    {
+      path: '/history',
+      meta: {
+        title: '弹幕历史'
+      },
+      component: History
+    },
+    {
+      path: '/roomlist',
+      meta: {
+        title: '房间列表'
+      },
+      component: () => lazyLoadView(import('../views/roomlist'))
     },
     {
       path: '*',
-      redirect: '/main/home'
+      component: notFound
     }
+
   ]
 })
 

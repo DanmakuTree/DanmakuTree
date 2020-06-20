@@ -51,27 +51,27 @@
           {
             title: '首页',
             icon: 'iconic_Dashboard',
-            to: '/main/home'
+            to: '/home'
           },
           {
             title: '房间管理',
             icon: 'iconic_Friends',
-            to: '/main/roomlist'
+            to: '/roomlist'
           },
           {
             title: '历史弹幕',
             icon: 'iconic_File',
-            to: '/main/history'
+            to: '/history'
           },
           {
             title: '插件中心',
             icon: 'iconic_Sales',
-            to: '/main/2'
+            to: '/2'
           },
           {
             title: '系统设置',
             icon: 'iconic_Settings1',
-            to: '/main/1'
+            to: '/1'
           }
         ]
       }

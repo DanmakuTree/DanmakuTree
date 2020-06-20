@@ -1,9 +1,9 @@
 <template>
   <div id="float-bar">
-    <div class="icon-item" style="background-color: #20c997">那</div>
-    <div class="icon-item" style="background-color: #28a745">没</div>
-    <div class="icon-item" style="background-color: #8cc354">事</div>
-    <div class="icon-item" style="background-color: #cddc4b">了</div>
+    <div class="icon-item" style="background-color: #20c997">快</div>
+    <div class="icon-item" style="background-color: #28a745">捷</div>
+    <div class="icon-item" style="background-color: #8cc354">方</div>
+    <div class="icon-item" style="background-color: #cddc4b">式</div>
     <div style="width: 32px;height: 32px;border-radius: 8px;margin-right: 16px;border: 1px dashed #E2E2EA;display: flex;align-items: center;justify-content: center;color: #E2E2EA">
       <span class="icon iconfont iconic_Plus1"/>
     </div>

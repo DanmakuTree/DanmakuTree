@@ -2,6 +2,7 @@
   <div style="flex: 1;padding: 16px 20px 80px 20px;background: #fafafb;display: flex;flex-direction: column">
     <div style="margin-bottom: 8px">
       <span class="h2">弹幕历史</span>
+      <span>房间选择下拉框</span>
     </div>
     <div style="display: flex;flex: 1;justify-content: space-between;overflow: hidden">
       <div class="card-r" style="width: 134px;padding: 16px 8px;display: flex;flex-direction: column">
@@ -14,15 +15,18 @@
         <span
           style="height: 28px;text-align: center;background: transparent;border-radius: 8px;line-height: 31px;
         font-family: Poppins,sans-serif;font-size: 12px;color: #92929D;margin-bottom: 6px">2020-06-01</span>
+        <span style="flex: 1"/>
+        <span>清空本日数据</span>
+        <span>清空所有日志</span>
       </div>
       <div class="card-r" style="width: 568px;padding: 16px;display: flex;flex-direction: column;">
-        <div>
-          <a-select default-value="弹幕" style="width: 120px">
-            <a-select-option value="jack">
-              弹幕
+        <div style="margin-bottom: 16px">
+          <a-select default-value="显示：弹幕" style="width: 120px">
+            <a-select-option value="显示：弹幕">
+              显示：弹幕
             </a-select-option>
-            <a-select-option value="lucy">
-              礼物
+            <a-select-option value="显示：礼物">
+              显示：礼物
             </a-select-option>
           </a-select>
           <d-input style="float: right"/>
