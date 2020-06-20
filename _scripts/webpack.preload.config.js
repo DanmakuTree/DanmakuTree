@@ -16,7 +16,7 @@ const config = {
   devtool: isDevMode ? '#cheap-module-eval-source-map' : false,
   entry: {
     main: path.join(__dirname, '../src/preload/main.js'),
-    captcha: path.join(__dirname, '../src/preload/captcha.js'),
+    captcha: path.join(__dirname, '../src/preload/bilibili.js'),
     plugin: path.join(__dirname, '../src/preload/module.js')
   },
   output: {

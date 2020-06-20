@@ -1,3 +1,4 @@
+import { BrowserWindow } from 'electron'
 const regexp = /[A-Za-z0-9]*/g
 
 export function isValidName (name) {
@@ -41,6 +42,9 @@ export class WebInterface {
   }
 
   async __handle (event, method, ...args) {
+    if (typeof event.frameId === 'number') {
+      console.log('is from inside', BrowserWindow.fromWebContents(event.sender).id)
+    }
     if (!isValidMethod(method)) {
       return { status: -2, msg: 'invalid method', result: {} }
     }
