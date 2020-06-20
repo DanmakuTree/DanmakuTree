@@ -1,12 +1,13 @@
-import { app, BrowserWindow, ipcMain, webContents } from 'electron'
+import { app, ipcMain } from 'electron'
 import { productName } from '../../package.json'
 import { configure, getLogger } from 'log4js'
 import { Platform } from './Platform'
 import { eventBus } from './EventBus'
-import { isDev, isDebug, MainWindowPage, MainPreloadScript, CaptchaPreloadScript, ModulePreloadScript } from './Consts'
+import { isDev, version } from './Consts'
 import { WebInterface } from './WebInterface'
 import { WebInterfaceBase } from './WebInterfaceBase'
-import Services from './Services'
+import { ModuleManager } from './ModuleManager'
+import { Main } from './Main'
 
 // set app name
 app.name = productName
@@ -17,11 +18,6 @@ app.allowRendererProcessReuse = true
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = false
 
 const gotTheLock = app.requestSingleInstanceLock()
-
-/**
- * @type {BrowserWindow}
- */
-let mainWindow
 
 app.setAppLogsPath()
 
@@ -60,15 +56,18 @@ var logConfig = {
   }
 }
 
+var platform
+var moduleManager
+
 // only allow single instance of application
 if (!isDev) {
   if (gotTheLock) {
     app.on('second-instance', () => {
       // Someone tried to run a second instance, we should focus our window.
-      if (mainWindow && mainWindow.isMinimized()) {
-        mainWindow.restore()
+      if (moduleManager.getMainWindow() && moduleManager.getMainWindow().isMinimized()) {
+        moduleManager.getMainWindow().restore()
       }
-      mainWindow.focus()
+      moduleManager.getMainWindow().focus()
     })
   } else {
     app.quit()
@@ -84,106 +83,33 @@ if (!isDev) {
 configure(logConfig)
 logger = getLogger('Main')
 
-async function installDevTools () {
-  try {
-    /* eslint-disable */
-    logger.info("Installing Vue-Devtools")
-    require('vue-devtools').install()
-    /* eslint-enable */
-  } catch (err) {
-    logger.error('Install Vue-Devtools fail,', err)
-  }
-}
-
-function createWindow () {
-  /**
-   * Initial window options
-   */
-  mainWindow = new BrowserWindow({
-    backgroundColor: '#fff',
-    width: 960,
-    height: 540,
-    minWidth: 960,
-    minHeight: 540,
-    // useContentSize: true,
-    webPreferences: {
-      nodeIntegration: false,
-      nodeIntegrationInWorker: false,
-      webSecurity: false,
-      webviewTag: true,
-      preload: MainPreloadScript
-    },
-    fullscreenable: false,
-    maximizable: false,
-    resizable: false,
-    frame: false,
-    show: false
-  })
-
-  // load root file/url
-  mainWindow.loadURL(MainWindowPage)
-  if (!isDev) {
-    global.__static = require('path')
-      .join(__dirname, '/static')
-      .replace(/\\/g, '\\\\')
-  }
-
-  // Show when loaded
-  mainWindow.on('ready-to-show', () => {
-    logger.info('MainWindow Ready')
-    mainWindow.show()
-    mainWindow.focus()
-  })
-
-  mainWindow.on('closed', () => {
-    logger.info('Application exiting...')
-  })
-}
-
 app.on('ready', () => {
-  createWindow()
-
-  if (isDev) {
-    installDevTools()
-    mainWindow.webContents.openDevTools()
-  }
-
-  if (isDebug) {
-    mainWindow.webContents.openDevTools()
-  }
+  logger.info(`DanmakuTree v${version} ready.`)
 })
 
 app.on('window-all-closed', () => {
+  logger.info(`DanmakuTree v${version} All Window closed.`)
   if (process.platform !== 'darwin') {
     app.quit()
   }
 })
 
 app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow()
-  }
+  logger.info(`DanmakuTree v${version} activate.`)
 })
 
+platform = new Platform()
 var webInterface = new WebInterface()
+moduleManager = new ModuleManager()
 
-webInterface.registry('Platform', new Platform())
-
-var main = new WebInterfaceBase()
-main.Services = Services
-main.available.push('Services')
+var main = new Main()
 
 webInterface.registry('Main', main)
+webInterface.registry('Platform', platform)
+webInterface.registry('Module', moduleManager)
 
 ipcMain.handle('APICall', webInterface.getHandler())
 
-eventBus.on('ALLPUBLIC', (e) => {
-  try {
-    mainWindow.webContents.send('event', e)
-  } catch (error) {
-    logger.info(`send ${e.name} event fail`, error)
-  }
-})
 /**
  * Auto Updater
  *

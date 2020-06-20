@@ -3,7 +3,6 @@ import Vue from 'vue/dist/vue.esm'
 import App from './App.vue'
 import router from './router/index'
 import store from './store/index'
-import vuetify from './plugins/vuetify'
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -11,11 +10,10 @@ Vue.config.devtools = isDev
 Vue.config.performance = isDev
 Vue.config.productionTip = isDev
 
-// tslint:disable-next-line: no-unused-expression
+// eslint-disable-next-line no-new
 new Vue({
   el: '#app',
   router,
-  vuetify,
   store,
   render: (h) => h(App)
 })
