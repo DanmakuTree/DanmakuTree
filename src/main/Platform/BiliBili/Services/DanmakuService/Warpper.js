@@ -13,10 +13,10 @@ export const defaultMap = {
       userLevel: message.info[4][0] || 0,
       roomVIPLevel: message.info[7],
       medal: {
-        level: 0,
-        label: '',
-        anchorUsername: '',
-        roomId: 0
+        level: message.info[3][0] || 0,
+        label: message.info[3][1] || '',
+        anchorUsername: message.info[3][2] || '',
+        roomId: message.info[3][3] || 0
       },
       title: message.info[5]
     }
