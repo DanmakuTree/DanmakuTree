@@ -15,7 +15,14 @@
       </div>
       <span style="flex: 1"/>
       <span style="font-family: Roboto-Regular;font-size: 10px;color: #92929D;margin-right: 32px">12:06:03</span>
-      <span class="icon iconfont iconic_More1" style="color: #92929D"/>
+      <a-popover placement="bottom" trigger="click">
+        <ul slot="content" style="font-size: 11px">
+          <li>复制用户id</li>
+          <li>封禁用户</li>
+          <li>任命房管</li>
+        </ul>
+        <span class="icon iconfont iconic_More1" style="color: #92929D"/>
+      </a-popover>
     </div>
     <div
       style="overflow-wrap: break-word;font-family: Roboto-Regular,sans-serif;
@@ -28,7 +35,12 @@
 
 <script>
   export default {
-    name: 'dItem'
+    name: 'dItem',
+    data: () => {
+      return {
+        v: true
+      }
+    }
   }
 </script>
 

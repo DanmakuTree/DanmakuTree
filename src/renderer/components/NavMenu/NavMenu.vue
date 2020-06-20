@@ -6,7 +6,8 @@
           <div style="width: 32px;height: 32px;border-radius: 50%;background: black">
           </div>
           <div style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between">
-            <div style="font-size: 13px;font-weight: bold;color: #171725">mano233</div>
+            <div style="font-size: 11px;font-weight: bold;color: #171725">mano233</div>
+            <div style="font-size: 11px;">哔哩哔哩</div>
           </div>
         </div>
       </div>

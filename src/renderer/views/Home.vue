@@ -2,7 +2,7 @@
   <div class="container">
     <div style="margin-bottom: 8px">
       <span class="h2">Hi mano233,</span>
-      <span style="font-family: Roboto-Regular,sans-serif;font-size: 13px;color: #92929D">nmd为什么？</span>
+      <span style="font-family: Roboto-Regular,sans-serif;font-size: 13px;color: #92929D">以下是直播间的统计信息</span>
     </div>
     <div style="display: flex;height: 260px;justify-content: space-between">
       <div class="card-r" style="flex: 1;display: flex;flex-direction: column;padding: 18px">

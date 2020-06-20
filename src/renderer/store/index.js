@@ -6,6 +6,7 @@ import modules from './modules'
 
 Vue.use(Vuex)
 
+console.info(modules)
 export default new Vuex.Store({
   modules,
   strict: process.env.NODE_ENV !== 'production'

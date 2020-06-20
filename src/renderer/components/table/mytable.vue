@@ -10,11 +10,11 @@
         {{ text }}
       </span>
     </span>
-    <span slot="types" slot-scope="types">
+    <span slot="types">
       删除按钮
     </span>
-    <span slot="action" slot-scope="text, record">
-      开关
+    <span slot="action" >
+      <a-switch default-checked style="transform: scale(0.8)"/>
     </span>
   </a-table>
 </template>
