@@ -3,6 +3,15 @@
  *
  * code is discussed at https://stackoverflow.com/questions/19098797/fastest-way-to-flatten-un-flatten-nested-json-objects
  * and provided at http://jsfiddle.net/WSzec/14/
+ * 
+ * Usage: 
+ * ```
+ * import flatten from './Utilities/flatten'
+ * flatten(JSON)
+ * JSON.flatten(_var)
+ * JSON.unflatten(_var)
+ * ```
+ * 
  */
 
 function flatten (J_S_O_N){
