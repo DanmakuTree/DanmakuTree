@@ -1,4 +1,3 @@
-import { BrowserWindow } from 'electron'
 const regexp = /[A-Za-z0-9]*/g
 
 export function isValidName (name) {

@@ -11,7 +11,7 @@ const portList = [6233, 6888, 60233, 60666, 60888]
 export class WebsocketService extends WebInterfaceBase {
   constructor () {
     super()
-    this.version = '0.0.1'
+    this.version = '0.0.2'
     this.server = null
     this.wss = null
     this.portIndex = 0
@@ -20,13 +20,14 @@ export class WebsocketService extends WebInterfaceBase {
     this.local = true
     this.connections = {}
     this.server = createServer()
+    this.handlerMap = {}
     this.logger = getLogger('WebsocketService')
     const methodList = ['start', 'stop', 'getStatus', 'switchLocal', 'broadcastEvent', 'sendEventToTarget']
     methodList.forEach((e) => {
       this[e] = this[e].bind(this)
       this.available.push(e)
     })
-    var selfList = ['onError', 'onListening', 'onUpgrade', 'onRequest', 'onConnection', 'closeHandler', 'messageHandler', 'errorHandler']
+    var selfList = ['onError', 'onListening', 'onUpgrade', 'onRequest', 'onConnection', 'closeHandler', 'messageHandler', 'errorHandler', 'handle']
     selfList.forEach((e) => {
       this[e] = this[e].bind(this)
     })
@@ -195,11 +196,17 @@ export class WebsocketService extends WebInterfaceBase {
     delete this.connections[socket.key]
   }
 
+  /**
+   *
+   * @param {import('ws')} socket
+   * @param {*} message
+   */
   messageHandler (socket, message) {
     if (typeof message !== 'object' || typeof message.type !== 'string') {
       socket.close(1008)
       return
     }
+
     switch (message.type) {
       case 'auth':
         if (socket.authed) {
@@ -213,8 +220,36 @@ export class WebsocketService extends WebInterfaceBase {
         socket.type = message.data.type
         socket.authed = true
         break
-
       default:
+        if (!socket.authed) {
+          socket.close(1008)
+        }
+        if (this.handlerMap[message.type]) {
+          try {
+            var promise
+            if (Array.isArray(message.data)) {
+              promise = this.handlerMap[message.type]({}, ...message.data)
+            } else {
+              promise = this.handlerMap[message.type]({}, message.data)
+            }
+            promise.then((...data) => {
+              if (socket.readyState === socket.OPEN) {
+                socket.send(JSON.stringify({
+                  'type': message.type,
+                  'data': data
+                }))
+              }
+            }).catch((e) => {
+              this.logger.error(`Get Error with ${JSON.stringify(message)} , ${JSON.stringify(error)}`)
+              socket.close(1011)
+            })
+          } catch (error) {
+            this.logger.error(`Get Error with ${JSON.stringify(message)} , ${JSON.stringify(error)}`)
+            socket.close(1011)
+          }
+        } else {
+          socket.close(1008)
+        }
         break
     }
   }
@@ -223,6 +258,8 @@ export class WebsocketService extends WebInterfaceBase {
     socket.close(1011)
     this.logger.warn(`[${socket.key}]Unhandler Error`, error.toString())
   }
+
+  handle (name, handler) {}
 }
 
 export default new WebsocketService()

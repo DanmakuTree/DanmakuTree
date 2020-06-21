@@ -2,12 +2,11 @@ import { app, ipcMain } from 'electron'
 import { productName } from '../../package.json'
 import { configure, getLogger } from 'log4js'
 import { Platform } from './Platform'
-import { eventBus } from './EventBus'
 import { isDev, version } from './Consts'
 import { WebInterface } from './WebInterface'
-import { WebInterfaceBase } from './WebInterfaceBase'
 import { ModuleManager } from './ModuleManager'
 import { Main } from './Main'
+import { WebsocketService } from './Services/WebsocketService'
 
 // set app name
 app.name = productName
@@ -109,7 +108,7 @@ webInterface.registry('Platform', platform)
 webInterface.registry('Module', moduleManager)
 
 ipcMain.handle('APICall', webInterface.getHandler())
-
+main.Services.WebsocketService.handle('API', webInterface.getHandler())
 /**
  * Auto Updater
  *
