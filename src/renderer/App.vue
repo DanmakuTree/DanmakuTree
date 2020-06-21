@@ -3,8 +3,7 @@
     <div id="container">
       <d-header/>
       <div class="content">
-        <nav-menu/>
-
+        <d-menu/>
         <div style="flex: 1;overflow: scroll;display: flex">
           <float-bar/>
           <Transition mode="out-in" name="list">
@@ -19,14 +18,14 @@
 
 <script>
   import Vue from 'vue'
-  import NavMenu from './components/NavMenu/NavMenu'
+  import dMenu from './components/menu'
   import floatbar from './components/floatbar'
   import dHeader from './components/header'
 
   export default Vue.extend({
     name: 'App',
     components: {
-      'nav-menu': NavMenu,
+      'd-menu': dMenu,
       'd-header': dHeader,
       'float-bar': floatbar
     },
