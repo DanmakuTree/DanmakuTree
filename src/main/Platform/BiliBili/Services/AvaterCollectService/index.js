@@ -6,18 +6,18 @@ import { eventBus } from '../../../../EventBus'
 export class AvaterCollectService extends WebInterfaceBase {
   constructor () {
     super()
-    this.version = '0.0.5'
+    this.version = '0.0.6'
     this.storage = {}
     this.promiseList = {}
     this.interval = null
     this.waiting = []
     this.working = []
     this.logger = getLogger('AvaterCollectService')
-    var methodList = ['add', 'request', 'verifyUrl', 'wakeup', 'tick', 'fail', 'makeSureInList']
+    var methodList = ['add', 'request', 'verifyUrl', 'wakeup', 'tick', 'fail', 'makeSureInList', 'clearAll']
     methodList.forEach((e) => {
       this[e] = this[e].bind(this)
     })
-    this.available.push('add', 'request')
+    this.available.push('add', 'request', 'clearAll')
     eventBus.on('Platform.BiliBili.Service.AvaterCollectService.push', (uid, url) => {
       this.add(uid, url)
     })
@@ -61,11 +61,11 @@ export class AvaterCollectService extends WebInterfaceBase {
    * 拉取头像地址
    * @param {Number} uid uid
    */
-  async request (uid) {
+  async request (uid, net = true, force = false) {
     // todo: sqlite
-    if (this.storage[uid]) {
+    if (this.storage[uid] && !force) {
       return this.storage[uid]
-    } else {
+    } else if (net || force) {
       if (!this.promiseList[uid]) {
         this.promiseList[uid] = []
       }
@@ -75,6 +75,8 @@ export class AvaterCollectService extends WebInterfaceBase {
       })
       this.wakeup()
       return promise
+    } else {
+      return false
     }
   }
 
