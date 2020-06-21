@@ -43,7 +43,7 @@ export class WebInterface {
 
   async __handle (event, method, ...args) {
     if (typeof event.frameId === 'number') {
-      console.log('is from inside', BrowserWindow.fromWebContents(event.sender).id)
+      // console.log('is from inside', BrowserWindow.fromWebContents(event.sender).id)
     }
     if (!isValidMethod(method)) {
       return { status: -2, msg: 'invalid method', result: {} }

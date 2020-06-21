@@ -163,7 +163,6 @@ export class ModuleManager extends WebInterfaceBase {
         .replace(/\\/g, '\\\\')
     }
     this.map[this.mainWindow.id] = 'main'
-    console.log(this.mainWindow.id)
     if (isDev) {
       this.mainWindow.webContents.openDevTools()
       this.mainWindow.webContents.on('did-attach-webview', (e, webContents) => {
