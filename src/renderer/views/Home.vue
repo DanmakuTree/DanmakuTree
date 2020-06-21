@@ -1,111 +1,77 @@
 <template>
-  <div class="home">
-    <div class="left">
-      <a-input-search
-        style="font-size: 18px"
-        placeholder="直播间id"
-        enter-button="添加房间"
-      />
-      <draggable v-model="roomList" handle=".handle">
-        <transition-group  type="transition" name="flip-list">
-          <div
-            v-for="element in roomList"
-            :key="element.roomId"
-            class="card"
-            style="margin-top: 10px">
-            <a-icon type="menu" class="handle"/>
-            {{element.title}}roomid:{{element.roomId}}
-          </div>
-        </transition-group>
-      </draggable>
+  <div class="container">
+    <div style="margin-bottom: 8px">
+      <span class="h2">Hi mano233,</span>
+      <span style="font-family: Roboto-Regular,sans-serif;font-size: 13px;color: #92929D">以下是直播间的统计信息</span>
     </div>
-    <div class="right">
-      <div class="card">
-        <a-button type="primary">
-          登陆bilibili账号
-        </a-button>
+    <div style="display: flex;height: 260px;justify-content: space-between">
+      <div class="card-r" style="flex: 1;display: flex;flex-direction: column;padding: 18px">
+        <div class="title-h4" style="margin-bottom: 10px">实时弹幕数量</div>
+        <my-linecharts/>
       </div>
-      <a-tabs default-active-key="1">
-        <a-tab-pane key="1" tab="应用模块">
-          <div class="small-card" @click="openWin">
-            <span></span>
-            弹幕助手
-          </div>
-        </a-tab-pane>
-        <a-tab-pane key="2" tab="obs模块" force-render>
-          Content of Tab Pane 2
-        </a-tab-pane>
-      </a-tabs>
+    </div>
+    <div style="display: flex;justify-content: space-between;margin-top: 32px">
+      <div class="card-little">
+        <div class="h2">1,233</div>
+        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 11px;color: #696974;">直播时长</div>
+        <div style="margin-top: 12px;">
+          +1.5%
+          <span class="icon iconfont iconic_Up1" style="color: #3DD598"></span>
+        </div>
+
+      </div>
+      <div class="card-little">
+        <div class="h2">1,233</div>
+        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 11px;color: #696974;">直播时长</div>
+        <div style="margin-top: 12px;">
+          +1.5%
+          <span class="icon iconfont iconic_Up1" style="color: #3DD598"></span>
+        </div>
+
+      </div>
+      <div class="card-little">
+        <div class="h2">1,233</div>
+        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 11px;color: #696974;">直播时长</div>
+        <div style="margin-top: 12px;">
+          +1.5%
+          <span class="icon iconfont iconic_Up1" style="color: #3DD598"></span>
+        </div>
+      </div>
+      <div class="card-little">
+        <div class="h2">1,233</div>
+        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 11px;color: #696974;">直播时长</div>
+
+        <div style="margin-top: 12px;">
+          +1.5%
+          <span class="icon iconfont iconic_Down1" style="color: #fc5a5a"></span>
+        </div>
+
+      </div>
     </div>
   </div>
 </template>
+
 <script>
-  import draggable from 'vuedraggable'
+  import mytable from '../components/table/mytable'
+  import linecharts from '../components/charts/linecharts'
+
   export default {
-    name: 'Home',
+    name: 'Home2',
     components: {
-      draggable
-    },
-    data () {
-      return {
-        roomList: [
-          {
-            roomId: 0,
-            title: '直播间1'
-          },
-          {
-            roomId: 1,
-            title: '直播间2'
-          }
-        ]
-      }
-    },
-    methods: {
-      openWin () {
-        window.API.CreateWindow()
-      }
+      'my-linecharts': linecharts,
+      'my-table': mytable
     }
   }
 </script>
-<style>
-  .home{
-    display: flex;
-    padding: 10px;
+
+<style scoped>
+  .container{
+    padding: 16px 20px;
+    background: #fafafb;
     flex: 1;
   }
-  .card{
-    height: 128px;
-    border-radius: 4px;
-    background-color: white;
-    border: 1px solid #dddee1;
-    padding: 10px;
-  }
-  .left{
-    width: 280px;
-  }
-  .right{
-    flex: 1;
-    margin-left: 10px;
-    display: flex;
-    flex-direction: column;
-  }
-  .small-card{
-    display: flex;
-    height: 50px;
-    width: 190px;
-    background-color: white;
-    align-items: center;
-    border: 1px solid #dddee1;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .small-card span{
-    height: 50px;
-    width: 50px;
-    margin-right: 10px;
-    background-color: #26ade3;
-  }
-  .handle{
-    cursor: move;
+  .item-d{
+    word-break: break-all;
+    margin-bottom: 2px;
   }
 </style>
