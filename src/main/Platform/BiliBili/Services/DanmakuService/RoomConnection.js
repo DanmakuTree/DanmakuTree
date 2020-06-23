@@ -104,10 +104,19 @@ export class RoomConnection extends EventEmitter {
               })
               var transformMessage = this.warpper.warp(msg)
               if (transformMessage) {
-                eventBus.emit('Platform.BiliBili.Service.DanmakuService.Message', {
-                  roomId: this.roomId,
-                  data: transformMessage
-                })
+                if (Array.isArray(transformMessage)) {
+                  transformMessage.forEach((e) => {
+                    eventBus.emit('Platform.BiliBili.Service.DanmakuService.Message', {
+                      roomId: this.roomId,
+                      data: e
+                    })
+                  })
+                } else {
+                  eventBus.emit('Platform.BiliBili.Service.DanmakuService.Message', {
+                    roomId: this.roomId,
+                    data: transformMessage
+                  })
+                }
               }
             } catch (error) {
               this.emit('decodeError', error, packet)
