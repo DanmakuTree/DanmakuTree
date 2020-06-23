@@ -6,6 +6,7 @@ import { Table, Input, Tag, Select, Popover, Switch } from 'ant-design-vue'
 
 import VueVirtualScroller from 'vue-virtual-scroller'
 import echarts from 'echarts'
+import API from './plugins/API'
 import 'ant-design-vue/dist/antd.css'
 import './assets/style/iconfont/iconfont.css'
 import './assets/style/global.css'
@@ -22,6 +23,7 @@ Vue.config.productionTip = isDev
 
 Vue.prototype.$echarts = echarts
 
+Vue.use(API)
 Vue.use(Table)
 Vue.use(Input)
 Vue.use(Tag)

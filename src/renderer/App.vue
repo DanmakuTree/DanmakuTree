@@ -17,12 +17,11 @@
 </template>
 
 <script>
-  import Vue from 'vue'
   import dMenu from './components/menu'
   import floatbar from './components/floatbar'
   import dHeader from './components/header'
 
-  export default Vue.extend({
+  export default {
     name: 'App',
     components: {
       'd-menu': dMenu,
@@ -34,8 +33,7 @@
         return this.$route.meta.title
       }
     }
-
-  })
+  }
 </script>
 <style scoped>
   #app{

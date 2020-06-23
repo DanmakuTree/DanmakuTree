@@ -5,14 +5,22 @@
       弹幕树
     </span>
     <span style="flex: 1"/>
-    <span class="icon iconfont iconic_Minus" style="margin-right: 12px"/>
-    <span class="icon iconfont iconic_Closs1"/>
+    <span class="icon iconfont iconic_Minus window-icon" @click="minimize" />
+    <span class="icon iconfont iconic_Closs1 window-icon" @click="close" />
   </header>
 </template>
 
 <script>
   export default {
-    name: 'dHeader'
+    name: 'dHeader',
+    methods: {
+      minimize () {
+        this.$currentWindow.minimize()
+      },
+      close () {
+        this.$currentWindow.close()
+      }
+    }
 
   }
 </script>
@@ -31,6 +39,10 @@
     backdrop-filter: blur(20px);
     border-bottom: 1px solid #e2e2ea;
     overflow: hidden;
-    padding:0 20px;
+    padding:0 0 0 20px;
+  }
+  .window-icon{
+    padding: 8px;
+    -webkit-app-region: no-drag;
   }
 </style>

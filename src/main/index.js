@@ -6,7 +6,6 @@ import { isDev, version } from './Consts'
 import { WebInterface } from './WebInterface'
 import { ModuleManager } from './ModuleManager'
 import { Main } from './Main'
-import { WebsocketService } from './Services/WebsocketService'
 
 // set app name
 app.name = productName

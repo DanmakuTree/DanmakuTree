@@ -1,7 +1,7 @@
 import { WebInterfaceBase } from './WebInterfaceBase'
 import Axios from 'axios'
 import { version, Backend, MainPreloadScript, MainWindowPage, ModuleWindowPage, isDev, BiliBiliPreloadScript, ModulePreloadScript } from './Consts'
-import { BrowserWindow, app, protocol } from 'electron'
+import { BrowserWindow, app, protocol, dialog } from 'electron'
 import { eventBus } from './EventBus'
 import { getLogger } from 'log4js'
 const BrowserWindowOptions = ['width', 'height', 'x', 'y', 'resizable', 'movable', 'minimizable', 'maximizable', 'skipTaskbar', 'alwaysOnTop', 'fullscreen', 'opacity', 'backgroundColor', 'transparent', 'frame']
@@ -21,8 +21,9 @@ export class ModuleManager extends WebInterfaceBase {
      */
     this.map = {}
     this.moduleWindows = {}
+    this.quitSign = false
     this.available.push('getAllModuleList', 'updateModuleConfig', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows')
-    var bindList = ['getAllModuleList', 'updateModuleConfig', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows']
+    var bindList = ['getAllModuleList', 'updateModuleConfig', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit']
     this.moduleList = []
     bindList.forEach((e) => { this[e] = this[e].bind(this) })
     app.on('ready', () => {
@@ -44,6 +45,7 @@ export class ModuleManager extends WebInterfaceBase {
         // createWindow()
       }
     })
+    eventBus.on('Main.quit', this.onMainQuit)
   }
 
   async getAllModuleList () {
@@ -177,6 +179,22 @@ export class ModuleManager extends WebInterfaceBase {
     })
 
     this.mainWindow.webContents.on('will-attach-webview', this.webviewInspector)
+    this.mainWindow.on('close', (e) => {
+      if (!this.quitSign) {
+        e.preventDefault()
+        dialog.showMessageBox({
+          type: 'warning',
+          message: '真的要退出弹幕树吗？',
+          buttons: ['是', '否'],
+          defaultId: 0,
+          cancelId: 1
+        }).then((res) => {
+          if (res.response === 0) {
+            eventBus.emit('Main.quit')
+          }
+        })
+      }
+    })
     this.mainWindow.on('closed', () => {
       this.mainWindow = null
       eventBus.detach('ALLPUBLIC', this.sendToMainWindow)
@@ -277,6 +295,11 @@ export class ModuleManager extends WebInterfaceBase {
     } catch (error) {
 
     }
+  }
+
+  onMainQuit () {
+    this.quitSign = true
+    this.mainWindow.close()
   }
 }
 

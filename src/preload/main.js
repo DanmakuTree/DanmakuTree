@@ -1,7 +1,6 @@
-
 var ipcRenderer = require('electron').ipcRenderer
 var remote = require('electron').remote
-var currentWindows = remote.getCurrentWindow()
+var currentWindow = remote.getCurrentWindow()
 
 function APIStructure (itemName) {
   return new Proxy(function () {}, {
@@ -24,31 +23,31 @@ function APIStructure (itemName) {
     }
   })
 };
-class CurrentWindows {
+class CurrentWindow {
   close () {
-    currentWindows.close()
+    currentWindow.close()
   }
 
   minimize () {
-    currentWindows.minimize()
+    currentWindow.minimize()
   }
 
   maximize () {
-    currentWindows.maximize()
+    currentWindow.maximize()
   }
 
   moveTop () {
-    currentWindows.moveTop()
+    currentWindow.moveTop()
   }
 
   setTitle (title) {
-    currentWindows.setTitle(title)
+    currentWindow.setTitle(title)
   }
 }
 
 window.API = {
   Platform: APIStructure('Platform'),
-  CurrentWindows: new CurrentWindows(),
+  CurrentWindow: new CurrentWindow(),
   Module: APIStructure('Module'),
   Main: APIStructure('Main'),
   eventhandler (...args) { console.log(...args) }
