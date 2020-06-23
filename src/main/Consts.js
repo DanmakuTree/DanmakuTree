@@ -5,8 +5,8 @@ export const isDebug = process.argv.includes('--debug')
 export const version = ProgramVersion
 export const Backend = 'https://api.r18g.fun/api'
 
-export const MainWindowPage = isDev ? 'http://localhost:9080' : `file://${__dirname}/index.html`
-export const ModuleWindowPage = isDev ? 'http://localhost:9080' : `file://${__dirname}/index.html`
+export const MainWindowPage = isDev ? 'http://localhost:9080/embed.html' : `file://${__dirname}/embed.html`
+export const ModuleWindowPage = isDev ? 'http://localhost:9080/externalWindow.html' : `file://${__dirname}/externalWindow/index.html`
 
 export const MainPreloadScript = isDev
   ? path.resolve('./src/preload/main.js')

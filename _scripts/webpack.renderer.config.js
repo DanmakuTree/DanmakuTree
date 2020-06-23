@@ -21,6 +21,7 @@ const config = {
   devtool: isDevMode ? '#cheap-module-eval-source-map' : false,
   entry: {
     renderer: path.join(__dirname, '../src/renderer/main.js'),
+    externalWindow: path.join(__dirname,'../src/renderer/externalWindow.js')
   },
   output: {
     libraryTarget: 'umd',
@@ -107,9 +108,14 @@ const config = {
   plugins: [
     // new WriteFilePlugin(),
     new HtmlWebpackPlugin({
-      excludeChunks: ['processTaskWorker'],
-      filename: 'index.html',
-      template: path.resolve(__dirname, '../src/index.ejs')
+      filename: 'embed.html',
+      template: path.resolve(__dirname, '../src/template.ejs'),
+      chunks: ['renderer']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'externalWindow.html',
+      template: path.resolve(__dirname, '../src/template.ejs'),
+      chunks: ['externalWindow']
     }),
     new VueLoaderPlugin(),
     new webpack.DefinePlugin({

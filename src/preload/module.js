@@ -1,4 +1,3 @@
-
 var { ipcRenderer, remote, shell, clipboard } = require('electron').ipcRenderer
 var currentWindow = remote.getCurrentWindow()
 

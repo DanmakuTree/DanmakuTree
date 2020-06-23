@@ -88,7 +88,6 @@ export class ModuleManager extends WebInterfaceBase {
         webPreferences: {
           nodeIntegration: false,
           nodeIntegrationInWorker: false,
-          nodeIntegrationInSubFrames: false,
           preload: ModulePreloadScript,
           webSecurity: false,
           webviewTag: false
@@ -119,16 +118,16 @@ export class ModuleManager extends WebInterfaceBase {
           this.moduleWindows[moduleId].push(moduleWindow)
         }
         var listener = InsertArgument(this.sendEventToWindow, moduleWindow)
+        const windowId = moduleWindow.id
         eventBus.on('ALLPUBLIC', listener)
         moduleWindow.on('closed', () => {
           eventBus.detach('ALLPUBLIC', listener)
-          this.map[moduleWindow.id] = undefined
+          this.map[windowId] = undefined
           this.moduleWindows[moduleId] = this.moduleWindows[moduleId].filter((e) => {
             return e !== moduleWindow
           })
         })
-
-        return { 'code': 0, 'msg': 'success', 'data': moduleWindow.id }
+        return { 'code': 0, 'msg': 'success', 'data': windowId }
       }
     } else {
       return { 'code': -1, 'msg': 'not support' }

@@ -1,5 +1,4 @@
-var ipcRenderer = require('electron').ipcRenderer
-var remote = require('electron').remote
+var { ipcRenderer, remote, shell, clipboard } = require('electron').ipcRenderer
 var currentWindow = remote.getCurrentWindow()
 
 function APIStructure (itemName) {
@@ -50,7 +49,13 @@ window.API = {
   CurrentWindow: new CurrentWindow(),
   Module: APIStructure('Module'),
   Main: APIStructure('Main'),
-  eventhandler (...args) { console.log(...args) }
+  eventhandler (...args) { console.log(...args) },
+  utils: {
+    clipboard,
+    openExternal (url) {
+      return shell.openExternal(url)
+    }
+  }
 }
 ipcRenderer.on('event', (sender, e) => {
   try {
