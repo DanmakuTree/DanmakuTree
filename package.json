@@ -96,7 +96,7 @@
     "electron-builder-install": "electron-builder install-app-deps",
     "electron-rebuild": "electron-rebuild",
     "lint": "eslint --fix --ext .js,.ts,.vue ./",
-    "pack": "run-p pack:main pack:renderer pack:web pack:preload",
+    "pack": "run-p pack:main pack:renderer pack:preload",
     "pack:main": "webpack --mode=production --env.NODE_ENV=production --hide-modules --config _scripts/webpack.main.config.js",
     "pack:renderer": "webpack --mode=production --env.NODE_ENV=production --hide-modules --config _scripts/webpack.renderer.config.js",
     "pack:web": "webpack --mode=production --env.NODE_ENV=production --hide-modules --config _scripts/webpack.web.config.js",

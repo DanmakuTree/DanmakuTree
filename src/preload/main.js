@@ -1,4 +1,4 @@
-var { ipcRenderer, remote, shell, clipboard } = require('electron').ipcRenderer
+var { ipcRenderer, remote, shell, clipboard } = require('electron')
 var currentWindow = remote.getCurrentWindow()
 
 function APIStructure (itemName) {
