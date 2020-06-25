@@ -1,11 +1,12 @@
-import { app, ipcMain } from 'electron'
+import { app, ipcMain, dialog } from 'electron'
 import { productName } from '../../package.json'
 import { configure, getLogger } from 'log4js'
 import { Platform } from './Platform'
-import { isDev, version } from './Consts'
+import { isDev, version, DataPath } from './Consts'
 import { WebInterface } from './WebInterface'
 import { ModuleManager } from './ModuleManager'
 import { Main } from './Main'
+import { mkdirSync } from 'fs'
 
 // set app name
 app.name = productName
@@ -17,7 +18,20 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = false
 
 const gotTheLock = app.requestSingleInstanceLock()
 
-app.setAppLogsPath()
+try {
+  mkdirSync(DataPath + '/log', { recursive: true })
+  mkdirSync(DataPath + '/data', { recursive: true })
+  mkdirSync(DataPath + '/config', { recursive: true })
+} catch (error) {
+  console.log(error)
+  dialog.showMessageBoxSync({
+    type: 'error',
+    title: '弹幕树',
+    message: `创建程序数据文件夹失败：${error.message}`
+  })
+  app.quit()
+  process.exit(-1)
+}
 
 /**
  * @type {Logger}
@@ -27,7 +41,7 @@ var logConfig = {
   appenders: {
     file: {
       type: 'dateFile',
-      filename: app.getPath('logs') + '/main',
+      filename: DataPath + '/log/main',
       pattern: 'yyyy-MM-dd.log',
       alwaysIncludePattern: true,
       layout: {

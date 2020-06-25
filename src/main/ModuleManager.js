@@ -108,7 +108,7 @@ export class ModuleManager extends WebInterfaceBase {
         var moduleWindow = new BrowserWindow(option)
         moduleWindow.loadURL(ModuleWindowPage + `#${moduleId}|${JSON.stringify(data)}`)
         if (isDev) {
-          moduleWindow.webContents.openDevTools()
+          moduleWindow.webContents.openDevTools({ mode: 'detach' })
         }
         this.map[moduleWindow.id] = moduleId
         if (this.moduleWindows[moduleId]) {
@@ -165,7 +165,7 @@ export class ModuleManager extends WebInterfaceBase {
     }
     this.map[this.mainWindow.id] = 'main'
     if (isDev) {
-      this.mainWindow.webContents.openDevTools()
+      this.mainWindow.webContents.openDevTools({ mode: 'detach' })
       this.mainWindow.webContents.on('did-attach-webview', (e, webContents) => {
         webContents.openDevTools({ mode: 'detach' })
       })
