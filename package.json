@@ -6,6 +6,7 @@
   "dependencies": {
     "ant-design-vue": "^1.6.2",
     "axios": "^0.19.2",
+    "better-sqlite3": "^7.1.0",
     "echarts": "^4.8.0",
     "lodash": "^4.17.15",
     "log4js": "^6.3.0",
