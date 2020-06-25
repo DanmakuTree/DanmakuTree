@@ -18,3 +18,9 @@ ipcRenderer.on('captchaCallback', (e, ...args) => {
     window.biliInject.biliCallbackReceived(...args)
   }
 })
+window.postMessage = (data) => {
+  ipcRenderer.sendToHost('message', data)
+}
+window.parent.postMessage = (data) => {
+  ipcRenderer.sendToHost('message', data)
+}
