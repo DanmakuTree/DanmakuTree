@@ -10,7 +10,7 @@ eventBus.registerPublicEvent('Platform.BiliBili.Service.DanmakuService.RawMessag
 export class DanmakuService extends WebInterfaceBase {
   constructor () {
     super()
-    this.version = '0.0.1'
+    this.version = '0.0.2'
     /**
      * @type {RoomConnection[]}
      */
@@ -72,6 +72,7 @@ export class DanmakuService extends WebInterfaceBase {
       if (!force) {
         oldConnection.once('close', () => {
           this.logger.info(`Room ${oldConnection.roomId} close`)
+          eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.close', oldConnection.roomId)
           eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
         })
       }
@@ -93,6 +94,7 @@ export class DanmakuService extends WebInterfaceBase {
       connection.on(e, () => {
         this.logger.info(`Room ${connection.roomId} ${e}`)
         eventBus.emit('Platform.BiliBili.Service.DanmakuService.control.statusUpdate')
+        eventBus.emit(`Platform.BiliBili.Service.DanmakuService.control.${e}`, connection.roomId)
       })
     })
     connection.on('needReconnect', this.onReconnect)
