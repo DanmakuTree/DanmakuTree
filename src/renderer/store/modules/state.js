@@ -1,3 +1,5 @@
 export default {
-  roomList: []
+  roomList: [],
+  modalVisible: false,
+  isLogin: false
 }

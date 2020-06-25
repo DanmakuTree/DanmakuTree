@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <d-modal />
     <div id="container">
       <d-header/>
       <div class="content">
@@ -20,13 +21,19 @@
   import dMenu from './components/menu'
   import floatbar from './components/floatbar'
   import dHeader from './components/header'
+  import dModal from './components/modal'
 
   export default {
     name: 'App',
     components: {
       'd-menu': dMenu,
       'd-header': dHeader,
-      'float-bar': floatbar
+      'float-bar': floatbar,
+      'd-modal': dModal
+    },
+    created () {
+      window.API.Module.getAllModuleList().then(e => { console.log(e[0].id) })
+      console.log(window.API.Module.getAvailable().then(e => console.log(e)))
     },
     computed: {
       routerTitle () {
