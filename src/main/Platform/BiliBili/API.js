@@ -94,9 +94,9 @@ export class API extends WebInterfaceBase {
    * @param {String} cookies cookies
    */
   async setCookies (cookies) {
-    this.cookies = cookies.map((e) => { return e.name_jct + '=' + e.value }).join(';')
+    this.cookies = cookies.map((e) => { return e.name + '=' + e.value }).join(';')
     this.uid = cookies.find((v) => { return v.name === 'DedeUserID' }).value
-    this.webAxios = createWebAxios(cookies)
+    this.webAxios = createWebAxios(this.cookies)
     this.loginType = 'WEB'
     this.saveLoginInfo()
     return true
@@ -878,7 +878,7 @@ function createWebAxios (cookies) {
     'Referer': 'https://live.bilibili.com'
   }
   if (cookies) {
-    headers.cookie = cookies
+    headers.Cookie = cookies
   }
   return axios.create({
     baseURL: 'https://api.live.bilibili.com',
