@@ -7,19 +7,19 @@ export class KVTable {
    * @param {string} tableName 表名
    */
   constructor (db, tableName) {
-      var dbConnection = undefined
-      var dbFile = '' 
-      if (typeof(db)==='string'&&db.includes('.db')) dbFile=db
-      else if (typeof(db)==='string'&&!db.includes('.db')) dbFile=`${db}.db`
-      else if (db instanceof Database) dbConnection = db
-      else {console.log(`${db} might not be a string`); return -1;} 
-    
-      this._dbFile = dbFile
-      this._tableName = tableName
-      if (!dbConnection) dbConnection = new Database(dbFile);
-      
-      dbConnection.prepare(`CREATE TABLE if not exists "${tableName}" (key TEXT NOT NULL PRIMARY KEY ASC, value TEXT)`).run()
-      this._dbConnection = dbConnection
+    var dbConnection
+    var dbFile = ''
+    if (typeof (db) === 'string' && db.includes('.db')) dbFile = db
+    else if (typeof (db) === 'string' && !db.includes('.db')) dbFile = `${db}.db`
+    else if (db instanceof Database) dbConnection = db
+    else { console.log(`${db} might not be a string`); return -1 }
+
+    this._dbFile = dbFile
+    this._tableName = tableName
+    if (!dbConnection) dbConnection = new Database(dbFile)
+
+    dbConnection.prepare(`CREATE TABLE if not exists "${tableName}" (key TEXT NOT NULL PRIMARY KEY ASC, value TEXT)`).run()
+    this._dbConnection = dbConnection
   }
 
   /**
@@ -29,13 +29,13 @@ export class KVTable {
    * c. 如果KEY存在且VALUE非空，则会返回 {value:string}
    * @date 2020-06-26
    * @param {string} key
-   * @returns {{value: string|null} | undefined} 
+   * @returns {{value: string|null} | undefined}
    */
   get (key) {
-      var stmt = this._dbConnection.prepare(`SELECT value FROM "main"."${this._tableName}" WHERE key=?`)
-      var result = stmt.get(String(key))
-      if (!result) console.log(`"main"."${this._tableName}" does NOT exist the key ${key}. CHECK your requested key.`)
-      return result
+    var stmt = this._dbConnection.prepare(`SELECT value FROM "main"."${this._tableName}" WHERE key=?`)
+    var result = stmt.get(String(key))
+    if (!result) console.log(`"main"."${this._tableName}" does NOT exist the key ${key}. CHECK your requested key.`)
+    return result
   }
 
   /**
@@ -46,7 +46,7 @@ export class KVTable {
    * @returns {changes} changes
    */
   set (key, value) {
-      return this._dbConnection.prepare(`REPLACE INTO "main"."${this._tableName}" (key,value) VALUES (?, ?)`).run(String(key), String(value))
+    return this._dbConnection.prepare(`REPLACE INTO "main"."${this._tableName}" (key,value) VALUES (?, ?)`).run(String(key), String(value))
   }
 
   /**
@@ -64,10 +64,10 @@ export class KVTable {
    * @date 2020-06-26
    * @returns {[string]} Array of String, contains key names.
    */
-  keys(){
-      var stmt = this._dbConnection.prepare(`SELECT key FROM "main"."${this._tableName}" ORDER BY key ASC`)
-      var keys = []
-      stmt.all().forEach((e)=>{keys.push(e.key)})
-      return keys
+  keys () {
+    var stmt = this._dbConnection.prepare(`SELECT key FROM "main"."${this._tableName}" ORDER BY key ASC`)
+    var keys = []
+    stmt.all().forEach((e) => { keys.push(e.key) })
+    return keys
   }
 }
