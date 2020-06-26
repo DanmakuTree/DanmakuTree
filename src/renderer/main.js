@@ -31,6 +31,8 @@ Vue.use(Select)
 Vue.use(Popover)
 Vue.use(Switch)
 
+window.API.Module.getAllModuleList()
+
 export default new Vue({
   el: '#app',
   router,

@@ -287,7 +287,7 @@ export class ModuleManager extends WebInterfaceBase {
     try {
       var url = new URL(params.src)
       if (url.origin.endsWith('.bilibili.com')) {
-        webPreferences.preloadURL = BiliBiliPreloadScript
+        webPreferences.preloadURL = 'file://' + BiliBiliPreloadScript
       } else if (url.protocol === 'http' && url.host === 'localhost:9080') {
         webPreferences.preloadURL = ModulePreloadScript
       }

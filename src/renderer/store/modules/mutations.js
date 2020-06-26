@@ -1,5 +1,6 @@
 export default {
   hiddenModal (state) {
+    state.isLogin = false
     state.modalVisible = false
   },
   showDefaultModal (state, data) {
