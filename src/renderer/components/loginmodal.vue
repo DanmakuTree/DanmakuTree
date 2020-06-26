@@ -7,11 +7,8 @@
     name: 'loginmodal',
     mounted () {
       const webview = this.$refs.view
-      webview.addEventListener('dom-ready', () => {
-        console.log(1)
-        webview.insertCSS('#wrapper{pointer-events:none;}#content{pointer-events:auto;}')
-      })
       webview.addEventListener('ipc-message', (event) => {
+        console.log('ipc-message...')
         if (event.channel === 'message' && event.args[0] === 'close') {
           this.$store.commit('hiddenModal')
         }

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <d-modal />
+    <d-modal v-show="modalVisible"/>
     <div id="container">
       <d-header/>
       <div class="content">
@@ -36,6 +36,9 @@
       console.log(window.API.Module.getAvailable().then(e => console.log(e)))
     },
     computed: {
+      modalVisible () {
+        return this.$store.state.modalVisible
+      },
       routerTitle () {
         return this.$route.meta.title
       }

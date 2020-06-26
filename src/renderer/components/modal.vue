@@ -1,5 +1,5 @@
 <template>
-  <div id="d-modal-container" v-show="modalVisible" @click="hidden">
+  <div id="d-modal-container">
     <component :is="component"/>
   </div>
 </template>
@@ -17,9 +17,6 @@
       isLogin () {
         return this.$store.state.isLogin
       },
-      modalVisible () {
-        return this.$store.state.modalVisible
-      },
       component () {
         return this.isLogin ? loginmodal : null
       }
@@ -27,7 +24,6 @@
     },
     methods: {
       hidden () {
-        console.log('1111')
         this.$store.commit('hiddenModal')
       }
     }
