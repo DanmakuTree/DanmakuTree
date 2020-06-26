@@ -11,4 +11,8 @@ export class Platform extends WebInterfaceBase {
   getPlatformList () {
     return ['BiliBili']
   }
+
+  init () {
+    this.BiliBili.init()
+  }
 }

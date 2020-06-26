@@ -1,6 +1,8 @@
 import { WebInterfaceBase } from '../../WebInterfaceBase'
 import API from './API'
 import BiliBiliServices from './Services'
+import Database from 'better-sqlite3'
+import { DataPath } from '../../Consts'
 
 export class BiliBili extends WebInterfaceBase {
   constructor () {
@@ -9,6 +11,14 @@ export class BiliBili extends WebInterfaceBase {
     this.API = API
     this.Services = BiliBiliServices
     this.available.push('API', 'Services')
+    this.init = this.init.bind(this)
+    this.db = null
+  }
+
+  init () {
+    this.db = new Database(DataPath + '/config/BiliBili.db')
+    this.Services.init(this.db)
+    this.API.init(this.db)
   }
 }
 

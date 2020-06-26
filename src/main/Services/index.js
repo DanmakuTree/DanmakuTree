@@ -7,5 +7,8 @@ export class Services extends WebInterfaceBase {
     this.available.push('WebsocketService')
     this.WebsocketService = WebsocketService
   }
+
+  init () {
+  }
 }
 export default new Services()

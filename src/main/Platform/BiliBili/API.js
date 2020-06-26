@@ -4,13 +4,15 @@ import https from 'https'
 import { isDev } from '../../Consts'
 import BiliBiliConsts from './Consts'
 import { WebInterfaceBase } from '../../WebInterfaceBase'
+import { KVTable } from '../../KVTable'
+import { session } from 'electron'
 // import { promises as fspromise } from 'fs'
 // const readFile = fspromise.readFile
 // const writeFile = fspromise.writeFile
 export class API extends WebInterfaceBase {
   constructor () {
     super()
-    this.version = '0.9.0'
+    this.version = '0.9.1'
     this.accessKey = ''
     this.uid = 0
     this.bili_jct = ''
@@ -22,7 +24,7 @@ export class API extends WebInterfaceBase {
      */
     this.loginType = 'NONE' // "WEB" "MOBILE"
     const methodList = [
-      'getLoginKey', 'setCookies', 'mobilelogin', 'getUserLiveInfo', 'getUserLiveInfo1', 'saveLoginInfo',
+      'logout', 'getLoginKey', 'setCookies', 'mobilelogin', 'getUserLiveInfo', 'getUserLiveInfo1', 'saveLoginInfo',
       'getAreaList', 'getMyChooseArea', 'getCoverList', 'setCover', 'getTitleList', 'getMyInfo', 'getReleation',
       'getLiverCustomTags', 'setLiverCustomTags', 'updateRoomInfo', 'getUserInfoNav', 'getFollowingList', 'getFollowersList',
       'setRoomTitle', 'setRoomArea', 'startLive', 'stopLive', 'getUserCard', 'getUserLiveCard', 'getInfoByRoom', 'getRoomInfoByUid',
@@ -42,6 +44,19 @@ export class API extends WebInterfaceBase {
     //   this.loginType = e.loginType
     //   this.webAxios = createWebAxios(this.cookies)
     // }).catch((e) => { console.log(e) })
+  }
+
+  init (db) {
+    this.store = new KVTable(db, 'auth')
+    var type = this.store.get('loginType')
+    if (typeof type === 'string' && (type = JSON.parse(type)) && (type === 'WEB' || type === 'MOBILE')) {
+      this.loginType = type
+      this.accessKey = JSON.parse(this.store.get('accessKey'))
+      this.uid = JSON.parse(this.store.get('uid'))
+      this.bili_jct = JSON.parse(this.store.get('bili_jct'))
+      this.cookies = JSON.parse(this.store.get('cookies'))
+      this.webAxios = createWebAxios(this.cookies)
+    }
   }
 
   /**
@@ -81,6 +96,9 @@ export class API extends WebInterfaceBase {
       this.cookies = loginRes.data.cookie_info.cookies.map((e) => { return e.name + '=' + e.value }).join(';')
       this.bili_jct = loginRes.data.cookie_info.cookies.find((v) => { return v.name === 'bili_jct' }).value
       this.uid = loginRes.data.token_info.mid
+      this.cookies.forEach((e) => {
+        e.name = e.name_jct
+      })
       this.webAxios = createWebAxios(this.cookies)
       this.loginType = 'MOBILE'
       loginRes.data = {}
@@ -100,6 +118,24 @@ export class API extends WebInterfaceBase {
     this.loginType = 'WEB'
     this.saveLoginInfo()
     return true
+  }
+
+  async logout () {
+    this.webAxios.get('https://account.bilibili.com/login?act=exit').then(() => {}).catch(() => {})
+    this.loginType = 'NONE'
+    this.accessKey = ''
+    this.uid = 0
+    this.bili_jct = ''
+    this.cookies = null
+    this.mobileAxios = createMobileAxios()
+    this.webAxios = createWebAxios()
+    this.saveLoginInfo()
+    var bilibiliDomain = ['https://api.bilibili.com', 'https://live.bilibili.com', 'https://passport.biligame.com', 'https://passport.bigfun.cn', 'https://passport.bigfunapp.cn', 'https://www.biliapi.com']
+    bilibiliDomain.forEach((e) => {
+      session.defaultSession.clear({
+        origin: e
+      })
+    })
   }
 
   /**
@@ -620,7 +656,7 @@ export class API extends WebInterfaceBase {
   async getDanmuConf (roomId, platform = 'pc', player = 'web') {
     const data = {
       room_id: roomId,
-      platform: BiliBiliConsts.platform,
+      platform: platform,
       player
     }
     return (await this.webAxios.get('/room/v1/Danmu/getConf', {
@@ -784,13 +820,11 @@ export class API extends WebInterfaceBase {
   }
 
   saveLoginInfo () {
-    // writeFile('./login.json', JSON.stringify({
-    //   accessKey: this.accessKey,
-    //   cookies: this.cookies,
-    //   bili_jct: this.bili_jct,
-    //   uid: this.uid,
-    //   loginType: this.loginType
-    // }))
+    this.store.set('accessKey', JSON.stringify(this.accessKey))
+    this.store.set('cookies', JSON.stringify(this.cookies))
+    this.store.set('bili_jct', JSON.stringify(this.bili_jct))
+    this.store.set('uid', JSON.stringify(this.uid))
+    this.store.set('loginType', JSON.stringify(this.loginType))
   }
 }
 

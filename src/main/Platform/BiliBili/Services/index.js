@@ -13,10 +13,14 @@ export class BiliBiliServices extends WebInterfaceBase {
     this.FollowerService = FollowerService
     this.AvaterCollectService = AvaterCollectService
     this.HistoryService = HistoryService
+    this.init = this.init.bind(this)
   }
 
   getServicesList () {
     return ['DanmakuService', 'FollowerService', 'AvaterCollectService', 'HistoryService']
+  }
+
+  init () {
   }
 }
 

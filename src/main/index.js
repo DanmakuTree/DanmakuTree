@@ -111,6 +111,7 @@ app.on('activate', () => {
 })
 
 platform = new Platform()
+platform.init()
 var webInterface = new WebInterface()
 moduleManager = new ModuleManager()
 
