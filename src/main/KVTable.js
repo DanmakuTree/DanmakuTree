@@ -29,13 +29,13 @@ export class KVTable {
    * c. 如果KEY存在且VALUE非空，则会返回 {value:string}
    * @date 2020-06-26
    * @param {string} key
-   * @returns {{value: string|null} | undefined}
+   * @returns {string|null|undefined}
    */
   get (key) {
     var stmt = this._dbConnection.prepare(`SELECT value FROM "main"."${this._tableName}" WHERE key=?`)
     var result = stmt.get(String(key))
     if (!result) console.log(`"main"."${this._tableName}" does NOT exist the key ${key}. CHECK your requested key.`)
-    return result
+    return result ? result.value : undefined
   }
 
   /**
