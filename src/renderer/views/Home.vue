@@ -13,7 +13,7 @@
     <div style="display: flex;justify-content: space-between;margin-top: 32px">
       <div class="card-little">
         <div class="h2">1,233</div>
-        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 11px;color: #696974;">直播时长</div>
+        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 12px;color: #696974;">直播时长</div>
         <div style="margin-top: 12px;">
           +1.5%
           <span class="icon iconfont iconic_Up1" style="color: #3DD598"></span>
@@ -22,7 +22,7 @@
       </div>
       <div class="card-little">
         <div class="h2">1,233</div>
-        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 11px;color: #696974;">直播时长</div>
+        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 12px;color: #696974;">直播时长</div>
         <div style="margin-top: 12px;">
           +1.5%
           <span class="icon iconfont iconic_Up1" style="color: #3DD598"></span>
@@ -31,7 +31,7 @@
       </div>
       <div class="card-little">
         <div class="h2">1,233</div>
-        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 11px;color: #696974;">直播时长</div>
+        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 12px;color: #696974;">直播时长</div>
         <div style="margin-top: 12px;">
           +1.5%
           <span class="icon iconfont iconic_Up1" style="color: #3DD598"></span>
@@ -39,7 +39,7 @@
       </div>
       <div class="card-little">
         <div class="h2">1,233</div>
-        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 11px;color: #696974;">直播时长</div>
+        <div style="font-family: PingFangSC-Regular,sans-serif;font-size: 12px;color: #696974;">直播时长</div>
 
         <div style="margin-top: 12px;">
           +1.5%

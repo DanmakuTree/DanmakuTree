@@ -31,7 +31,7 @@
     {
       title: '#直播房间id',
       dataIndex: 'id',
-      width: 300,
+      width: 220,
       key: 'id'
     },
     {

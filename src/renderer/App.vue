@@ -18,10 +18,10 @@
 </template>
 
 <script>
-  import dMenu from './components/menu'
+  import dMenu from './components/menu/menu'
   import floatbar from './components/floatbar'
   import dHeader from './components/header'
-  import dModal from './components/modal'
+  import dModal from './components/modal/modal'
 
   export default {
     name: 'App',

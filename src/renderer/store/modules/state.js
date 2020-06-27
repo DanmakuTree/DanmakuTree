@@ -1,5 +1,8 @@
+import modelTypeEnum from '../../components/modal/modelTypeEnum'
 export default {
   roomList: [],
-  modalVisible: false,
-  isLogin: false
+  initializing: true,
+  modalVisible: true,
+  userInfo: {},
+  modalType: modelTypeEnum.INITIALIZING
 }

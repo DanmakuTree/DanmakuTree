@@ -30,9 +30,22 @@ Vue.use(Tag)
 Vue.use(Select)
 Vue.use(Popover)
 Vue.use(Switch)
+console.log('initializing...')
 
-window.API.Module.getAllModuleList()
-
+async function init () {
+  // 拉取module信息
+  await window.API.Module.getAllModuleList()
+  // 拉取用户信息
+  const result = await window.API.Platform.BiliBili.API.getUserInfoNav()
+  if (result.data.isLogin) {
+    // 如果用户已登陆，保存用户信息到vuex
+    store.commit('setUserInfo', result.data)
+  }
+}
+init().then(() => {
+  console.log('inited...')
+  store.commit('hiddenModal')
+})
 export default new Vue({
   el: '#app',
   router,

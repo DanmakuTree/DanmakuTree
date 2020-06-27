@@ -1,15 +1,9 @@
+<!--侧边栏导航组件-->
 <template>
   <div id="nav-bar">
     <div style="padding: 16px 8px">
       <div class="card-border" style="padding: 8px">
-        <div style="display: flex;align-items: center">
-          <div style="width: 32px;height: 32px;border-radius: 50%;background: black">
-          </div>
-          <div style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between" @click="login">
-            <div style="font-size: 11px;font-weight: bold;color: #171725">mano233</div>
-            <div style="font-size: 11px;">哔哩哔哩</div>
-          </div>
-        </div>
+        <userlittle/>
       </div>
     </div>
     <router-link
@@ -44,8 +38,12 @@
 </template>
 
 <script>
+  import userlittle from './userlittle'
   export default {
     name: 'NavMenu',
+    components: {
+      'userlittle': userlittle
+    },
     data () {
       return {
         menuitems: [
@@ -78,10 +76,6 @@
       }
     },
     methods: {
-      login () {
-        console.log('click')
-        this.$store.commit('showLoginModal')
-      },
       quit () {
         window.API.Quit()
       }

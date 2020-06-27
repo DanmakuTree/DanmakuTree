@@ -1,14 +1,12 @@
 export default {
   hiddenModal (state) {
-    state.isLogin = false
     state.modalVisible = false
   },
-  showDefaultModal (state, data) {
-    state.isLogin = false
-    state.modalVisible = true
+  setUserInfo (state, data) {
+    state.userInfo = data
   },
-  showLoginModal (state, data) {
-    state.isLogin = true
+  showModal (state, modalType) {
+    state.modalType = modalType
     state.modalVisible = true
   }
 }

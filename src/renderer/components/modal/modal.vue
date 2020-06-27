@@ -1,3 +1,4 @@
+<!--模态窗组件-->
 <template>
   <div id="d-modal-container">
     <component :is="component"/>
@@ -6,19 +7,28 @@
 
 <script>
   import loginmodal from './loginmodal'
+  import type from './modelTypeEnum'
+  import initializingmodal from './initializingmodal'
+
   export default {
     name: 'd_modal',
     data () {
       return {}
-    },
-    watch: {
     },
     computed: {
       isLogin () {
         return this.$store.state.isLogin
       },
       component () {
-        return this.isLogin ? loginmodal : null
+        switch (this.$store.state.modalType) {
+        case type.LOGIN: {
+          return loginmodal
+        }
+        case type.INITIALIZING:
+          return initializingmodal
+        default :
+          return null
+        }
       }
 
     },
