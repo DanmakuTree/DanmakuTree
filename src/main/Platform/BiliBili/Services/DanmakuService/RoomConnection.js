@@ -40,7 +40,7 @@ export class RoomConnection extends EventEmitter {
       this.connection = null
     }
     this.authInfo = {
-      uid,
+      uid: parseInt(uid),
       roomid: roomId,
       protover: 2,
       platform: 'web',

@@ -1,31 +1,40 @@
 import { WebInterfaceBase } from './WebInterfaceBase'
 import Services from './Services'
-import { version } from './Consts'
+import { version, DataPath } from './Consts'
 import { dialog } from 'electron'
 import { eventBus } from './EventBus'
+import Database from 'better-sqlite3'
+import { KVTable } from './KVTable'
 
 export class Main extends WebInterfaceBase {
   constructor () {
     super()
-    this.available.push('Services', 'getConfig', 'updateConfig', 'getRoomList', 'updateRoomList', 'getVersion')
+    var methodList = ['init', 'getConfig', 'updateConfig', 'quit', 'getVersion']
+    methodList.forEach((e) => { this[e] = this[e].bind(this) })
+    this.available.push('Services', 'getConfig', 'updateConfig', 'getVersion')
     this.Services = Services
+    this.database = null
     eventBus.registerPublicEvent('Main.quit')
   }
 
-  async getConfig () {
-    // todo
+  init () {
+    this.database = new Database(DataPath + '/config/config.db')
+    this.Services.init()
+    this.config = new KVTable(this.database, 'config')
   }
 
-  async updateConfig () {
-    // todo
+  async getConfig (key) {
+    return (() => {
+      try {
+        return JSON.parse(this.config.get(key))
+      } catch (error) {
+        return undefined
+      }
+    })()
   }
 
-  async getRoomList () {
-
-  }
-
-  async updateRoomList () {
-
+  async updateConfig (key, value) {
+    return this.config.set(key, JSON.stringify(value))
   }
 
   async quit () {

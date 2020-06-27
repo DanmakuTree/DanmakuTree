@@ -71,7 +71,7 @@ export class WebInterface {
           status: -1,
           msg: 'error',
           result: {},
-          error
+          error: String(error)
         }
       }
     }
