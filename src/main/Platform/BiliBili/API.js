@@ -12,7 +12,7 @@ import { session } from 'electron'
 export class API extends WebInterfaceBase {
   constructor () {
     super()
-    this.version = '0.9.1'
+    this.version = '0.9.2'
     this.accessKey = ''
     this.uid = 0
     this.bili_jct = ''
@@ -30,7 +30,9 @@ export class API extends WebInterfaceBase {
       'setRoomTitle', 'setRoomArea', 'startLive', 'stopLive', 'getUserCard', 'getUserLiveCard', 'getInfoByRoom', 'getRoomInfoByUid',
       'getDanmuConf', 'getRtmpStream', 'getInfoByUser', 'getRoomGiftList', 'getGiftConfig', 'getWebServerRank',
       'getWebGuardRank', 'getWebMedalRank', 'getRoomInfo', 'getRoomAdminByRoom', 'getRoomAdminByAnchor', 'sendRoomMessage', 'blockRoomUser',
-      'removeRoomBlockUserByUid', 'getRoomAdminByUid', 'getBlockUserListBySearch', 'addRoomAdmin', 'removeRoomAdmin']
+      'removeRoomBlockUserByUid', 'getRoomAdminByUid', 'getBlockUserListBySearch', 'addRoomAdmin', 'removeRoomAdmin',
+      'getDanmuReportReasonList', 'reportDanmaku', 'getSuperChatReportReasonList', 'reportSuperChatMessage', 'removeSuperChatMessage', 'setDanmuColor',
+      'setDanmuMode', 'updateDanmuConf', 'getRoomNews', 'updateRoomNews', 'getDanmuConfig', 'getSuperChatConfig', 'getSuperChatMessageInfo']
     methodList.forEach((e) => {
       this[e] = this[e].bind(this)
       this.available.push(e)
@@ -802,6 +804,112 @@ export class API extends WebInterfaceBase {
   }
 
   /**
+   * 拉取弹幕举报理由
+   */
+  async getDanmuReportReasonList () {
+    return (await this.webAxios.get('room_ex/v1/Danmu/forDanmuReason')).data
+  }
+
+  /**
+   * 举报弹幕
+   * @param {Number} roomId 房间号
+   * @param {Number} userId 用户ID
+   * @param {String} message 弹幕
+   * @param {String} reason 理由
+   * @param {String} ts 校验数据
+   * @param {String} sign 校验数据
+   */
+  async reportDanmaku (roomId, userId, message, reason, ts, sign) {
+    return (await this.webAxios.post(('room_ex/v1/Danmu/danmuReport', new URLSearchParams({
+      'roomid': roomId,
+      'uid': userId,
+      'msg': message,
+      reason,
+      ts,
+      sign,
+      'csrf_token': this.bili_jct,
+      'csrf': this.bili_jct
+    })))).data
+  }
+
+  /**
+   * 拉取醒目留言举报理由
+   */
+  async getSuperChatReportReasonList () {
+    return (await this.webAxios.get('av/v1/SuperChat/forMsgReason')).data
+  }
+
+  /**
+   * 举报醒目留言
+   * @param {Number} roomId
+   * @param {Number} userId
+   * @param {Number} messageId
+   * @param {String} message
+   * @param {String} reason
+   * @param {String} reasonId
+   * @param {String} token
+   * @param {String} ts
+   * @param {String} sign
+   */
+  async reportSuperChatMessage (roomId, userId, messageId, message, reason, reasonId, token, ts, sign = '') {
+    return (await this.webAxios.post('av/v1/SuperChat/report', new URLSearchParams({
+      'id': messageId,
+      'roomid': roomId,
+      'uid': userId,
+      'msg': message,
+      reason,
+      'reason_id': reasonId,
+      token,
+      sign,
+      ts,
+      'csrf_token': this.bili_jct,
+      'csrf': this.bili_jct
+    }))).data
+  }
+
+  /**
+   * 移除醒目留言
+   * @param {Number} messageId 醒目留言id
+   */
+  async removeSuperChatMessage (messageId) {
+    return (await this.webAxios.post('av/v1/SuperChat/remove', new URLSearchParams({
+      'id': messageId,
+      'csrf_token': this.bili_jct,
+      'csrf': this.bili_jct
+    }))).data
+  }
+
+  /**
+   * 设置弹幕颜色
+   * @param {*} color 颜色
+   * @param {*} roomId 房间号
+   */
+  async setDanmuColor (color, roomId) {
+    return this.updateDanmuConf({ color }, roomId)
+  }
+
+  /**
+   * 设置
+   * @param {*} mode 弹幕模式
+   * @param {*} roomId 房间号
+   */
+  async setDanmuMode (mode, roomId) {
+    return this.updateDanmuConf({ mode }, roomId)
+  }
+
+  /**
+   * 更改弹幕设置
+   * @param {*} conf 设置
+   * @param {*} roomId 房间号
+   */
+  async updateDanmuConf (conf, roomId) {
+    conf.roomid = roomId
+    conf.csrf_token = this.bili_jct
+    conf.csrf = this.bili_jct
+    return (await this.webAxios.post('api/ajaxSetConfig', new URLSearchParams(conf))).data
+  }
+
+  /**
    * 任命房管
    * @param {Number} userId 新房管UID
    */
@@ -812,11 +920,86 @@ export class API extends WebInterfaceBase {
     }))).data
   }
 
+  /**
+   * 移除房管
+   * @param {Number} userId 用户ID
+   */
   async removeRoomAdmin (userId) {
     return (await this.webAxios.post('/xlive/app-ucenter/v1/roomAdmin/dismiss', new URLSearchParams({
       'uid': userId,
       'csrf': this.bili_jct
     }))).data
+  }
+
+  /**
+   * 拉取房间公告
+   * @param {*} roomId
+   * @param {*} anchorId
+   */
+  async getRoomNews (roomId, anchorId) {
+    return (await this.webAxios.get('room_ex/v1/RoomNews/get', {
+      params: {
+        roomid: roomId,
+        uid: anchorId
+      }
+    })).data
+  }
+
+  /**
+   * 更新房间公告
+   * @param {*} roomId
+   * @param {*} anchorId
+   * @param {*} content
+   */
+  async updateRoomNews (roomId, anchorId, content) {
+    return (await this.webAxios.post('room_ex/v1/RoomNews/update', new URLSearchParams({
+      'roomid': roomId,
+      'uid': anchorId,
+      content,
+      'csrf_token': this.bili_jct
+    }))).data
+  }
+
+  /**
+   * 获取当前弹幕设置
+   * @param {*} roomId
+   */
+  async getDanmuConfig (roomId) {
+    return (await this.webAxios.get('userext/v1/DanmuConf/getConfig', {
+      params: {
+        roomid: roomId
+      }
+    })).data
+  }
+
+  /**
+   * 拉取直播间醒目留言配置
+   * @param {*} roomId
+   * @param {*} userId
+   * @param {*} parentAreaId
+   * @param {*} areaId
+   */
+  async getSuperChatConfig (roomId, userId, parentAreaId, areaId) {
+    return (await this.webAxios.get('av/v1/SuperChat/config', {
+      params: {
+        room_id: roomId,
+        ruid: userId,
+        parent_area_id: parentAreaId,
+        area_id: areaId
+      }
+    })).data
+  }
+
+  /**
+   * 获取某条醒目留言设置
+   * @param {*} messageId
+   */
+  async getSuperChatMessageInfo (messageId) {
+    return (await this.webAxios.get('av/v1/SuperChat/messageInfo', {
+      params: {
+        id: messageId
+      }
+    })).data
   }
 
   saveLoginInfo () {
