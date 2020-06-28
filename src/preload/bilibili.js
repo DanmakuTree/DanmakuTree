@@ -24,3 +24,7 @@ window.postMessage = (data) => {
 window.parent.postMessage = (data) => {
   ipcRenderer.sendToHost('message', data)
 }
+
+window.onload = function () {
+  document.querySelector('#wrapper').onclick = function (e) { if (e.toElement.id === 'wrapper') { document.querySelector('#close').click() } }
+}
