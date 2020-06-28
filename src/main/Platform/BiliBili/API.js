@@ -134,7 +134,7 @@ export class API extends WebInterfaceBase {
     this.saveLoginInfo()
     var bilibiliDomain = ['https://api.bilibili.com', 'https://live.bilibili.com', 'https://passport.biligame.com', 'https://passport.bigfun.cn', 'https://passport.bigfunapp.cn', 'https://www.biliapi.com']
     bilibiliDomain.forEach((e) => {
-      session.defaultSession.clear({
+      session.defaultSession.clearStorageData({
         origin: e
       })
     })
