@@ -3,9 +3,12 @@
 </template>
 
 <script>
+  import store from '../../store'
+
   export default {
     name: 'loginmodal',
     mounted () {
+      const _this = this
       const webview = this.$refs.view
       webview.addEventListener('ipc-message', (event) => {
         if (event.channel === 'message' && event.args[0] === 'close') {
@@ -18,10 +21,21 @@
               cookie.push({ name: e.name, value: e.value })
             })
             this.$platform.BiliBili.API.setCookies(cookie)
+            // 保存用户信息
+            this.$platform.BiliBili.API.getUserInfoNav().then(({ data }) => {
+              console.log(data)
+              if (data.isLogin) {
+                // 保存用户信息到vuex
+                _this.$store.commit('setUserInfo', data)
+                _this.$store.commit('hiddenModal')
+              } else {
+                // todo 异常处理
+                _this.$store.commit('hiddenModal')
+              }
+            })
           }).catch((err) => {
             console.log(err)
           })
-          this.$store.commit('hiddenModal')
         }
       })
     }

@@ -45,10 +45,4 @@
     padding: 8px;
     -webkit-app-region: no-drag;
   }
-  .window-icon:last-child:hover{
-    color: red;
-  }
-  .window-icon:hover{
-    color: #0062ff;
-  }
 </style>

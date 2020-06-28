@@ -1,16 +1,20 @@
 <!--显示用户头像和用户名的UI组件-->
 <template>
-  <div style="display: flex;align-items: center">
+  <div v-if="isLogin" style="display: flex;align-items: center">
     <div style="width: 32px;height: 32px;border-radius: 50%;">
-      <img :src="userInfo.face" width="100%" height="100%"/>
+      <img v-if="isLogin" :src="userInfo.face" style="height: 100%;"/>
     </div>
-    <div v-if="isLogin" style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between" @click="logout">
-      <div style="font-size: 12px;font-weight: bold;color: #171725">{{userInfo.name}}</div>
-      <div style="font-size: 12px;">哔哩哔哩</div>
+    <div style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between">
+      <div style="font-size: 12px;font-weight: bold;color: #171725" @click="logout">{{userInfo.name}}</div>
+      <div v-if="isLogin" style="font-size: 12px;">哔哩哔哩</div>
     </div>
-    <div v-else style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between" @click="login">
-      <div style="font-size: 12px;font-weight: bold;color: #171725">点击登陆</div>
-      <div style="font-size: 12px;"></div>
+  </div>
+  <div v-else style="display: flex;align-items: center">
+    <div style="width: 32px;height: 32px;border-radius: 50%;">
+      <a-avatar style="backgroundColor:#87d068" icon="user" />
+    </div>
+    <div style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between">
+      <div style="font-size: 12px;font-weight: bold;color: #171725" @click="openLoginModal" >点击登陆</div>
     </div>
   </div>
 </template>
@@ -23,7 +27,7 @@
       logout () {
         this.$store.dispatch('logout')
       },
-      login () {
+      openLoginModal () {
         this.$store.commit('showModal', type.LOGIN)
       }
     },

@@ -2,8 +2,12 @@ export default {
   hiddenModal (state) {
     state.modalVisible = false
   },
-  logout (state) {
+  init (state) {
+    state.initializing = false
+  },
+  deleteUserInfo (state) {
     state.isLogin = false
+    state.userInfo = {}
   },
   setUserInfo (state, data) {
     state.isLogin = true
