@@ -4,9 +4,13 @@
     <div style="width: 32px;height: 32px;border-radius: 50%;">
       <img :src="userInfo.face" width="100%" height="100%"/>
     </div>
-    <div style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between" @click="login">
+    <div v-if="isLogin" style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between" @click="logout">
       <div style="font-size: 12px;font-weight: bold;color: #171725">{{userInfo.name}}</div>
       <div style="font-size: 12px;">哔哩哔哩</div>
+    </div>
+    <div v-else style="margin-left: 8px;display: flex;flex-direction: column;justify-content: space-between" @click="login">
+      <div style="font-size: 12px;font-weight: bold;color: #171725">点击登陆</div>
+      <div style="font-size: 12px;"></div>
     </div>
   </div>
 </template>
@@ -16,11 +20,17 @@
   export default {
     name: 'userlittle',
     methods: {
+      logout () {
+        this.$store.dispatch('logout')
+      },
       login () {
         this.$store.commit('showModal', type.LOGIN)
       }
     },
     computed: {
+      isLogin () {
+        return this.$store.state.isLogin
+      },
       userInfo () {
         return {
           name: this.$store.state.userInfo.uname,

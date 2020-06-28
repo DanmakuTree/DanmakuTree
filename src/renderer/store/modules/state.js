@@ -4,5 +4,6 @@ export default {
   initializing: true,
   modalVisible: true,
   userInfo: {},
+  isLogin: false,
   modalType: modelTypeEnum.INITIALIZING
 }

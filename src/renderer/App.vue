@@ -8,7 +8,9 @@
         <div style="flex: 1;overflow: scroll;display: flex">
           <float-bar/>
           <Transition mode="out-in" name="list">
-            <router-view />
+            <keep-alive>
+              <router-view />
+            </keep-alive>
           </Transition>
         </div>
 

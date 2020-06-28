@@ -39,10 +39,16 @@
     backdrop-filter: blur(20px);
     border-bottom: 1px solid #e2e2ea;
     overflow: hidden;
-    padding:0 0 0 20px;
+    padding:0 12px 0 20px;
   }
   .window-icon{
     padding: 8px;
     -webkit-app-region: no-drag;
+  }
+  .window-icon:last-child:hover{
+    color: red;
+  }
+  .window-icon:hover{
+    color: #0062ff;
   }
 </style>
