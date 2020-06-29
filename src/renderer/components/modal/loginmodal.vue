@@ -22,9 +22,10 @@
             })
             this.$platform.BiliBili.API.setCookies(cookie)
             // 保存用户信息
-            this.$platform.BiliBili.API.getUserInfoNav().then(({ data }) => {
+            this.$platform.BiliBili.API.getUserLiveInfo().then(({ data, code }) => {
               console.log(data)
-              if (data.isLogin) {
+              if (code === 0) {
+                data.isLogin = true
                 // 保存用户信息到vuex
                 _this.$store.commit('setUserInfo', data)
                 _this.$store.commit('hiddenModal')
