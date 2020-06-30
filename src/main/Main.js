@@ -9,12 +9,15 @@ import { KVTable } from './KVTable'
 export class Main extends WebInterfaceBase {
   constructor () {
     super()
-    var methodList = ['init', 'getConfig', 'updateConfig', 'quit', 'getVersion']
+    var methodList = ['init', 'getConfig', 'updateConfig', 'quit', 'getVersion', 'getRoomList', 'updateRoomList']
     methodList.forEach((e) => { this[e] = this[e].bind(this) })
-    this.available.push('Services', 'getConfig', 'updateConfig', 'getVersion')
+    this.available.push('Services', 'getConfig', 'updateConfig', 'getVersion', 'getRoomList', 'updateRoomList')
     this.Services = Services
     this.database = null
+    this.roomList = null
     eventBus.registerPublicEvent('Main.quit')
+    eventBus.registerPublicEvent('Main.roomListUpdate')
+    eventBus.registerPublicEvent('Main.mainRoomUpdate')
   }
 
   init () {
@@ -24,6 +27,9 @@ export class Main extends WebInterfaceBase {
   }
 
   async getConfig (key) {
+    if (key === 'roomList') {
+      return []
+    }
     return (() => {
       try {
         return JSON.parse(this.config.get(key))
@@ -35,6 +41,56 @@ export class Main extends WebInterfaceBase {
 
   async updateConfig (key, value) {
     return this.config.set(key, JSON.stringify(value))
+  }
+
+  async getRoomList () {
+    if (this.roomList === null) {
+      var list = this.config.get('roomList')
+      if (!list) {
+        this.roomList = []
+      } else {
+        try {
+          this.roomList = JSON.parse(list)
+        } catch (error) {
+          this.roomList = []
+        }
+      }
+    }
+    return this.roomList
+  }
+
+  async updateRoomList (list) {
+    await this.getRoomList()
+    if (typeof list === 'object' && Array.isArray(list) && list.every(verifyRoom)) {
+      var map = {}
+      list.forEach((room) => {
+        if (!map[room.platform]) {
+          map[room.platform] = {}
+        }
+        if (map[room.platform][room.roomId]) {
+          throw new Error('Have Same Room')
+        }
+        map[room.platform][room.roomId] = true
+      })
+      this.config.set('roomList', JSON.stringify(list))
+      var oldList = this.roomList
+      this.roomList = list
+      if (oldList[0]) {
+        if (list[0]) {
+          if (list[0].platform !== oldList[0].platform ||
+             list[0].roomId !== oldList[0].roomId) {
+            eventBus.emit('Main.mainRoomUpdate', { old: oldList[0], new: list[0] })
+          }
+        } else {
+          eventBus.emit('Main.mainRoomUpdate', { old: oldList[0], new: undefined })
+        }
+      } else if (list[0]) {
+        eventBus.emit('Main.mainRoomUpdate', { old: undefined, new: list[0] })
+      }
+      eventBus.registerPublicEvent('Main.roomListUpdate')
+    } else {
+      throw new Error('Bad Type')
+    }
   }
 
   async quit () {
@@ -54,4 +110,10 @@ export class Main extends WebInterfaceBase {
   async getVersion () {
     return version
   }
+}
+
+function verifyRoom (room) {
+  return typeof room === 'object' &&
+  (typeof room.roomId === 'string' || typeof room.roomId === 'number') &&
+  (typeof room.platform === 'string')
 }

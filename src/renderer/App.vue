@@ -5,12 +5,10 @@
       <d-header/>
       <div class="content">
         <d-menu/>
-        <div style="flex: 1;overflow: scroll;display: flex">
+        <div style="flex: 1;overflow: hidden;display: flex">
           <float-bar/>
           <Transition mode="out-in" name="list">
-            <keep-alive>
-              <router-view />
-            </keep-alive>
+            <router-view style="height:492px"/>
           </Transition>
         </div>
 

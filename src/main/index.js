@@ -116,7 +116,7 @@ var webInterface = new WebInterface()
 moduleManager = new ModuleManager()
 
 var main = new Main()
-
+main.init()
 webInterface.registry('Main', main)
 webInterface.registry('Platform', platform)
 webInterface.registry('Module', moduleManager)

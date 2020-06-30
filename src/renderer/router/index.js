@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Home from '../views/Home'
 import Roomlist from '../views/roomlist'
 import History from '../views/History'
-import notFound from '../views/404'
+import notFound from '../views/NotFound'
 import RouteLoading from '../components/RouteLoading'
 import RouteError from '../components/RouteError'
 

@@ -2,7 +2,7 @@ import Vue from 'vue/dist/vue.esm'
 import App from './App'
 import router from './router/index'
 import store from './store/index'
-import { Table, Input, Tag, Select, Popover, Switch, Spin, Icon, Avatar } from 'ant-design-vue'
+import { Table, Input, Tag, Select, Popover, Switch, Spin, Icon, Avatar, Progress, message, Button } from 'ant-design-vue'
 
 import VueVirtualScroller from 'vue-virtual-scroller'
 import echarts from 'echarts'
@@ -33,6 +33,9 @@ Vue.use(Switch)
 Vue.use(Spin)
 Vue.use(Icon)
 Vue.use(Avatar)
+Vue.use(Progress)
+Vue.use(Button)
+Vue.prototype.$message = message
 console.log('initializing...')
 
 async function init () {

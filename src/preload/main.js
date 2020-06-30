@@ -17,7 +17,10 @@ function APIStructure (itemName) {
           } else {
             reject(result)
           }
-        }).catch((err) => { reject(err) })
+        }).catch((err) => {
+          console.error(err)
+          reject(err)
+        })
       })
     }
   })

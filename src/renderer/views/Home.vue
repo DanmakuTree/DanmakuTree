@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <div style="margin-bottom: 8px">
-      <span class="h2">Hi mano233,</span>
+
+      <span class="h2">Hi {{username}},</span>
       <span style="font-family: Roboto-Regular,sans-serif;font-size: 13px;color: #92929D">以下是直播间的统计信息</span>
     </div>
     <div style="display: flex;height: 260px;justify-content: space-between">
@@ -52,14 +53,28 @@
 </template>
 
 <script>
-  import mytable from '../components/table/mytable'
   import linecharts from '../components/charts/linecharts'
 
   export default {
     name: 'Home2',
+    data: function () {
+      return {
+
+      }
+    },
+    computed: {
+      username () {
+        if (this.$store.state.isLogin) {
+          return this.$store.state.userInfo.uname
+        }
+        return '摸鱼用户'
+      }
+    },
     components: {
-      'my-linecharts': linecharts,
-      'my-table': mytable
+      'my-linecharts': linecharts
+    },
+    mounted () {
+      console.log(this.$store.state.userInfo)
     }
   }
 </script>
