@@ -12,6 +12,7 @@
     "log4js": "^6.3.0",
     "material-design-icons": "^3.0.1",
     "mockjs": "^1.1.0",
+    "sql-bricks-sqlite": "^0.1.0",
     "ts-event-bus": "github:DanmakuTree/ts-event-bus#v1.0.4",
     "uuid": "^8.1.0",
     "vue": "^2.6.11",
