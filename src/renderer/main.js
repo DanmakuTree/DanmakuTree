@@ -13,6 +13,7 @@ import './assets/style/iconfont/iconfont.css'
 import './assets/style/global.css'
 
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import DanmakuMixin from './mixins/DanmakuMixin'
 
 Vue.use(VueVirtualScroller)
 
@@ -40,6 +41,9 @@ Vue.use(API)
 
 Vue.use(Antd)
 Vue.prototype.$message = message
+
+Vue.mixin(DanmakuMixin)
+
 console.log('initializing...')
 
 async function init () {
@@ -57,6 +61,7 @@ init().then(() => {
   store.commit('init')
   store.commit('hiddenModal')
 })
+
 export default new Vue({
   el: '#app',
   router,

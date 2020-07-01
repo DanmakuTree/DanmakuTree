@@ -49,10 +49,8 @@
 </template>
 
 <script>
-  import DanmakuMixin from '../mixins/DanmakuMixin'
   export default {
     name: 'd_roomlist',
-    mixins: [DanmakuMixin],
     data: function () {
       return {
         roomInfo: {
