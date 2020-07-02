@@ -1,9 +1,25 @@
+import flatten from './Utilities/flatten'
 var sql = require('sql-bricks-sqlite')
+flatten(JSON)
 
 function split (obj, char = '$') {
   var obj2 = {}
   for (var i of Object.entries(obj)) obj2[i[0]] = `${char}${i[0]}`
   return { prepare: obj2, origin: obj }
+}
+
+const typeofMap = {
+  string () { return 'TEXT' },
+  number (val) { return Number.isInteger(val) ? 'INTEGER' : 'REAL' },
+  boolean () { return 'BOOLEAN' }
+}
+
+function columnDefine (obj) {
+  var flattenObj = JSON.flatten(obj)
+  var str = []
+  for (var i of Object.entries(flattenObj)) { var type = typeofMap[`${typeof (i[1])}`](i[1]); str.push(`"${i[0]}" ${type}`) }
+
+  return str.join(',')
 }
 
 sql.Statement.prototype._toString_ = sql.Statement.prototype.toString
@@ -26,5 +42,6 @@ sql.Statement.prototype.toParams = function (option) {
 }
 
 sql.SplitPrepared = split
+sql.columnDefine = columnDefine
 
 export default sql
