@@ -38,7 +38,9 @@ sql.Statement.prototype.toParams = function (option) {
   if (option && typeof (option) !== 'string') { return console.log(`toParams does not accept ${option}`) }
 
   if (/%d/.test(option)) { params = this._toParams_({ placeholder: option }) } else if (option === 'named' || option === 'prepared') { return this.toString() } else { params = this._toParams_({ placeholder: '?' }) }
-  return { sqlStr: params.text, valueArray: params.values }
+  // map function() to parse the boolean from (true|false) to (1|0)
+  var parsedValues = params.values.map(function (item) { return typeof (item) === 'boolean' ? +item : item })
+  return { sqlStr: params.text, valueArray: parsedValues }
 }
 
 sql.SplitPrepared = split
