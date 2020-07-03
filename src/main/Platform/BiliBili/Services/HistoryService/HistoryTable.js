@@ -51,4 +51,21 @@ export class HistoryTable {
     // db.prepare(`asc LIMIT 0``).all()
     return this.dbConnection.prepare(`SELECT * FROM "${this.tableName}" ORDER BY longtimestamp DESC LIMIT ?`).all(num)
   }
+
+  getByPageBeforeLongtimestamp (longtimestamp = Math.pow(10, 13) - 1, pagesize = 500) {
+    if (typeof pagesize !== 'number' || !isInteger(pagesize) || pagesize <= 0) {
+      throw new Error('bad argument pagesize: ' + String(pagesize))
+    }
+    if (typeof longtimestamp !== 'number' || !isInteger(longtimestamp) || String(longtimestamp).length !== 13) {
+      throw new Error('bad argument longtimestamp: ' + String(longtimestamp))
+    }
+
+    return this.dbConnection.prepare(`
+SELECT * 
+FROM "${this.tableName}" 
+WHERE longtimestamp < ${longtimestamp} 
+ORDER BY longtimestamp DESC
+LIMIT ${pagesize}
+    `).all()
+  }
 }
