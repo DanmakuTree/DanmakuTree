@@ -41,14 +41,14 @@ export class HistoryTable {
   }
 
   getAll () {
-    return this.db.prepare(`SELECT * FROM "${this.tableName}"`).all()
+    return this.dbConnection.prepare(`SELECT * FROM "${this.tableName}" ORDER BY longtimestamp ASC`).all()
   }
 
-  getLast (num = 1) {
+  getLatest (num = 1) {
     if (typeof num !== 'number' || !isInteger(num) || num <= 0) {
       throw new Error('bad argument num: ' + String(num))
     }
     // db.prepare(`asc LIMIT 0``).all()
-    return this.db.prepare(`SELECT * FROM "${this.tableName}" asc LIMIT ?`).all(num)
+    return this.dbConnection.prepare(`SELECT * FROM "${this.tableName}" ORDER BY longtimestamp DESC LIMIT ?`).all(num)
   }
 }
