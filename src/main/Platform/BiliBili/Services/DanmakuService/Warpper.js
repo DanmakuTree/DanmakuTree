@@ -6,6 +6,8 @@ export const defaultMap = {
     result.data.comment = message.info[1]
     result.data.longtimestamp = message.info[0][4]
     result.data.timestamp = message.info[9].ts || 0
+    result.data.isLotteryAutoMsg = !!message.info[0][9]
+    result.data.msgFrameValue = message.info[0][10]
     result.data.user = {
       uid: message.info[2][0],
       username: message.info[2][1],
