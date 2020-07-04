@@ -154,6 +154,7 @@
         this.roomList.splice(index, 1)
         this.roomList.unshift(record)
         this.$main.updateRoomList(this.roomList).then(() => {}).catch(console.error)
+        this.displayRoomInfo(this.roomList[0])
       },
       connect (record) {
         this.$platform.BiliBili.Services.DanmakuService.connect(record.roomId).then(() => {}).catch(console.error)

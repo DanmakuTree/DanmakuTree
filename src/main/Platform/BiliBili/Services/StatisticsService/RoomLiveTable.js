@@ -9,19 +9,16 @@ export class RoomLiveTable {
   constructor (db, tableName) {
     this.db = db
     this.tableName = tableName
-    db.prepare(`CREATE TABLE if not exists "${tableName}" ("startTime" NUMERIC, "endTime" NUMERIC, "totalUser" INTEGER, "totalDanmu" INTEGER, "totalGold" NUMERIC, "id" TEXT, PRIMARY KEY("id"));`)
+    db.prepare(`CREATE TABLE if not exists "${tableName}" ("startTime" NUMERIC, "endTime" NUMERIC, "id" TEXT, "columns" TEXT, "other" TEXT, PRIMARY KEY("id"));`)
       .run()
   }
 
   push (report) {
-    return this.db.prepare(`INSERT INTO "${this.tableName}" VALUES (:startTime, :endTime, :totalUser, :totalDanmu, :totalGold, :id)`).run(report)
+    return this.db.prepare(`INSERT INTO "${this.tableName}" (startTime,endTime,id,columns,other,id) VALUES (:startTime, :endTime, :id, :columns, :other, :id)`).run(report)
   }
 
-  update (report) {
-    if (typeof report.id !== 'string') {
-      throw new Error('Bad Type of id')
-    }
-    return this.db.prepare(`UPDATE "${this.tableName}" SET (endTime, totalUser, totalDanmu, totalGold) = (:endTime, :totalUser, :totalDanmu, :totalGold) WHERE id=:id`).run(report)
+  updateEndTime (id, endTime) {
+    return this.db.prepare(`UPDATE "${this.tableName}" SET (endTime) = (:endTime) WHERE id=:id`).run({ endTime, id })
   }
 
   getAll () {
@@ -33,6 +30,6 @@ export class RoomLiveTable {
       throw new Error('bad argument num: ' + String(num))
     }
     // db.prepare(`asc LIMIT 0``).all()
-    return this.db.prepare(`SELECT * FROM "${this.tableName}" asc LIMIT ?`).all(num)
+    return this.db.prepare(`SELECT * FROM "${this.tableName}" ORDER BY startTime desc LIMIT ?`).all(num)
   }
 }

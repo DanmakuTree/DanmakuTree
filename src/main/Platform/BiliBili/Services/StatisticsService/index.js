@@ -11,14 +11,14 @@ import { StatisticsTable } from './StatisticsTable'
 export class StatisticsService extends WebInterfaceBase {
   constructor () {
     super()
-    this.version = '0.8.7'
+    this.version = '0.9.5'
     this.store = null
     this.roomMap = {}
     var methodList = ['init', 'onMessage', 'onConnect', 'onClose']
     methodList.forEach((e) => {
       this[e] = this[e].bind(this)
     })
-    var publicList = ['getRoomList', 'getRoomLiveList', 'getRoomLiveStatAll', 'getRoomLiveStatLast']
+    var publicList = ['getRoomList', 'getRoomLiveList', 'getRoomLiveListLast', 'getRoomLiveStatAll', 'getRoomLiveStatLast']
     publicList.forEach((e) => {
       this.available.push(e)
       this[e] = this[e].bind(this)
@@ -56,7 +56,7 @@ export class StatisticsService extends WebInterfaceBase {
   }
 
   getRoomLiveStatAll (LiveId) {
-    if (typeof LiveId === 'string') {
+    if (verifyUUID(LiveId)) {
       if (this.store.prepare('SELECT count(*) FROM sqlite_master WHERE name = ?').get(`Live-${LiveId}`)['count(*)'] > 0) {
         return (new StatisticsTable(this.store, `Live-${LiveId}`)).getAll()
       }
@@ -65,7 +65,7 @@ export class StatisticsService extends WebInterfaceBase {
   }
 
   getRoomLiveStatLast (LiveId, num = 30) {
-    if (typeof LiveId === 'string') {
+    if (verifyUUID(LiveId)) {
       if (this.store.prepare('SELECT count(*) FROM sqlite_master WHERE name = ?').get(`Live-${LiveId}`)['count(*)'] > 0) {
         return (new StatisticsTable(this.store, `Live-${LiveId}`)).getLast(num)
       }
@@ -95,3 +95,16 @@ export class StatisticsService extends WebInterfaceBase {
 }
 
 export default new StatisticsService()
+
+/**
+ *
+ * @param {String} item
+ */
+function verifyUUID (item) {
+  if (typeof item !== 'string') {
+    return false
+  }
+  var i = item.toLowerCase()
+  var match = i.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)
+  return match !== null && match[0] === i
+}

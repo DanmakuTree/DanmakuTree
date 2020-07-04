@@ -5,6 +5,15 @@ import { StatisticsTable } from './StatisticsTable'
 import { RoomLiveTable } from './RoomLiveTable'
 import { v4 as UUID } from 'uuid'
 
+const columns = [
+  { name: 'user', type: 'INTEGER', displayName: '5分钟内活动用户数' },
+  { name: 'danmu', type: 'INTEGER', displayName: '1分钟内弹幕量' },
+  { name: 'gold', type: 'NUMERIC', displayName: '1分钟内氪金量' },
+  { name: 'totalUser', type: 'INTEGER', displayName: '总活动用户数' },
+  { name: 'totalDanmu', type: 'INTEGER', displayName: '总弹幕数' },
+  { name: 'totalGold', type: 'NUMERIC', displayName: '总氪金量' }
+]
+
 const logger = getLogger('StatisticsService')
 export class Room {
   constructor (roomId, db) {
@@ -88,12 +97,14 @@ export class Room {
       num: data.gift.num * data.gift.price / 1000, // 1元=1000金瓜子
       timestamp: Date.now()
     })
+    this.totalGold += data.gift.num * data.gift.price / 1000
   }
 
   onDanmu () {
     this.danmuList.push({
       timestamp: Date.now()
     })
+    this.totalDanmu++
   }
 
   onUser (data) {
@@ -162,12 +173,24 @@ export class Room {
   }
 
   onLiveStart () {
-    this.status = 'LIVE'
     if (this.interval === null) {
+      this.status = 'LIVE'
+      this.totalDanmu = 0
+      this.totalGold = 0
+      this.userMap = {}
       this.interval = setInterval(this.tick, 30 * 1000)
       this.currentLiveId = UUID()
-      this.currentLiveTable = new StatisticsTable(this.db, 'Live-' + this.currentLiveId)
-      this.roomliveList.push({ startTime: Date.now(), endTime: Date.now(), totalUser: 0, totalDanmu: 0, totalGold: 0, id: this.currentLiveId })
+      this.currentLiveTable = new StatisticsTable(this.db, 'Live-' + this.currentLiveId, columns)
+      this.currentLiveTable.push({
+        time: Date.now(),
+        gold: 0,
+        user: 0,
+        danmu: 0,
+        totalGold: 0,
+        totalDanmu: 0,
+        totalUser: 0
+      })
+      this.roomliveList.push({ startTime: Date.now(), endTime: Date.now(), columns: JSON.stringify(columns), id: this.currentLiveId, other: '' })
     }
   }
 
@@ -180,6 +203,9 @@ export class Room {
     }
     this.currentLiveTable = null
     this.currentLiveId = null
+    this.totalDanmu = 0
+    this.totalGold = 0
+    this.userMap = {}
   }
 
   finishTickReport (report) {
@@ -188,13 +214,7 @@ export class Room {
       this.currentLiveTable.push(report)
     }
     if (this.currentLiveId != null) {
-      this.roomliveList.update({
-        id: this.currentLiveId,
-        endTime: Date.now(),
-        totalDanmu: report.totalDanmu,
-        totalGold: report.totalGold,
-        totalUser: report.totalUser
-      })
+      this.roomliveList.updateEndTime(this.currentLiveId, report.time)
     }
   }
 
