@@ -47,7 +47,7 @@ export class StatisticsService extends WebInterfaceBase {
   }
 
   getRoomLiveListLast (roomId, num) {
-    if (isInteger(roomId) && roomId > 0) {
+    if (isInteger(roomId) && roomId > 0 && num > 0) {
       if (this.store.prepare('SELECT count(*) FROM sqlite_master WHERE name = ?').get(`Room-${roomId}`)['count(*)'] > 0) {
         return (new RoomLiveTable(this.store, `Room-${roomId}`)).getLast(num)
       }
