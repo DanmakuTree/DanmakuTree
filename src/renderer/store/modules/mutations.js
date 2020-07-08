@@ -9,6 +9,9 @@ export default {
     state.isLogin = false
     state.userInfo = {}
   },
+  setModuleList (state, data) {
+    state.moduleList = data
+  },
   setUserInfo (state, data) {
     state.isLogin = true
     state.userInfo = data

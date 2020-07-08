@@ -48,10 +48,9 @@ console.log('initializing...')
 
 async function init () {
   // 拉取module信息
-  await window.API.Module.getAllModuleList()
+  store.dispatch('getModuleList')
   // 初始化用户信息
   const result = await window.API.Platform.BiliBili.API.getUserLiveInfo()
-  console.log(result)
   if (result.code === 0) {
     result.data.isLogin = true
     store.commit('setUserInfo', result.data)

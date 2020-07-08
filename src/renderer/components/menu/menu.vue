@@ -25,7 +25,7 @@
         <div style="width: 26px;height: 26px;border-radius: 8px;background: #26ade3;margin-right: 12px;line-height: 26px;color: white;text-align: center;font-size: 12px">
           插
         </div>
-        <span class="title-h5-middle">弹幕悬浮窗</span>
+        <span class="title-h5-middle" @click="testClick">弹幕悬浮窗</span>
       </div>
       <div style="height: 40px;line-height: 40px;padding: 0 16px;display: flex;align-items: center">
         <div style="width: 26px;height: 26px;border-radius: 8px;background: #A461D8;margin-right: 12px;line-height: 26px;color: white;text-align: center;font-size: 12px">
@@ -76,6 +76,11 @@
       }
     },
     methods: {
+      // 点击测试用例
+      testClick () {
+        const id = this.$store.state.moduleList[0].id
+        // this.$module.createModuleExternalWindow(id).then((e) => console.log(e))
+      },
       quit () {
         window.API.Quit()
       }
