@@ -1,6 +1,12 @@
 import path from 'path'
 import { version as ProgramVersion } from '../../package.json'
-import { app } from 'electron'
+// import { app } from 'electron'
+var app = {}
+app.pathKV = { 'appData': '.' }
+app.setPath = function (key, value) { app.pathKV[key] = value }
+app.getPath = function (key) { return app.pathKV[key] }
+
+export const appMock = app
 export const isDev = process.env.NODE_ENV === 'development'
 export const isDebug = process.argv.includes('--debug')
 export const version = ProgramVersion
