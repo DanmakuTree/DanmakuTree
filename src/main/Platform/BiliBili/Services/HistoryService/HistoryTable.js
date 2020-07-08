@@ -35,9 +35,10 @@ export class HistoryTable {
 
   push (danmu) {
     var danmuFlatten = JSON.flatten(danmu.data)
-    var ds = sql.insertInto(this.tableName, danmuFlatten).toParams()
+    // var ds = sql.insertInto(this.tableName, danmuFlatten).toParams()
+    var ds = colPrepare(danmuFlatten)
     // todo: tofix: should use sql...toParams() to automatic prepare the query, but it has bugs
-    return this.dbConnection.prepare('INSERT INTO tt ("comment", "longtimestamp", "timestamp", "user.uid", "user.username", "user.isAdmin", "user.platformVIPLevel", "user.userLevel", "user.roomVIPLevel", "user.medal.level", "user.medal.label", "user.medal.anchorUsername", "user.medal.roomId", "user.title.0", "user.title.1", "validation.ts", "validation.ct") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(...ds.valueArray)
+    return this.dbConnection.prepare(`INSERT INTO "${this.tableName}" (${ds.col}) VALUES (${ds.placeholder})`).run(...ds.valueArray)
   }
 
   getAll () {
@@ -68,4 +69,14 @@ ORDER BY longtimestamp DESC
 LIMIT ${pagesize}
     `).all()
   }
+}
+
+function colPrepare (obj) {
+  var colName = []
+  var valueArray = []
+  for (var [k, v] of Object.entries(obj)) { colName.push(k); valueArray.push(v) }
+  var col = colName.map(function (e) { return `"${e}"` }).join(', ')
+  var placeholder = colName.map(function (e) { return '?' }).join(', ')
+  var valueArrayTrans = valueArray.map(function (item) { return typeof (item) === 'boolean' ? +item : item })
+  return { col: col, placeholder: placeholder, valueArray: valueArrayTrans }
 }
