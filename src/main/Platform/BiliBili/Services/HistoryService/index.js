@@ -76,7 +76,10 @@ export class HistoryService extends WebInterfaceBase {
     * these should be fixed together with HistoryService and DanmakuService
     * or add variable security check before calling the actual functions
     */
-    this.roomMap[roomId] = new HistoryTable(this.store, `Room-${roomId}`)
+    if (!this.roomMap[roomId]) {
+      this.roomMap[roomId] = new HistoryTable(this.store, `Room-${roomId}`)
+      this.roomList.set(roomId, 'true')
+    }
   }
 
   onClose (roomId) {
