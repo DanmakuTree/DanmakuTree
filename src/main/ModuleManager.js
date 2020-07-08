@@ -4,6 +4,7 @@ import { version, Backend, MainPreloadScript, MainWindowPage, ModuleWindowPage, 
 import { BrowserWindow, app, protocol, dialog } from 'electron'
 import { eventBus } from './EventBus'
 import { getLogger } from 'log4js'
+import { URLSearchParams } from 'url'
 const BrowserWindowOptions = ['width', 'height', 'x', 'y', 'resizable', 'movable', 'minimizable', 'maximizable', 'skipTaskbar', 'alwaysOnTop', 'fullscreen', 'opacity', 'backgroundColor', 'transparent', 'frame']
 export class ModuleManager extends WebInterfaceBase {
   constructor () {
@@ -48,6 +49,8 @@ export class ModuleManager extends WebInterfaceBase {
     eventBus.on('Main.quit', this.onMainQuit)
   }
 
+  init () {}
+
   async getAllModuleList () {
     if (isDev || this.moduleList === []) {
       var data = (await this.axios.get('module/list', {
@@ -61,7 +64,6 @@ export class ModuleManager extends WebInterfaceBase {
   }
 
   async updateModuleConfig (moduleId, data) {
-    // TODO
     eventBus.emit('Module.configChange', moduleId)
   }
 
@@ -116,7 +118,8 @@ export class ModuleManager extends WebInterfaceBase {
           })
         }
         var moduleWindow = new BrowserWindow(option)
-        moduleWindow.loadURL(ModuleWindowPage + `#${moduleId}|${JSON.stringify(data)}`)
+
+        moduleWindow.loadURL(ModuleWindowPage + `#${(new URLSearchParams({ module: moduleId, data: JSON.stringify(data) })).toString()}`)
         if (isDev) {
           moduleWindow.webContents.openDevTools({ mode: 'detach' })
         }
