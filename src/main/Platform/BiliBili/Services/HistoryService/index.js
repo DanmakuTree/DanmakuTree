@@ -65,7 +65,7 @@ export class HistoryService extends WebInterfaceBase {
   onMessage (message) {
     if (message.roomId > 0 && message.data.type === 'message' && !message.data.data.isLotteryAutoMsg) {
       // note: push it by message.data.data, because this is the same nested-level as Warpper.warp() will return.
-      this.roomMap[message.roomId].push(message.data.data)
+      this.roomMap[message.roomId].push(message.data)
     }
   }
 
