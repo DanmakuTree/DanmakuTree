@@ -10,7 +10,6 @@
     "echarts": "^4.8.0",
     "lodash": "^4.17.15",
     "log4js": "^6.3.0",
-    "material-design-icons": "^3.0.1",
     "mockjs": "^1.1.0",
     "ts-event-bus": "github:DanmakuTree/ts-event-bus#v1.0.4",
     "uuid": "^8.1.0",

@@ -49,12 +49,14 @@ export class ModuleManager extends WebInterfaceBase {
   }
 
   async getAllModuleList () {
-    var data = (await this.axios.get('module/list', {
-      params: {
-        version: version
-      }
-    })).data
-    this.moduleList = data
+    if (isDev || this.moduleList === []) {
+      var data = (await this.axios.get('module/list', {
+        params: {
+          version: version
+        }
+      })).data
+      this.moduleList = data
+    }
     return data
   }
 
@@ -68,10 +70,16 @@ export class ModuleManager extends WebInterfaceBase {
   }
 
   async getModuleInfo (moduleId) {
+    if (isDev) {
+      await this.getAllModuleList()
+    }
     return this.moduleList.find((module) => { return module.id === moduleId })
   }
 
   async createModuleExternalWindow (moduleId, data) {
+    if (isDev) {
+      await this.getAllModuleList()
+    }
     const module = this.moduleList.find((e) => {
       return e.id === moduleId
     })
@@ -197,6 +205,7 @@ export class ModuleManager extends WebInterfaceBase {
     this.mainWindow.on('closed', () => {
       this.mainWindow = null
       eventBus.detach('ALLPUBLIC', this.sendToMainWindow)
+      this.closeAllWindowAndExit()
       this.logger.info('MainWindow closed')
     })
     eventBus.on('ALLPUBLIC', this.sendToMainWindow)
@@ -299,6 +308,16 @@ export class ModuleManager extends WebInterfaceBase {
   onMainQuit () {
     this.quitSign = true
     this.mainWindow.close()
+  }
+
+  closeAllWindowAndExit () {
+    var windowList = BrowserWindow.getAllWindows()
+    windowList.forEach((e) => {
+      e.close()
+    })
+    setTimeout(() => {
+      app.exit()
+    })
   }
 }
 
