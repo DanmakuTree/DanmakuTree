@@ -104,15 +104,17 @@ export class ModuleManager extends WebInterfaceBase {
       if (isDev) {
         option.webPreferences.devTools = true
       }
-      if (module.externalWindow.option) {
-        if (module.externalWindow.option.only && this.moduleWindows[moduleId] && this.moduleWindows[moduleId].length > 0) {
-          return { 'code': -2, 'msg': 'already have one' }
-        }
-        BrowserWindowOptions.forEach((e) => {
-          if (module.externalWindow.option[e] !== undefined) {
-            option[e] = module.externalWindow.option[e]
+      if (module.externalWindow) {
+        if (module.externalWindowOption) {
+          if (module.externalWindowOption.only && this.moduleWindows[moduleId] && this.moduleWindows[moduleId].length > 0) {
+            return { 'code': -2, 'msg': 'already have one' }
           }
-        })
+          BrowserWindowOptions.forEach((e) => {
+            if (module.externalWindowOption[e] !== undefined) {
+              option[e] = module.externalWindowOption[e]
+            }
+          })
+        }
         var moduleWindow = new BrowserWindow(option)
         moduleWindow.loadURL(ModuleWindowPage + `#${moduleId}|${JSON.stringify(data)}`)
         if (isDev) {
