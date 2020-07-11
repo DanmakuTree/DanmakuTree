@@ -28,17 +28,36 @@ export class HistoryTable {
     this.tableName = tableName
     if (!dbConnection) dbConnection = new Database(dbFile)
     this.dbConnection = dbConnection
+    this.insertPrepare = undefined
+    this.prepare()
+    this.pushMany = this.dbConnection.transaction((danmuArray) => {
+      if (!this.insertPrepare) { return false }
+      for (var danmu of danmuArray) {
+        var danmuFlatten = JSON.flatten(danmu.data)
+        var ds = colPrepare(danmuFlatten)
+        this.insertPrepare.run(...ds.valueArray)
+      }
+    })
 
     dbConnection.prepare(`CREATE TABLE if not exists "${tableName}" (${sql.columnDefine(dmMsgMock.data)},PRIMARY KEY("longtimestamp","user.uid"));`)
       .run()
   }
 
+  prepare () {
+    var danmuFlatten = JSON.flatten(dmMsgMock.data)
+    var ds = colPrepare(danmuFlatten)
+    if (!this.insertPrepare) {
+      this.insertPrepare = this.dbConnection.prepare(`INSERT INTO "${this.tableName}" (${ds.col}) VALUES (${ds.placeholder})`)
+    }
+  }
+
   push (danmu) {
     var danmuFlatten = JSON.flatten(danmu.data)
-    // var ds = sql.insertInto(this.tableName, danmuFlatten).toParams()
     var ds = colPrepare(danmuFlatten)
-    // todo: tofix: should use sql...toParams() to automatic prepare the query, but it has bugs
-    return this.dbConnection.prepare(`INSERT INTO "${this.tableName}" (${ds.col}) VALUES (${ds.placeholder})`).run(...ds.valueArray)
+    if (!this.insertPrepare) {
+      this.insertPrepare = this.dbConnection.prepare(`INSERT INTO "${this.tableName}" (${ds.col}) VALUES (${ds.placeholder})`)
+    }
+    return this.insertPrepare.run(...ds.valueArray)
   }
 
   getAll () {
