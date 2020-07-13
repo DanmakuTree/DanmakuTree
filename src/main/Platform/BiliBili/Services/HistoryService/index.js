@@ -5,6 +5,7 @@ import { DataPath } from '../../../../Consts'
 import { KVTable } from '../../../../KVTable'
 import { isInteger } from 'lodash'
 import { HistoryTable } from './HistoryTable'
+import { Query } from './Query'
 
 export class HistoryService extends WebInterfaceBase {
   constructor () {
@@ -86,7 +87,9 @@ export class HistoryService extends WebInterfaceBase {
     * or add variable security check before calling the actual functions
     */
     if (!this.roomMap[roomId]) {
-      this.roomMap[roomId] = new HistoryTable(this.store, `Room-${roomId}`)
+      var table = new HistoryTable(this.store, `Room-${roomId}`)
+      table.query = new Query(table)
+      this.roomMap[roomId] = table
       this.roomList.set(roomId, 'true')
     }
   }

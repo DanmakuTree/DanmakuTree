@@ -88,7 +88,7 @@ LIMIT ${pagesize}
   }
 
   count () {
-    return this.dbConnection.prepare(`SELECT count(*) FROM "${this.tableName}"`).get()
+    return this.dbConnection.prepare(`SELECT count(*) FROM "${this.tableName}"`).get()['count(*)']
   }
 }
 
