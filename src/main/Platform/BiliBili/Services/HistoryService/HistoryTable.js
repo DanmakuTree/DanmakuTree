@@ -29,6 +29,7 @@ export class HistoryTable {
     if (!dbConnection) dbConnection = new Database(dbFile)
     this.dbConnection = dbConnection
     this.insertPrepare = undefined
+    dbConnection.prepare(`CREATE TABLE if not exists "${tableName}" (${sql.columnDefine(dmMsgMock.data)},PRIMARY KEY("longtimestamp","user.uid"));`).run()
     this.prepare()
     this.pushMany = this.dbConnection.transaction((danmuArray) => {
       if (!this.insertPrepare) { return false }
@@ -38,9 +39,6 @@ export class HistoryTable {
         this.insertPrepare.run(...ds.valueArray)
       }
     })
-
-    dbConnection.prepare(`CREATE TABLE if not exists "${tableName}" (${sql.columnDefine(dmMsgMock.data)},PRIMARY KEY("longtimestamp","user.uid"));`)
-      .run()
   }
 
   prepare () {
@@ -87,6 +85,10 @@ WHERE longtimestamp < ${longtimestamp}
 ORDER BY longtimestamp DESC
 LIMIT ${pagesize}
     `).all()
+  }
+
+  count () {
+    return this.dbConnection.prepare(`SELECT count(*) FROM "${this.tableName}"`).get()
   }
 }
 

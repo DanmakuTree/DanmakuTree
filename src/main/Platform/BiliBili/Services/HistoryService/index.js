@@ -16,7 +16,7 @@ export class HistoryService extends WebInterfaceBase {
     methodList.forEach((e) => {
       this[e] = this[e].bind(this)
     })
-    var publicList = ['getRoomList', 'getRoomHistoryLatest', 'getRoomHistoryAll', 'getRoomHistoryByPageBeforeLongtimestamp']
+    var publicList = ['getRoomList', 'getRoomHistoryLatest', 'getRoomHistoryAll', 'getRoomHistoryByPageBeforeLongtimestamp', 'room']
     publicList.forEach((e) => {
       this.available.push(e)
       this[e] = this[e].bind(this)
@@ -38,7 +38,8 @@ export class HistoryService extends WebInterfaceBase {
   getRoomHistoryLatest (roomId, num) {
     if (isInteger(roomId) && roomId > 0 && num > 0) {
       if (this.store.prepare('SELECT count(*) FROM sqlite_master WHERE name = ?').get(`Room-${roomId}`)['count(*)'] > 0) {
-        return (new HistoryTable(this.store, `Room-${roomId}`)).getLatest(num)
+        var room = this.roomMap[roomId]
+        if (!room) { return (new HistoryTable(this.store, `Room-${roomId}`)).getLatest(num) } else { return room.getLatest(num) }
       }
     }
     return []
@@ -47,19 +48,27 @@ export class HistoryService extends WebInterfaceBase {
   getRoomHistoryAll (roomId) {
     if (isInteger(roomId) && roomId > 0) {
       if (this.store.prepare('SELECT count(*) FROM sqlite_master WHERE name = ?').get(`Room-${roomId}`)['count(*)'] > 0) {
-        return (new HistoryTable(this.store, `Room-${roomId}`)).getAll()
+        var room = this.roomMap[roomId]
+        if (!room) { return (new HistoryTable(this.store, `Room-${roomId}`)).getAll() } else { return room.getAll() }
       }
     }
     return []
   }
 
-  getRoomHistoryByPageBeforeLongtimestamp (roomId, pageSize = null, longtimestamp = null) {
+  getRoomHistoryByPageBeforeLongtimestamp (roomId, pageSize = undefined, longtimestamp = undefined) {
     if (isInteger(roomId) && roomId > 0) {
       if (this.store.prepare('SELECT count(*) FROM sqlite_master WHERE name = ?').get(`Room-${roomId}`)['count(*)'] > 0) {
-        return (new HistoryTable(this.store, `Room-${roomId}`)).getByPageBeforeLongtimestamp(longtimestamp, pageSize)
+        var room = this.roomMap[roomId]
+        if (!room) { return (new HistoryTable(this.store, `Room-${roomId}`)).getByPageBeforeLongtimestamp(longtimestamp, pageSize) } else { return room.getByPageBeforeLongtimestamp(longtimestamp, pageSize) }
       }
     }
     return []
+  }
+
+  room (roomId) {
+    var room = this.roomMap[roomId]
+    if (!room) { return false }
+    return room
   }
 
   onMessage (message) {
