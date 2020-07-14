@@ -65,7 +65,7 @@
           {
             title: '插件中心',
             icon: 'iconic_Sales',
-            to: '/2'
+            to: '/moduleCenter'
           },
           {
             title: '系统设置',

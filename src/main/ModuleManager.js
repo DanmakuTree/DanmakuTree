@@ -1,10 +1,12 @@
 import { WebInterfaceBase } from './WebInterfaceBase'
 import Axios from 'axios'
-import { version, Backend, MainPreloadScript, MainWindowPage, ModuleWindowPage, isDev, BiliBiliPreloadScript, ModulePreloadScript } from './Consts'
+import { version, Backend, MainPreloadScript, MainWindowPage, ModuleWindowPage, isDev, BiliBiliPreloadScript, ModulePreloadScript, DataPath } from './Consts'
 import { BrowserWindow, app, protocol, dialog } from 'electron'
 import { eventBus } from './EventBus'
 import { getLogger } from 'log4js'
 import { URLSearchParams } from 'url'
+import Database from 'better-sqlite3'
+import { KVTable } from './KVTable'
 const BrowserWindowOptions = ['width', 'height', 'x', 'y', 'resizable', 'movable', 'minimizable', 'maximizable', 'skipTaskbar', 'alwaysOnTop', 'fullscreen', 'opacity', 'backgroundColor', 'transparent', 'frame']
 export class ModuleManager extends WebInterfaceBase {
   constructor () {
@@ -17,16 +19,20 @@ export class ModuleManager extends WebInterfaceBase {
         'user-agent': `DanmakuTree v${version}`
       }
     })
+    this.database = null
     /**
      * @type {{any:BrowserWindow[]}}
      */
     this.map = {}
     this.moduleWindows = {}
     this.quitSign = false
-    this.available.push('getAllModuleList', 'updateModuleConfig', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows')
-    var bindList = ['getAllModuleList', 'updateModuleConfig', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit']
+    this.installedModuleList = []
+    this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig')
+    var bindList = ['getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig']
     this.moduleList = []
-    bindList.forEach((e) => { this[e] = this[e].bind(this) })
+    bindList.forEach((e) => {
+      this[e] = this[e].bind(this)
+    })
     app.on('ready', () => {
       this.createMainWindow()
       if (isDev) {
@@ -49,7 +55,50 @@ export class ModuleManager extends WebInterfaceBase {
     eventBus.on('Main.quit', this.onMainQuit)
   }
 
-  init () {}
+  init () {
+    this.database = new Database(DataPath + '/config/ModuleConfig.db')
+    this.config = new KVTable(this.database, 'config')
+    this.installedModuleList = JSON.parse(this.config.get('installedModuleList') || '[]')
+  }
+
+  /**
+   * 拉取已安装模块列表
+   */
+  getInstalledModuleList () {
+    return this.installedModuleList
+  }
+
+  /**
+   * 安装模块
+   * @param {string} moduleId 模块id
+   * @returns {string[]|false}
+   */
+  installModule (moduleId) {
+    var index = this.moduleList.findIndex((item) => {
+      return item.id === moduleId
+    })
+    if (index !== -1 && this.installedModuleList.indexOf(moduleId)) {
+      this.installedModuleList.push(moduleId)
+      this.config.set('installedModuleList', JSON.stringify(this.installedModuleList))
+      if (this.moduleList[index].DefaultConfig) {
+        this.updateModuleMultipleConfig(moduleId, this.moduleList[index].DefaultConfig)
+      }
+      return true
+    } else {
+      return false
+    }
+  }
+
+  uninstallModule (moduleId) {
+    var index = this.installedModuleList.indexOf(moduleId)
+    if (index !== -1) {
+      this.installedModuleList.splice(index, 1)
+      this.config.set('installedModuleList', JSON.stringify(this.installedModuleList))
+      this.clearModuleConfig(moduleId)
+      return true
+    }
+    return false
+  }
 
   async getAllModuleList () {
     if (isDev || this.moduleList === []) {
@@ -63,19 +112,87 @@ export class ModuleManager extends WebInterfaceBase {
     return data
   }
 
-  async updateModuleConfig (moduleId, data) {
-    eventBus.emit('Module.configChange', moduleId)
+  async updateModuleConfig (moduleId, key, value) {
+    if (this.installedModuleList.indexOf(moduleId) !== -1) {
+      if (value !== 'undefined') {
+        (new KVTable(this.database, `module-${moduleId}`)).set(key, JSON.stringify(value))
+      } else {
+        (new KVTable(this.database, `module-${moduleId}`)).delete(key)
+      }
+      eventBus.emit('Module.configChange', moduleId)
+      return true
+    } else {
+      throw new Error('This Module didn\'t installed')
+    }
   }
 
-  async getModuleConfig (moduleId, fallback) {
-    // TODO
+  async updateModuleMultipleConfig (moduleId, config) {
+    if (this.installedModuleList.indexOf(moduleId) === -1) {
+      throw new Error('This Module didn\'t installed')
+    }
+    var keys = Object.keys(config)
+    if (keys.length <= 0) {
+      return true
+    }
+    var table = new KVTable(this.database, `module-${moduleId}`)
+    keys.forEach((key) => {
+      if (config[key] !== 'undefined') {
+        table.set(key, JSON.stringify(config[key]))
+      } else {
+        table.delete(key)
+      }
+    })
+    eventBus.emit('Module.configChange', moduleId)
+    return true
+  }
+
+  /**
+   *
+   * @param {string} moduleId
+   * @param {string[]} keys
+   */
+  async getModuleMultiConfig (moduleId, keys = []) {
+    if (this.installedModuleList.indexOf(moduleId) === -1) {
+      throw new Error('This Module didn\'t installed')
+    }
+    var result = {}
+    if (keys.length > 0) {
+      var table = new KVTable(this.database, `module-${moduleId}`)
+      keys.forEach((key) => {
+        var read = table.get(key)
+        result[key] = typeof read === 'undefined' ? undefined : JSON.stringify(read)
+      })
+    }
+    return result
+  }
+
+  async getModuleConfig (moduleId, key) {
+    return (await this.getModuleMultiConfig(moduleId, [key]))[key]
+  }
+
+  clearModuleConfig (moduleId) {
+    if (this.installedModuleList.indexOf(moduleId) !== '-1') {
+      try {
+        var table = new KVTable(this.database, `module-${moduleId}`)
+        table.keys().forEach((e) => {
+          table.delete(e)
+        })
+        return true
+      } catch (error) {
+        console.log(error)
+        return false
+      }
+    }
+    return false
   }
 
   async getModuleInfo (moduleId) {
     if (isDev) {
       await this.getAllModuleList()
     }
-    return this.moduleList.find((module) => { return module.id === moduleId })
+    return this.moduleList.find((module) => {
+      return module.id === moduleId
+    })
   }
 
   async createModuleExternalWindow (moduleId, data) {
@@ -87,7 +204,8 @@ export class ModuleManager extends WebInterfaceBase {
     })
     if (module === undefined) {
       return {
-        code: -3, msg: 'no module or module list not load'
+        code: -3,
+        msg: 'no module or module list not load'
       }
     }
     if (module.externalWindow) {
@@ -109,7 +227,10 @@ export class ModuleManager extends WebInterfaceBase {
       if (module.externalWindow) {
         if (module.externalWindowOption) {
           if (module.externalWindowOption.only && this.moduleWindows[moduleId] && this.moduleWindows[moduleId].length > 0) {
-            return { 'code': -2, 'msg': 'already have one' }
+            return {
+              'code': -2,
+              'msg': 'already have one'
+            }
           }
           BrowserWindowOptions.forEach((e) => {
             if (module.externalWindowOption[e] !== undefined) {
@@ -121,7 +242,9 @@ export class ModuleManager extends WebInterfaceBase {
 
         moduleWindow.loadURL(ModuleWindowPage + `#${(new URLSearchParams({ module: moduleId, data: JSON.stringify(data) })).toString()}`)
         if (isDev) {
-          moduleWindow.webContents.openDevTools({ mode: 'detach' })
+          moduleWindow.webContents.openDevTools({
+            mode: 'detach'
+          })
         }
         this.map[moduleWindow.id] = moduleId
         if (this.moduleWindows[moduleId]) {
@@ -140,10 +263,17 @@ export class ModuleManager extends WebInterfaceBase {
             return e !== moduleWindow
           })
         })
-        return { 'code': 0, 'msg': 'success', 'data': windowId }
+        return {
+          'code': 0,
+          'msg': 'success',
+          'data': windowId
+        }
       }
     } else {
-      return { 'code': -1, 'msg': 'not support' }
+      return {
+        'code': -1,
+        'msg': 'not support'
+      }
     }
   }
 
@@ -178,9 +308,13 @@ export class ModuleManager extends WebInterfaceBase {
     }
     this.map[this.mainWindow.id] = 'main'
     if (isDev) {
-      this.mainWindow.webContents.openDevTools({ mode: 'detach' })
+      this.mainWindow.webContents.openDevTools({
+        mode: 'detach'
+      })
       this.mainWindow.webContents.on('did-attach-webview', (e, webContents) => {
-        webContents.openDevTools({ mode: 'detach' })
+        webContents.openDevTools({
+          mode: 'detach'
+        })
       })
     }
     // Show when loaded
@@ -229,7 +363,9 @@ export class ModuleManager extends WebInterfaceBase {
     if (this.moduleWindows[moduleId]) {
       return {
         code: 0,
-        data: this.moduleWindows[moduleId].map((e) => { return e.id })
+        data: this.moduleWindows[moduleId].map((e) => {
+          return e.id
+        })
       }
     }
     return {

@@ -11,10 +11,8 @@
 </template>
 
 <script>
-  import Mock from 'mockjs'
+
   import item from './item'
-  let id = 0
-  let inval
   // 默认设置选项
   const defaultOptions = {
     // 弹幕内容颜色
@@ -64,46 +62,13 @@
       }
     },
     created () {
-      const Random = Mock.Random
-      // 模拟弹幕数据生成，500ms生成一次
-      inval = setInterval(() => {
-        const item = {
-          id: id,
-          cmd: Random.pick(['DANMU_MSG',
-                            'SEND_GIFT',
-                            'WELCOME',
-                            'WELCOME_GUARD',
-                            'SYS_MSG',
-                            'PREPARING',
-                            'LIVE']),
-          username: Random.csentence(1, 20),
-
-          userLevel: Random.natural(1, 60),
-          fansLevel: Random.natural(1, 20),
-          content: Random.csentence(1, 20)
-        }
-        this.normalList.push(item)
-        id++
-      }, 500)
     },
     mounted () {
-      // const ele = this.$refs.content
-      // let ticking = false
-      // // 组件加载完毕时，监听滚动事件，如果滚动到底部则保持在底部状态
-      // ele.addEventListener('scroll', (e) => {
-      //   // 节流处理，防止滚动时频繁触发
-      //   if (!ticking) {
-      //     window.requestAnimationFrame(() => {
-      //       ticking = false
-      //       this.keepBottom = ele.scrollHeight - ele.scrollTop === ele.clientHeight
-      //     })
-      //     ticking = true
-      //   }
-      // })
+
     },
     methods: {
       stop () {
-        clearInterval(inval)
+
       }
     }
   }
