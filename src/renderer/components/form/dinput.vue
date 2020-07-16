@@ -1,17 +1,18 @@
 <template>
   <span>
-    <input class="my-input" type="text" placeholder="提示信息..."/>
+    <input class="d-input" type="text" :placeholder="placeholder"/>
   </span>
 </template>
 
 <script>
   export default {
-    name: 'my-input'
+    name: 'd-input',
+    props: ['placeholder']
   }
 </script>
 
 <style scoped>
-  .my-input{
+  .d-input{
     outline: none;
     height: 31px;
     box-sizing: border-box;
@@ -22,7 +23,7 @@
     font-size: 11px;
     overflow: hidden;
   }
-  .my-input::placeholder{
+  .d-input::placeholder{
     color: #92929D;
   }
 

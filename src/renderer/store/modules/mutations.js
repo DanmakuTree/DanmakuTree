@@ -2,6 +2,9 @@ export default {
   hiddenModal (state) {
     state.modalVisible = false
   },
+  updateRoomList (state, data) {
+    state.roomList = data
+  },
   init (state) {
     state.initializing = false
   },

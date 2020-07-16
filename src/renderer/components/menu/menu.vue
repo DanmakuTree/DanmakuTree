@@ -17,7 +17,7 @@
       </div>
       <span>{{item.title}}</span>
     </router-link>
-    <div style="margin-top: 16px;height: 40px;line-height: 40px;padding: 0 16px;font-size: 10px;color: #92929D;letter-spacing: 1px">
+    <div style="margin-top: 16px;height: 40px;line-height: 40px;padding: 0 16px;font-size: 12px;color: #92929D;letter-spacing: 1px">
       插件列表
     </div>
     <ul style="flex: 1;overflow-y: scroll">

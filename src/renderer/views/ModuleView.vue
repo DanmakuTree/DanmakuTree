@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import fail from './NotFound'
+  import fail from './Error'
   async function externalComponent (config, id) {
     const name = config.js.split('/').reverse()[0].match(/^(.*?)\.js/)[1]
     // if (window[name]) return window[name]

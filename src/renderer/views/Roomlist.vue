@@ -12,11 +12,13 @@
     <div class="card RoomInfo">
       <div class="cover" :style="cover"></div>
       <div class="info">
-        <p class="title">{{roomInfo.title}}</p>
-        <p>主播: {{roomInfo.username}} </p>
-        <p>分区：{{roomInfo.area.big}} · {{roomInfo.area.small}}</p>
-        <p><span>UID: {{roomInfo.uid}}</span> <span>直播间号: {{roomInfo.roomId}}</span> <span v-if='roomInfo.shortId !== 0'>短位号: {{roomInfo.shortId}}</span></p>
+        <p class="title" style="margin-bottom: 4px">{{roomInfo.title}}#{{roomInfo.roomId}}</p>
+        <p><span>分区：</span>{{roomInfo.area.big}} · {{roomInfo.area.small}}</p>
+        <p style="margin-top: 8px"><span>主播：</span>{{roomInfo.username}} ({{roomInfo.uid}})</p>
+        <!--        <p><span>UID: {{roomInfo.uid}}</span> <span>直播间号: {{roomInfo.roomId}}</span> <span v-if='roomInfo.shortId !== 0'>短位号: {{roomInfo.shortId}}</span></p>-->
         <p>UP.{{roomInfo.upLevel.level}}  <a-progress :percent="roomInfo.upLevel.percent" :showInfo="false" style="margin:0 5px;width:100px; transform: translate(0px, -2px);"/> {{roomInfo.upLevel.percent.toFixed(2)}} %</p>
+        <!--        <slot name="RTop"/>-->
+        <!--        <slot name="RBottom"/>-->
       </div>
     </div>
     <div class="card RoomList">
@@ -86,6 +88,7 @@
         this.roomList = e
         if (e.length >= 1) {
           this.displayRoomInfo(e[0].roomId)
+          this.$store.commit('updateRoomList', this.roomList)
         }
       }).catch(console.error)
       this.$platform.BiliBili.Services.DanmakuService.getRoomList().then((e) => {
@@ -140,7 +143,9 @@
               shortId: res.data.room_info.short_id,
               userId: res.data.room_info.uid
             })
-            this.$main.updateRoomList(this.roomList).then(() => {}).catch(console.error)
+            this.$main.updateRoomList(this.roomList).then(() => {
+              this.$store.commit('updateRoomList', this.roomList)
+            }).catch(console.error)
           } else {
             this.$message.error(res.msg || '未知错误')
           }
@@ -181,7 +186,7 @@
 }
 .RoomInfo > .cover {
   width: 192px;
-  height: 115px;
+  height: 108px;
   background-size: cover;
   border-radius: 5px;
   flex-shrink: 0;

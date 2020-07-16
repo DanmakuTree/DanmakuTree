@@ -231,7 +231,7 @@
       createChart () {
         this.chart = this.$echarts.init(this.$refs.chart, true)
         if (this.option.dataset.source.length > 0) {
-          var a = 0
+          let a = 0
           this.option.dataset.dimensions = ['time']
           this.option.series = []
           this.option.yAxis = []
@@ -240,6 +240,13 @@
               this.option.dataset.dimensions.push(e.name)
               this.option.series.push({
                 type: 'line',
+                lineStyle: {
+                  width: 3
+                },
+                // areaStyle: {
+                //   opacity: 0.4
+                // },
+                smooth: true,
                 encode: { x: 'time', y: e.name },
                 yAxisIndex: a++,
                 name: e.displayName,

@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home'
-import Roomlist from '../views/roomlist'
+import Roomlist from '../views/Roomlist'
 import ModuleView from '../views/ModuleView'
 import ModuleCenter from '../views/ModuleCenter'
 import History from '../views/History'
-import notFound from '../views/NotFound'
+import notFound from '../views/Error'
 import RouteLoading from '../components/RouteLoading'
 import RouteError from '../components/RouteError'
 
@@ -69,7 +69,7 @@ const router = new Router({
       meta: {
         title: '房间列表'
       },
-      component: () => lazyLoadView(import('../views/roomlist'))
+      component: () => lazyLoadView(import('../views/Roomlist'))
     },
     {
       path: '/moduleCenter',

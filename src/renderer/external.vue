@@ -12,7 +12,7 @@
 
 <script>
   import dHeader from './components/header'
-  import fail from './views/NotFound'
+  import fail from './views/Error'
   async function externalComponent (config, id) {
     const name = config.js.split('/').reverse()[0].match(/^(.*?)\.js/)[1]
     // if (window[name]) return window[name]

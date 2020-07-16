@@ -1,32 +1,35 @@
 <template>
-  <div style="flex: 1;padding: 16px 20px 80px 20px;background: #fafafb;display: flex;flex-direction: column">
+  <div style="flex: 1;padding: 16px 20px 20px 20px;background: #fafafb;display: flex;flex-direction: column">
     <div style="margin-bottom: 8px">
       <span class="h2">弹幕历史</span>
       <span style="font-family: Roboto-Regular,sans-serif;font-size: 13px;color: #92929D">
         <a-select default-value="#1909310" style="width: 120px">
-            <a-select-option value="#1909310">
-              #1909310
-            </a-select-option>
-            <a-select-option value="#1293113">
-              #1293113
-            </a-select-option>
-          </a-select>
+          <a-select-option value="#1909310">
+            #1909310
+          </a-select-option>
+          <a-select-option value="#1293113">
+            #1293113
+          </a-select-option>
+        </a-select>
       </span>
     </div>
     <div style="display: flex;flex: 1;justify-content: space-between;overflow: hidden">
-      <div class="card-r" style="width: 134px;padding: 16px 8px;display: flex;flex-direction: column">
-        <span
-          style="height: 28px;text-align: center;background: #f2f7ff;border-radius: 8px;line-height: 31px;
+      <div style="width: 134px;display: flex;flex-direction: column;">
+        <div class="card-r" style="padding: 16px 8px;display: flex;flex-direction: column;flex: 1">
+          <span
+            style="height: 28px;text-align: center;background: #f2f7ff;border-radius: 8px;line-height: 31px;
         font-family: Poppins-SemiBold,sans-serif;font-size: 12px;color: #0062FF;margin-bottom: 6px">2020-06-01</span>
-        <span
-          style="height: 28px;text-align: center;background: transparent;border-radius: 8px;line-height: 31px;
+          <span
+            style="height: 28px;text-align: center;background: transparent;border-radius: 8px;line-height: 31px;
         font-family: Poppins,sans-serif;font-size: 12px;color: #92929D;margin-bottom: 6px">2020-06-01</span>
-        <span
-          style="height: 28px;text-align: center;background: transparent;border-radius: 8px;line-height: 31px;
+          <span
+            style="height: 28px;text-align: center;background: transparent;border-radius: 8px;line-height: 31px;
         font-family: Poppins,sans-serif;font-size: 12px;color: #92929D;margin-bottom: 6px">2020-06-01</span>
-        <span style="flex: 1"/>
-        <span>清空本日数据</span>
-        <span>清空所有日志</span>
+        </div>
+        <div class="card-r" style="padding: 16px 8px;display: flex;flex-direction: column;height: 100px;margin-top: 16px">
+
+        </div>
+
       </div>
       <div class="card-r" style="width: 568px;padding: 16px;display: flex;flex-direction: column;">
         <div style="margin-bottom: 16px">
@@ -39,7 +42,7 @@
             </a-select-option>
           </a-select>
           <a-input-search  placeholder="搜索..."  style="width: 180px;float: right;font-size: 11px"/>
-<!--          <d-input style="float: right"/>-->
+          <!--          <d-input style="float: right"/>-->
         </div>
         <div style="flex: 1;display: flex;overflow: scroll">
           <DynamicScroller
@@ -68,7 +71,7 @@
 
 <script>
   import dItem from '../components/danmaku/item'
-  import dInput from '../components/form/input'
+  import dInput from '../components/form/dinput'
   export default {
     name: 'History',
     components: {
