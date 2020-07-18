@@ -66,6 +66,7 @@
     "prettier": "^2.0.5",
     "sass": "^1.26.7",
     "sass-loader": "^8.0.2",
+    "shx": "^0.3.2",
     "style-loader": "^1.2.1",
     "tree-kill": "1.2.2",
     "typescript": "^3.9.2",
@@ -106,7 +107,13 @@
     "postinstall": "electron-rebuild",
     "rebuild:electron": "run-s electron-builder-install electron-rebuild",
     "rebuild:node": "npm rebuild",
-    "release": "run-s test build"
+    "release": "run-s test build",
+    "mocker": "run-s mocker:make rebuild:node mocker:folder mocker:help",
+    "mocker:make": "git branch test-0 && git switch test-0",
+    "mocker:folder": "shx mkdir -p DanmakuTree/config && shx mkdir -p DanmakuTree/data && shx mkdir -p DanmakuTree/log",
+    "mocker:help": "echo Please run (in your command line): git cherry-pick (git merge-base master mocker)..mocker && echo HINT: Make sure you run mocker:folder before you run mocker:debug",
+    "mocker:debug": "node --inspect -r esm",
+    "mocker:clean": "git branch -D test-0"
   },
   "version": "0.0.1"
 }
