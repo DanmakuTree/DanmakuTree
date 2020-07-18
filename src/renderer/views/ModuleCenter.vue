@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2>插件中心</h2>
+    <h2 class="h2">插件中心</h2>
     <div class="module-list">
       <div class='module' v-for="Amodule in moduleList" :key="Amodule.id">
         <h3>{{Amodule.name}} <span>{{Amodule.version}}</span> </h3>

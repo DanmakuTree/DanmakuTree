@@ -67,7 +67,8 @@ ul{
 .h2{
   font-family: Poppins-SemiBold,sans-serif;
   font-size: 18px;
-  color: #171725;
+  /*虹蓝*/
+  color: #2177b8;
 }
 .slide-menu{
   font-family: Poppins-Medium,sans-serif;
@@ -89,7 +90,7 @@ ul{
 }
 .card-border{
   border: 1px solid #E2E2EA;
-  border-radius: 15px;
+  border-radius: 8px;
   background: #FAFAFB;
 }
 table{
