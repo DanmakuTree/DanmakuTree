@@ -21,18 +21,14 @@
       插件列表
     </div>
     <ul style="flex: 1;overflow-y: scroll">
-      <div style="height: 40px;line-height: 40px;padding: 0 16px;display: flex;align-items: center">
-        <div style="width: 26px;height: 26px;border-radius: 8px;background: #26ade3;margin-right: 12px;line-height: 26px;color: white;text-align: center;font-size: 12px">
-          插
+      <div v-for="DTModule in displayModuleList" :key="DTModule.id" style="height: 40px;line-height: 40px;padding: 0 16px;display: flex;align-items: center">
+        <!-- TODO: 自动替换为图标。 -->
+        <div style="width: 26px;height: 26px;border-radius: 8px;margin-right: 12px;line-height: 26px;color: white;text-align: center;font-size: 12px" :style="IconColor(DTModule)" >
+          {{DTModule.name[0]}}
         </div>
-        <span class="title-h5-middle" @click="testClick">弹幕悬浮窗</span>
+        <span class="title-h5-middle" @click="moduleAction(DTModule)">{{DTModule.name}}</span>
       </div>
-      <div style="height: 40px;line-height: 40px;padding: 0 16px;display: flex;align-items: center">
-        <div style="width: 26px;height: 26px;border-radius: 8px;background: #A461D8;margin-right: 12px;line-height: 26px;color: white;text-align: center;font-size: 12px">
-          件
-        </div>
-        <span class="title-h5-middle">礼物图标</span>
-      </div>
+
     </ul>
   </div>
 </template>
@@ -70,19 +66,59 @@
           {
             title: '系统设置',
             icon: 'iconic_Settings1',
-            to: '/1'
+            to: '/settings'
           }
-        ]
+        ],
+        installedModules: [],
+        displayModuleList: [],
+        allModule: []
       }
     },
+    mounted () {
+      console.log(1)
+      Promise.all([this.getAllModules(), this.getInstalledModules()]).then(this.updateDisplayModuleList)
+    },
     methods: {
-      // 点击测试用例
-      testClick () {
-        const id = this.$store.state.moduleList[0].id
-        // this.$module.createModuleExternalWindow(id).then((e) => console.log(e))
+      getInstalledModules () {
+        return this.$module.getInstalledModuleList().then((list) => {
+          console.log(this.installedModules)
+          this.installedModules = list
+        })
       },
-      quit () {
-        window.API.Quit()
+      getAllModules () {
+        return this.$module.getAllModuleList().then((list) => {
+          this.allModule = list
+        }).catch(console.log)
+      },
+      updateDisplayModuleList () {
+        this.installedModules.forEach((id) => {
+          var DTModule = this.allModule.find((e) => {
+            return e.id === id
+          })
+          if (DTModule) {
+            DTModule.iconColor = DTModule.iconColor ? DTModule.iconColor : '#' + Math.floor(Math.random() * 16777215).toString(16)
+            this.displayModuleList.push(DTModule)
+          }
+        })
+      },
+      moduleAction (DTModule) {
+        if (DTModule.embed) {
+          this.$router.push(`/module/${DTModule.id}`).catch(() => {})
+        } else if (DTModule.externalWindow) {
+          this.$module.createModuleExternalWindow(DTModule.id).then((res) => {
+            if (res.code !== 0) {
+              this.$message.error(res.msg)
+            }
+          }).catch((e) => {
+            this.$message.error(e.message || e)
+            console.error(e)
+          })
+        }
+      },
+      IconColor (DTModule) {
+        return {
+          backgroundColor: DTModule.iconColor
+        }
       }
     }
   }

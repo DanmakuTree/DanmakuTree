@@ -28,9 +28,19 @@ Vue.use(API)
 Vue.use(Antd)
 Vue.prototype.$message = message
 var hash = new URLSearchParams((window.location.hash || '#').split('#', 2)[1])
+var loaddata = {}
+try {
+  const json = hash.get('data')
+  if (json !== 'undefined') {
+    loaddata = JSON.parse()
+  }
+} catch (error) {
+  console.log(error)
+}
+
 Vue.prototype.$meta = {
   id: hash.get('module'),
-  data: JSON.parse(hash.get('data'))
+  data: loaddata
 }
 console.log(Vue.prototype.$meta)
 

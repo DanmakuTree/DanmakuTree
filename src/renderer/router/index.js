@@ -4,6 +4,7 @@ import Home from '../views/Home'
 import Roomlist from '../views/Roomlist'
 import ModuleView from '../views/ModuleView'
 import ModuleCenter from '../views/ModuleCenter'
+import Settings from '../views/Settings'
 import History from '../views/History'
 import notFound from '../views/Error'
 import RouteLoading from '../components/RouteLoading'
@@ -46,10 +47,6 @@ const router = new Router({
       redirect: '/home'
     },
     {
-      path: '/plugin',
-      component: () => lazyLoadView(import('../components/plugins/danmaku/index'))
-    },
-    {
       path: '/home',
       meta: {
         title: '首页',
@@ -69,7 +66,7 @@ const router = new Router({
       meta: {
         title: '房间列表'
       },
-      component: () => lazyLoadView(import('../views/Roomlist'))
+      component: Roomlist
     },
     {
       path: '/moduleCenter',
@@ -79,10 +76,14 @@ const router = new Router({
       component: ModuleCenter
     },
     {
-      path: '/module/:id',
+      path: '/settings',
       meta: {
-        title: 'test'
+        title: '系统设置'
       },
+      component: Settings
+    },
+    {
+      path: '/module/:id',
       component: ModuleView
     },
     {

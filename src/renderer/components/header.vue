@@ -36,6 +36,7 @@
     color: #44444F;
     align-items: center;
     background: rgba(123,255,255,0);
+    background-color: white;
     backdrop-filter: blur(20px);
     border-bottom: 1px solid #e2e2ea;
     overflow: hidden;

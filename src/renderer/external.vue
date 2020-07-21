@@ -83,7 +83,14 @@
       },
       loadAsset () {
         this.computedComponent = async () => {
-          return externalComponent(this.module.externalWindow, this.id).catch((e) => {
+          return externalComponent(this.module.externalWindow, this.id).then((e) => {
+            if (this.module.externalWindowOption) {
+              if (this.module.externalWindowOption.frameless) {
+                this.frameless = this.module.externalWindowOption.frameless
+              }
+            }
+            return e
+          }).catch((e) => {
             console.error(e)
             return fail
           })

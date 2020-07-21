@@ -53,6 +53,7 @@ export class ModuleManager extends WebInterfaceBase {
       }
     })
     eventBus.on('Main.quit', this.onMainQuit)
+    eventBus.registerPublicEvent('Module.configChange')
   }
 
   init () {
@@ -80,9 +81,10 @@ export class ModuleManager extends WebInterfaceBase {
     if (index !== -1 && this.installedModuleList.indexOf(moduleId)) {
       this.installedModuleList.push(moduleId)
       this.config.set('installedModuleList', JSON.stringify(this.installedModuleList))
-      if (this.moduleList[index].DefaultConfig) {
-        this.updateModuleMultipleConfig(moduleId, this.moduleList[index].DefaultConfig)
+      if (this.moduleList[index].defaultConfig) {
+        this.updateModuleMultipleConfig(moduleId, this.moduleList[index].defaultConfig)
       }
+      eventBus.emit('Module.installListUpdate')
       return true
     } else {
       return false
@@ -95,6 +97,7 @@ export class ModuleManager extends WebInterfaceBase {
       this.installedModuleList.splice(index, 1)
       this.config.set('installedModuleList', JSON.stringify(this.installedModuleList))
       this.clearModuleConfig(moduleId)
+      eventBus.emit('Module.installListUpdate')
       return true
     }
     return false
