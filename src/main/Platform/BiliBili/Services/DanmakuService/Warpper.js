@@ -176,12 +176,14 @@ export const defaultMap = {
   },
   LIVE (message) {
     return {
-      type: 'live'
+      type: 'live',
+      data: {}
     }
   },
   PREPARING (message) {
     return {
-      type: 'prepare'
+      type: 'prepare',
+      data: {}
     }
   },
   CUT_OFF (message) {
