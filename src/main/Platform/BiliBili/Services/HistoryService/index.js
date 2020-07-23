@@ -22,14 +22,14 @@ export class HistoryService extends WebInterfaceBase {
       this.available.push(e)
       this[e] = this[e].bind(this)
     })
-    eventBus.on('Platform.BiliBili.Service.DanmakuService.control.authSuccess', this.onConnect)
-    eventBus.on('Platform.BiliBili.Service.DanmakuService.control.close', this.onClose)
-    eventBus.on('Platform.BiliBili.Service.DanmakuService.Message', this.onMessage)
   }
 
   init () {
     this.store = new Database(DataPath + '/data/BiliBiliDanmakuHistory.db')
     this.roomList = new KVTable(this.store, 'roomList')
+    eventBus.on('Platform.BiliBili.Service.DanmakuService.control.authSuccess', this.onConnect)
+    eventBus.on('Platform.BiliBili.Service.DanmakuService.control.close', this.onClose)
+    eventBus.on('Platform.BiliBili.Service.DanmakuService.Message', this.onMessage)
   }
 
   getRoomList () {
