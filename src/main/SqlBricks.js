@@ -11,7 +11,8 @@ function split (obj, char = '$') {
 const typeofMap = {
   string () { return 'TEXT' },
   number (val) { return Number.isInteger(val) ? 'INTEGER' : 'REAL' },
-  boolean () { return 'BOOLEAN' }
+  boolean () { return 'BOOLEAN' },
+  undefined () { console.warn('Warning: Undefined data at dmMsgMock, Please checkout between wsRawCmd and Warpper!'); return 'BLOB' }
 }
 
 function columnDefine (obj) {

@@ -19,7 +19,9 @@ export const defaultMap = {
         level: message.info[3][0] || 0,
         label: message.info[3][1] || '',
         anchorUsername: message.info[3][2] || '',
-        roomId: message.info[3][3] || 0
+        roomId: message.info[3][3] || 0,
+        isLight: !!message.info[3][11],
+        anchorUid: message.info[3][12] || 0
       },
       title: message.info[5]
     }
