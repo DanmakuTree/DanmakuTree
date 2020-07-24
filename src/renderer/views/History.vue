@@ -11,27 +11,12 @@
             #1293113
           </a-select-option>
         </a-select>
+<!--       todo： 时间范围选择器因为大小软件尺寸问题导致悬浮窗有一些错位-->
+        <a-range-picker/>
       </span>
     </div>
     <div style="display: flex;flex: 1;justify-content: space-between;overflow: hidden">
-      <div style="width: 134px;display: flex;flex-direction: column;">
-        <div class="card-r" style="padding: 16px 8px;display: flex;flex-direction: column;flex: 1">
-          <span
-            style="height: 28px;text-align: center;background: #f2f7ff;border-radius: 8px;line-height: 31px;
-        font-family: Poppins-SemiBold,sans-serif;font-size: 12px;color: #0062FF;margin-bottom: 6px">2020-06-01</span>
-          <span
-            style="height: 28px;text-align: center;background: transparent;border-radius: 8px;line-height: 31px;
-        font-family: Poppins,sans-serif;font-size: 12px;color: #92929D;margin-bottom: 6px">2020-06-01</span>
-          <span
-            style="height: 28px;text-align: center;background: transparent;border-radius: 8px;line-height: 31px;
-        font-family: Poppins,sans-serif;font-size: 12px;color: #92929D;margin-bottom: 6px">2020-06-01</span>
-        </div>
-        <div class="card-r" style="padding: 16px 8px;display: flex;flex-direction: column;height: 100px;margin-top: 16px">
-
-        </div>
-
-      </div>
-      <div class="card-r" style="width: 568px;padding: 16px;display: flex;flex-direction: column;">
+      <div class="card-r" style="flex:1;padding: 16px;display: flex;flex-direction: column;">
         <div style="margin-bottom: 16px">
           <a-select default-value="显示：弹幕" style="width: 120px">
             <a-select-option value="显示：弹幕">
@@ -44,7 +29,7 @@
           <a-input-search  placeholder="搜索..."  style="width: 180px;float: right;font-size: 11px"/>
           <!--          <d-input style="float: right"/>-->
         </div>
-        <div style="flex: 1;display: flex;overflow: scroll">
+        <div style="flex: 1;display: flex;overflow: hidden">
           <DynamicScroller
             :items="items"
             :min-item-size="54"
@@ -71,11 +56,9 @@
 
 <script>
   import dItem from '../components/danmaku/item'
-  import dInput from '../components/form/dinput'
   export default {
     name: 'History',
     components: {
-      'd-input': dInput,
       'd-item': dItem
     },
     data: () => {
@@ -104,7 +87,7 @@
 <style scoped>
   .scroller{
     flex: 1;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
   }
 

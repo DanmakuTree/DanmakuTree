@@ -5,6 +5,22 @@ body{
   user-select:none;
   background-color: transparent!important;
 }
+/*mac风格的滚动条*/
+/*todo: 实现不滚动时自动隐藏（定时器？）*/
+::-webkit-scrollbar{
+  width: 4px;
+  height: 4px;
+  /*display: none;*/
+}
+::-webkit-scrollbar-thumb{
+  border-radius: 1em;
+  background: rgba(50,50,50,.3);
+}
+::-webkit-scrollbar-track{
+  border-radius: 1em;
+  background: rgba(50,50,50,.1);
+}
+
 ul{
   list-style: none;
   margin: 0;

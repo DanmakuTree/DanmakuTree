@@ -20,7 +20,7 @@
     <div style="margin-top: 16px;height: 40px;line-height: 40px;padding: 0 16px;font-size: 12px;color: #92929D;letter-spacing: 1px">
       插件列表
     </div>
-    <ul style="flex: 1;overflow-y: scroll">
+    <ul style="flex: 1;overflow-y: auto;overflow-x: hidden">
       <div v-for="DTModule in displayModuleList" :key="DTModule.id" style="height: 40px;line-height: 40px;padding: 0 16px;display: flex;align-items: center">
         <!-- TODO: 自动替换为图标。 -->
         <div style="width: 26px;height: 26px;border-radius: 8px;margin-right: 12px;line-height: 26px;color: white;text-align: center;font-size: 12px" :style="IconColor(DTModule)" >
