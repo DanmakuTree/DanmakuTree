@@ -7,6 +7,7 @@ import { getLogger } from 'log4js'
 import { URLSearchParams } from 'url'
 import Database from 'better-sqlite3'
 import { KVTable } from './KVTable'
+import { keys } from 'lodash'
 const BrowserWindowOptions = ['width', 'height', 'x', 'y', 'resizable', 'movable', 'minimizable', 'maximizable', 'skipTaskbar', 'alwaysOnTop', 'fullscreen', 'opacity', 'backgroundColor', 'transparent', 'frame']
 export class ModuleManager extends WebInterfaceBase {
   constructor () {
@@ -27,8 +28,8 @@ export class ModuleManager extends WebInterfaceBase {
     this.moduleWindows = {}
     this.quitSign = false
     this.installedModuleList = []
-    this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig')
-    var bindList = ['getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig']
+    this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList')
+    var bindList = ['getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList']
     this.moduleList = []
     bindList.forEach((e) => {
       this[e] = this[e].bind(this)
@@ -54,6 +55,8 @@ export class ModuleManager extends WebInterfaceBase {
     })
     eventBus.on('Main.quit', this.onMainQuit)
     eventBus.registerPublicEvent('Module.configChange')
+    eventBus.registerPublicEvent('Module.installListUpdate')
+    eventBus.registerPublicEvent('Module.gotRequestQuickLink')
   }
 
   init () {
@@ -173,7 +176,7 @@ export class ModuleManager extends WebInterfaceBase {
     return (await this.getModuleMultiConfig(moduleId, [key]))[key]
   }
 
-  clearModuleConfig (moduleId) {
+  async clearModuleConfig (moduleId) {
     if (this.installedModuleList.indexOf(moduleId) !== '-1') {
       try {
         var table = new KVTable(this.database, `module-${moduleId}`)
@@ -187,6 +190,35 @@ export class ModuleManager extends WebInterfaceBase {
       }
     }
     return false
+  }
+
+  async requestQuickLink (moduleId, link) {
+    if (this.installedModuleList.indexOf(moduleId) === -1) {
+      return false
+    }
+    if (!verifyLink(link)) {
+      return false
+    }
+    link.moduleId = moduleId
+    this.sendToMainWindow({
+      name: 'Module.gotRequestQuickLink',
+      data: [link]
+    })
+    return true
+  }
+
+  async getQuickLinkList () {
+    var list = this.config.get('quickLinkList')
+    if (typeof list !== 'string') {
+      list = []
+    } else {
+      list = JSON.parse(list)
+    }
+    return list
+  }
+
+  async updateQuickLinkList (linkList) {
+    return this.config.set('quickLinkList', JSON.stringify(linkList))
   }
 
   async getModuleInfo (moduleId) {
@@ -471,4 +503,20 @@ function InsertArgument (target, ...data) {
       return target(...data, ...argumentsList)
     }
   })
+}
+
+function verifyLink (link) {
+  if (typeof link !== 'object') {
+    return false
+  }
+  if (typeof link.name !== 'string' || link.name.length <= 0) {
+    return false
+  }
+  if (typeof link.action !== 'string' || link.action.length <= 0) {
+    return false
+  }
+  if (!(typeof link.icon === 'string' && link.icon.length > 0) && typeof link.icon !== 'undefined') {
+    return false
+  }
+  return true
 }
