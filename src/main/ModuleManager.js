@@ -7,8 +7,16 @@ import { getLogger } from 'log4js'
 import { URLSearchParams } from 'url'
 import Database from 'better-sqlite3'
 import { KVTable } from './KVTable'
-import { keys } from 'lodash'
+
+const internalModuleList = [
+  '6d443ea8-54ba-4a27-be2e-c4ab474c3230', // 首页
+  '327a2641-531c-4129-8a8f-0fd18bab8601', // 房间列表
+  '01a28479-4901-4b50-ae4a-92452d4bfe4f', // 历史弹幕
+  'b3a11260-c5e1-4edb-b7cc-23e8f6285f97', // 插件中心
+  '9ead739b-a95d-4673-9e40-2f18f4ad895e' //  系统设置
+]
 const BrowserWindowOptions = ['width', 'height', 'x', 'y', 'resizable', 'movable', 'minimizable', 'maximizable', 'skipTaskbar', 'alwaysOnTop', 'fullscreen', 'opacity', 'backgroundColor', 'transparent', 'frame']
+
 export class ModuleManager extends WebInterfaceBase {
   constructor () {
     super()
@@ -28,8 +36,8 @@ export class ModuleManager extends WebInterfaceBase {
     this.moduleWindows = {}
     this.quitSign = false
     this.installedModuleList = []
-    this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList')
-    var bindList = ['getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList']
+    this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList', 'getInternalModuleList')
+    var bindList = ['getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList', 'getInternalModuleList']
     this.moduleList = []
     bindList.forEach((e) => {
       this[e] = this[e].bind(this)
@@ -72,12 +80,19 @@ export class ModuleManager extends WebInterfaceBase {
     return this.installedModuleList
   }
 
+  getInternalModuleList () {
+    return internalModuleList
+  }
+
   /**
    * 安装模块
    * @param {string} moduleId 模块id
    * @returns {string[]|false}
    */
   installModule (moduleId) {
+    if (internalModuleList.indexOf(moduleId) !== -1) {
+      throw new Error('InternalModule')
+    }
     var index = this.moduleList.findIndex((item) => {
       return item.id === moduleId
     })
@@ -95,6 +110,9 @@ export class ModuleManager extends WebInterfaceBase {
   }
 
   uninstallModule (moduleId) {
+    if (internalModuleList.indexOf(moduleId) !== -1) {
+      throw new Error('InternalModule')
+    }
     var index = this.installedModuleList.indexOf(moduleId)
     if (index !== -1) {
       this.installedModuleList.splice(index, 1)
@@ -119,7 +137,7 @@ export class ModuleManager extends WebInterfaceBase {
   }
 
   async updateModuleConfig (moduleId, key, value) {
-    if (this.installedModuleList.indexOf(moduleId) !== -1) {
+    if (this.installedModuleList.indexOf(moduleId) !== -1 || internalModuleList.indexOf(moduleId) !== -1) {
       if (value !== 'undefined') {
         (new KVTable(this.database, `module-${moduleId}`)).set(key, JSON.stringify(value))
       } else {
@@ -133,7 +151,7 @@ export class ModuleManager extends WebInterfaceBase {
   }
 
   async updateModuleMultipleConfig (moduleId, config) {
-    if (this.installedModuleList.indexOf(moduleId) === -1) {
+    if (this.installedModuleList.indexOf(moduleId) === -1 || internalModuleList.indexOf(moduleId) !== -1) {
       throw new Error('This Module didn\'t installed')
     }
     var keys = Object.keys(config)
@@ -158,7 +176,7 @@ export class ModuleManager extends WebInterfaceBase {
    * @param {string[]} keys
    */
   async getModuleMultiConfig (moduleId, keys = []) {
-    if (this.installedModuleList.indexOf(moduleId) === -1) {
+    if (this.installedModuleList.indexOf(moduleId) === -1 || internalModuleList.indexOf(moduleId) !== -1) {
       throw new Error('This Module didn\'t installed')
     }
     var result = {}
@@ -177,7 +195,7 @@ export class ModuleManager extends WebInterfaceBase {
   }
 
   async clearModuleConfig (moduleId) {
-    if (this.installedModuleList.indexOf(moduleId) !== '-1') {
+    if (this.installedModuleList.indexOf(moduleId) !== '-1' || internalModuleList.indexOf(moduleId) !== -1) {
       try {
         var table = new KVTable(this.database, `module-${moduleId}`)
         table.keys().forEach((e) => {
@@ -193,7 +211,7 @@ export class ModuleManager extends WebInterfaceBase {
   }
 
   async requestQuickLink (moduleId, link) {
-    if (this.installedModuleList.indexOf(moduleId) === -1) {
+    if (this.installedModuleList.indexOf(moduleId) === -1 || internalModuleList.indexOf(moduleId) !== -1) {
       return false
     }
     if (!verifyLink(link)) {

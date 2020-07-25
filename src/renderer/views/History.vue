@@ -11,7 +11,7 @@
             #1293113
           </a-select-option>
         </a-select>
-<!--       todo： 时间范围选择器因为大小软件尺寸问题导致悬浮窗有一些错位-->
+        <!--       todo： 时间范围选择器因为大小软件尺寸问题导致悬浮窗有一些错位-->
         <a-range-picker/>
       </span>
     </div>
@@ -63,6 +63,7 @@
     },
     data: () => {
       return {
+        moduleId: '01a28479-4901-4b50-ae4a-92452d4bfe4f',
         items: [
           { message: '11231', id: 1 },
           { message: '11231', id: 2 },

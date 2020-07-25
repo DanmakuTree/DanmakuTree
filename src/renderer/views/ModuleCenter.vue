@@ -23,6 +23,7 @@
   export default {
     data: function () {
       return {
+        moduleId: 'b3a11260-c5e1-4edb-b7cc-23e8f6285f97',
         installedModuleList: [],
         moduleList: []
       }

@@ -53,6 +53,7 @@
     name: 'Home2',
     data: function () {
       return {
+        moduleId: '6d443ea8-54ba-4a27-be2e-c4ab474c3230',
         mainRoom: 0,
         interval: null,
         chart: null,

@@ -55,6 +55,7 @@
     name: 'd_roomlist',
     data: function () {
       return {
+        moduleId: '327a2641-531c-4129-8a8f-0fd18bab8601',
         roomInfo: {
           title: '',
           username: '',
