@@ -4,6 +4,12 @@ import { app } from 'electron'
 export const isDev = process.env.NODE_ENV === 'development'
 export const isDebug = process.argv.includes('--debug')
 export const version = ProgramVersion
+export const gitVersion = {
+  'version': process.env.GIT_VERSION || 'UNKNOWN',
+  'hash': process.env.GIT_COMMITHASH || 'UNKNOWN',
+  'branch': process.env.GIT_BRANCH || 'UNKNOWN'
+}
+
 export const Backend = isDev ? 'http://127.0.0.1:8369' : 'https://api.r18g.fun/api'
 
 export const MainWindowPage = isDev ? 'http://localhost:9080/embed.html' : `file://${__dirname}/embed.html`

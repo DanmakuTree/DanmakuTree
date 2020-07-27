@@ -60,11 +60,14 @@ const config = {
 if (isDevMode) {
     config.plugins.push(
         new webpack.DefinePlugin({
-            __static: `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`,
+            __static: `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
         })
     )
 } else {
+    const GitRevisionPlugin = require('git-revision-webpack-plugin')
+    const gitRevisionPlugin = new GitRevisionPlugin()
     config.plugins.push(
+        gitRevisionPlugin,
         new CopyWebpackPlugin({
             patterns: [
                 {
@@ -79,6 +82,12 @@ if (isDevMode) {
         }),
         new webpack.LoaderOptionsPlugin({
             minimize: true,
+        }),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': '"release"',
+            'process.env.GIT_VERSION': JSON.stringify(gitRevisionPlugin.version()),
+            'process.env.GIT_COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
+            'process.env.GIT_BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
         })
     )
 }

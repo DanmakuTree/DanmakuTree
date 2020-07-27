@@ -1,6 +1,6 @@
 import { WebInterfaceBase } from './WebInterfaceBase'
 import Services from './Services'
-import { version, DataPath } from './Consts'
+import { version, DataPath, gitVersion, isDev } from './Consts'
 import { dialog } from 'electron'
 import { eventBus } from './EventBus'
 import Database from 'better-sqlite3'
@@ -9,9 +9,9 @@ import { KVTable } from './KVTable'
 export class Main extends WebInterfaceBase {
   constructor () {
     super()
-    var methodList = ['init', 'getConfig', 'updateConfig', 'quit', 'getVersion', 'getRoomList', 'updateRoomList']
+    var methodList = ['init', 'getConfig', 'updateConfig', 'quit', 'getVersion', 'getRoomList', 'updateRoomList', 'getGitVersion', 'isDev']
     methodList.forEach((e) => { this[e] = this[e].bind(this) })
-    this.available.push('Services', 'getConfig', 'updateConfig', 'getVersion', 'getRoomList', 'updateRoomList')
+    this.available.push('Services', 'getConfig', 'updateConfig', 'getVersion', 'getRoomList', 'updateRoomList', 'getGitVersion', 'isDev')
     this.Services = Services
     this.database = null
     this.roomList = null
@@ -109,6 +109,14 @@ export class Main extends WebInterfaceBase {
 
   async getVersion () {
     return version
+  }
+
+  async getGitVersion () {
+    return gitVersion
+  }
+
+  async isDev () {
+    return isDev
   }
 }
 
