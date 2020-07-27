@@ -9,6 +9,7 @@ import History from '../views/History'
 import notFound from '../views/Error'
 import RouteLoading from '../components/RouteLoading'
 import RouteError from '../components/RouteError'
+import { ConfigDataMixin } from '../mixins/ConfigDataMixin'
 
 Vue.use(Router)
 
@@ -39,6 +40,27 @@ function lazyLoadView (AsyncView) {
     }
   })
 }
+
+if (!Home.mixins) {
+  Home.mixins = []
+}
+Home.mixins.push(ConfigDataMixin('6d443ea8-54ba-4a27-be2e-c4ab474c3230'))
+if (!History.mixins) {
+  History.mixins = []
+}
+History.mixins.push(ConfigDataMixin('01a28479-4901-4b50-ae4a-92452d4bfe4f'))
+if (!Roomlist.mixins) {
+  Roomlist.mixins = []
+}
+Roomlist.mixins.push(ConfigDataMixin('327a2641-531c-4129-8a8f-0fd18bab8601'))
+if (!ModuleCenter.mixins) {
+  ModuleCenter.mixins = []
+}
+ModuleCenter.mixins.push(ConfigDataMixin('b3a11260-c5e1-4edb-b7cc-23e8f6285f97'))
+if (!Settings.mixins) {
+  Settings.mixins = []
+}
+Settings.mixins.push(ConfigDataMixin('9ead739b-a95d-4673-9e40-2f18f4ad895e'))
 
 const router = new Router({
   routes: [

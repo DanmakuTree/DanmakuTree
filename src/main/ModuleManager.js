@@ -15,7 +15,7 @@ const internalModuleList = [
   'b3a11260-c5e1-4edb-b7cc-23e8f6285f97', // 插件中心
   '9ead739b-a95d-4673-9e40-2f18f4ad895e' //  系统设置
 ]
-const BrowserWindowOptions = ['width', 'height', 'x', 'y', 'resizable', 'movable', 'minimizable', 'maximizable', 'skipTaskbar', 'alwaysOnTop', 'fullscreen', 'opacity', 'backgroundColor', 'transparent', 'frame']
+const BrowserWindowOptions = ['width', 'height', 'x', 'y', 'resizable', 'movable', 'minimizable', 'maximizable', 'focusable', 'alwaysOnTop', 'fullscreenable', 'skipTaskbar', 'frame', 'modal', 'acceptFirstMouse', 'disableAutoHideCursor', 'autoHideMenuBar', 'enableLargerThanScreen', 'backgroundColor', 'hasShadow', 'opacity', 'darkTheme', 'transparent', 'type', 'thickFrame', 'vibrancy']
 
 export class ModuleManager extends WebInterfaceBase {
   constructor () {
@@ -36,8 +36,15 @@ export class ModuleManager extends WebInterfaceBase {
     this.moduleWindows = {}
     this.quitSign = false
     this.installedModuleList = []
-    this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList', 'getInternalModuleList')
-    var bindList = ['getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector', 'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit', 'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'updateModuleMultipleConfig', 'getModuleMultiConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList', 'getInternalModuleList']
+    this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow',
+      'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule',
+      'uninstallModule', 'updateModuleConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList',
+      'getInternalModuleList', 'updateModuleData', 'getModuleData', 'clearModuleData')
+    var bindList = ['getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector',
+      'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit',
+      'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'clearModuleConfig',
+      'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList', 'getInternalModuleList', 'updateModuleData',
+      'getModuleData', 'clearModuleData']
     this.moduleList = []
     bindList.forEach((e) => {
       this[e] = this[e].bind(this)
@@ -62,7 +69,6 @@ export class ModuleManager extends WebInterfaceBase {
       }
     })
     eventBus.on('Main.quit', this.onMainQuit)
-    eventBus.registerPublicEvent('Module.configChange')
     eventBus.registerPublicEvent('Module.installListUpdate')
     eventBus.registerPublicEvent('Module.gotRequestQuickLink')
   }
@@ -70,6 +76,8 @@ export class ModuleManager extends WebInterfaceBase {
   init () {
     this.database = new Database(DataPath + '/config/ModuleConfig.db')
     this.config = new KVTable(this.database, 'config')
+    this.moduleConfig = new KVTable(this.database, 'moduleConfig')
+    this.moduleData = new KVTable(this.database, 'moduleData')
     this.installedModuleList = JSON.parse(this.config.get('installedModuleList') || '[]')
   }
 
@@ -100,7 +108,7 @@ export class ModuleManager extends WebInterfaceBase {
       this.installedModuleList.push(moduleId)
       this.config.set('installedModuleList', JSON.stringify(this.installedModuleList))
       if (this.moduleList[index].defaultConfig) {
-        this.updateModuleMultipleConfig(moduleId, this.moduleList[index].defaultConfig)
+        this.updateModuleConfig(moduleId, this.moduleList[index].defaultConfig)
       }
       eventBus.emit('Module.installListUpdate')
       return true
@@ -136,78 +144,56 @@ export class ModuleManager extends WebInterfaceBase {
     return data
   }
 
-  async updateModuleConfig (moduleId, key, value) {
-    if (this.installedModuleList.indexOf(moduleId) !== -1 || internalModuleList.indexOf(moduleId) !== -1) {
-      if (value !== 'undefined') {
-        (new KVTable(this.database, `module-${moduleId}`)).set(key, JSON.stringify(value))
-      } else {
-        (new KVTable(this.database, `module-${moduleId}`)).delete(key)
-      }
-      eventBus.emit('Module.configChange', moduleId)
-      return true
-    } else {
-      throw new Error('This Module didn\'t installed')
-    }
-  }
-
-  async updateModuleMultipleConfig (moduleId, config) {
-    if (this.installedModuleList.indexOf(moduleId) === -1 || internalModuleList.indexOf(moduleId) !== -1) {
-      throw new Error('This Module didn\'t installed')
-    }
-    var keys = Object.keys(config)
-    if (keys.length <= 0) {
-      return true
-    }
-    var table = new KVTable(this.database, `module-${moduleId}`)
-    keys.forEach((key) => {
-      if (config[key] !== 'undefined') {
-        table.set(key, JSON.stringify(config[key]))
-      } else {
-        table.delete(key)
-      }
+  async updateModuleConfig (moduleId, config) {
+    this.moduleConfig.set(moduleId, JSON.stringify(config))
+    eventBus.emit('Module.configChange', {
+      moduleId: moduleId,
+      config: JSON.stringify(config)
     })
-    eventBus.emit('Module.configChange', moduleId)
     return true
   }
 
-  /**
-   *
-   * @param {string} moduleId
-   * @param {string[]} keys
-   */
-  async getModuleMultiConfig (moduleId, keys = []) {
-    if (this.installedModuleList.indexOf(moduleId) === -1 || internalModuleList.indexOf(moduleId) !== -1) {
-      throw new Error('This Module didn\'t installed')
+  async getModuleConfig (moduleId) {
+    var config = this.moduleConfig.get(moduleId)
+    if (config) {
+      return JSON.parse(config)
+    } else {
+      return {}
     }
-    var result = {}
-    if (keys.length > 0) {
-      var table = new KVTable(this.database, `module-${moduleId}`)
-      keys.forEach((key) => {
-        var read = table.get(key)
-        result[key] = typeof read === 'undefined' ? undefined : JSON.stringify(read)
-      })
-    }
-    return result
-  }
-
-  async getModuleConfig (moduleId, key) {
-    return (await this.getModuleMultiConfig(moduleId, [key]))[key]
   }
 
   async clearModuleConfig (moduleId) {
-    if (this.installedModuleList.indexOf(moduleId) !== '-1' || internalModuleList.indexOf(moduleId) !== -1) {
-      try {
-        var table = new KVTable(this.database, `module-${moduleId}`)
-        table.keys().forEach((e) => {
-          table.delete(e)
-        })
-        return true
-      } catch (error) {
-        console.log(error)
-        return false
-      }
+    eventBus.emit('Module.configChange', {
+      moduleId: moduleId,
+      config: JSON.stringify({})
+    })
+    return this.moduleConfig.delete(moduleId)
+  }
+
+  async updateModuleData (moduleId, data) {
+    this.moduleData.set(moduleId, JSON.stringify(data))
+    eventBus.emit('Module.configChange', {
+      moduleId: moduleId,
+      data: JSON.stringify(data)
+    })
+    return true
+  }
+
+  async getModuleData (moduleId) {
+    var data = this.moduleData.get(moduleId)
+    if (data) {
+      return JSON.parse(data)
+    } else {
+      return {}
     }
-    return false
+  }
+
+  async clearModuleData (moduleId) {
+    eventBus.emit('Module.dataChange', {
+      moduleId: moduleId,
+      data: JSON.stringify({})
+    })
+    return this.moduleData.delete(moduleId)
   }
 
   async requestQuickLink (moduleId, link) {
@@ -266,6 +252,7 @@ export class ModuleManager extends WebInterfaceBase {
         width: 800,
         height: 600,
         frame: false,
+        title: '弹幕树',
         webPreferences: {
           nodeIntegration: false,
           nodeIntegrationInWorker: false,
@@ -309,8 +296,12 @@ export class ModuleManager extends WebInterfaceBase {
         var listener = InsertArgument(this.sendEventToWindow, moduleWindow)
         const windowId = moduleWindow.id
         eventBus.on('ALLPUBLIC', listener)
+        eventBus.onRaw('Module.configChange', listener)
+        eventBus.onRaw('Module.dataChange', listener)
         moduleWindow.on('closed', () => {
           eventBus.detach('ALLPUBLIC', listener)
+          eventBus.detach('Module.configChange', listener)
+          eventBus.detach('Module.dataChange', listener)
           this.map[windowId] = undefined
           this.moduleWindows[moduleId] = this.moduleWindows[moduleId].filter((e) => {
             return e !== moduleWindow
@@ -397,10 +388,14 @@ export class ModuleManager extends WebInterfaceBase {
     this.mainWindow.on('closed', () => {
       this.mainWindow = null
       eventBus.detach('ALLPUBLIC', this.sendToMainWindow)
+      eventBus.detach('Module.configChange', this.sendToMainWindow)
+      eventBus.detach('Module.dataChange', this.sendToMainWindow)
       this.closeAllWindowAndExit()
       this.logger.info('MainWindow closed')
     })
     eventBus.on('ALLPUBLIC', this.sendToMainWindow)
+    eventBus.onRaw('Module.configChange', this.sendToMainWindow)
+    eventBus.onRaw('Module.dataChange', this.sendToMainWindow)
   }
 
   async installDevTools () {

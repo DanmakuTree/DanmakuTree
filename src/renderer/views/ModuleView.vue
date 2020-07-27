@@ -4,9 +4,10 @@
 
 <script>
   import fail from './Error'
-  async function externalComponent (config, id) {
+  import { ConfigDataMixin } from '../mixins/ConfigDataMixin'
+  async function externalComponent (config, id, moduleId, isDev = false) {
     const name = config.js.split('/').reverse()[0].match(/^(.*?)\.js/)[1]
-    // if (window[name]) return window[name]
+    if (window[name] && !isDev) return window[name]
     window[name] = new Promise((resolve, reject) => {
       const script = document.createElement('script')
       const style = document.createElement('link')
@@ -24,6 +25,12 @@
       style.href = config.css
       document.head.appendChild(style)
       document.head.appendChild(script)
+    }).then((e) => {
+      if (!e.default.mixins) {
+        e.default.mixins = []
+      }
+      e.default.mixins.push(ConfigDataMixin(moduleId))
+      return e
     })
 
     return window[name]
@@ -37,11 +44,14 @@
         computedComponent: null,
         module: null,
         id: Math.floor(Math.random() * 16777215).toString(16),
-        ws: null
+        ws: null,
+        isDev: false
       }
     },
     mounted () {
-      this.load()
+      this.$main.isDev().then((e) => {
+        this.isDev = e
+      }).then(this.load())
     },
     destroyed () {
       this.unload()
@@ -51,7 +61,7 @@
         this.$module.getModuleInfo(this.$route.params.id).then((data) => {
           this.module = data
           this.loadAsset()
-          if (this.module.embed.reloadNotice) {
+          if (this.isDev && this.module.embed.reloadNotice) {
             this.ws = new WebSocket(this.module.embed.reloadNotice)
             this.ws.onmessage = (e) => {
               if (e.data === 'reload') {
@@ -64,7 +74,7 @@
       },
       loadAsset () {
         this.computedComponent = async () => {
-          return externalComponent(this.module.embed, this.id).catch((e) => {
+          return externalComponent(this.module.embed, this.id, this.module.id, this.isDev).catch((e) => {
             console.error(e)
             return fail
           })

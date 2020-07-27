@@ -13,9 +13,10 @@
 <script>
   import dHeader from './components/header'
   import fail from './views/Error'
-  async function externalComponent (config, id) {
+  import { ConfigDataMixin } from './mixins/ConfigDataMixin'
+  async function externalComponent (config, id, moduleId, isDev = false) {
     const name = config.js.split('/').reverse()[0].match(/^(.*?)\.js/)[1]
-    // if (window[name]) return window[name]
+    if (window[name] && !isDev) return window[name]
     window[name] = new Promise((resolve, reject) => {
       const script = document.createElement('script')
       const style = document.createElement('link')
@@ -33,6 +34,12 @@
       style.href = config.css
       document.head.appendChild(style)
       document.head.appendChild(script)
+    }).then((e) => {
+      if (!e.default.mixins) {
+        e.default.mixins = []
+      }
+      e.default.mixins.push(ConfigDataMixin(moduleId))
+      return e
     })
 
     return window[name]
@@ -46,7 +53,8 @@
         computedComponent: null,
         module: null,
         id: Math.floor(Math.random() * 16777215).toString(16),
-        ws: null
+        ws: null,
+        isDev: false
       }
     },
     components: {
@@ -58,7 +66,9 @@
       }
     },
     mounted () {
-      this.load()
+      this.$main.isDev().then((e) => {
+        this.isDev = e
+      }).then(this.load())
     },
     destroyed () {
       this.unload()
@@ -83,10 +93,13 @@
       },
       loadAsset () {
         this.computedComponent = async () => {
-          return externalComponent(this.module.externalWindow, this.id).then((e) => {
+          return externalComponent(this.module.externalWindow, this.id, this.module.id, this.isDev).then((e) => {
             if (this.module.externalWindowOption) {
               if (this.module.externalWindowOption.frameless) {
                 this.frameless = this.module.externalWindowOption.frameless
+              }
+              if (this.module.externalWindowOption.alwaysOnTop) {
+                this.$currentWindow.setAlwaysonTop(true)
               }
             }
             return e

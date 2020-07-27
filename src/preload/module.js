@@ -54,6 +54,10 @@ class CurrentWindow {
   getBounds () {
     return currentWindow.getBounds()
   }
+
+  setAlwaysonTop (flag) {
+    return currentWindow.setAlwaysOnTop(flag, 'screen-saver')
+  }
 }
 
 window.API = {
