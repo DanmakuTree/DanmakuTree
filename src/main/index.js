@@ -123,7 +123,26 @@ webInterface.registry('Platform', platform)
 webInterface.registry('Module', moduleManager)
 
 ipcMain.handle('APICall', webInterface.getHandler())
-main.Services.WebsocketService.handle('API', webInterface.getHandler())
+const handler = webInterface.getHandler
+main.Services.WebsocketService.handle('API', (apicall) => {
+  var promise = handler(apicall.method, ...apicall.data)
+  handler.then((data) => {
+    return {
+      method: apicall.method,
+      id: apicall.id,
+      data: data,
+      code: 0
+    }
+  }).catch((error) => {
+    return {
+      method: apicall.method,
+      id: apicall.id,
+      error: error.message,
+      code: -1
+    }
+  })
+  return promise
+})
 /**
  * Auto Updater
  *

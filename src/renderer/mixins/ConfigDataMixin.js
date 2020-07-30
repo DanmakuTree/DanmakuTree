@@ -1,5 +1,4 @@
 export function ConfigDataMixin (moduleId) {
-  console.log(moduleId)
   return {
     data () {
       return {

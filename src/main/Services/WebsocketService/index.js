@@ -1,6 +1,6 @@
 import { WebInterfaceBase } from '../../WebInterfaceBase'
 import { createServer } from 'http'
-import { Server } from 'ws'
+import { Server, OPEN } from 'ws'
 import { eventBus } from '../../EventBus'
 import { URL } from 'url'
 import { version } from '../../Consts'
@@ -12,7 +12,6 @@ export class WebsocketService extends WebInterfaceBase {
   constructor () {
     super()
     this.version = '0.0.2'
-    this.server = null
     this.wss = null
     this.portIndex = 0
     this.status = 'prepare'
@@ -31,12 +30,18 @@ export class WebsocketService extends WebInterfaceBase {
     selfList.forEach((e) => {
       this[e] = this[e].bind(this)
     })
+    WSServerPatch(this.server)
     this.server.on('error', this.onError)
     this.server.on('listening', this.onListening)
     this.server.on('upgrade', this.onUpgrade)
     this.server.on('request', this.onRequest)
     this.wss = new Server({ noServer: true })
     this.wss.on('connection', this.onConnection)
+    eventBus.registerPublicEvent('Main.Services.WebsocketService.statusUpdate')
+    // not implement yet
+    // eventBus.registerPublicEvent('Main.Services.WebsocketService.clientJoin')
+    // eventBus.registerPublicEvent('Main.Services.WebsocketService.clientLeave')
+    eventBus.registerPublicEvent('Main.Services.WebsocketService.error')
     eventBus.onRaw('ALLPUBLIC', (e) => {
       if (this.status === 'ready') {
         this.broadcastEvent(e.name, ...e.data)
@@ -55,6 +60,7 @@ export class WebsocketService extends WebInterfaceBase {
   async stop () {
     if (this.status === 'ready') {
       this.server.close()
+      eventBus.emit('Main.Services.WebsocketService.statusUpdate', 'prepare')
       this.status = 'prepare'
       return true
     }
@@ -66,9 +72,9 @@ export class WebsocketService extends WebInterfaceBase {
 
   async getStatus () {
     return {
-      status: this.status,
-      port: this.port,
-      address: this.server.address
+      'status': this.status,
+      'port': this.port,
+      'count': Object.keys(this.connections).length
     }
   }
 
@@ -90,6 +96,7 @@ export class WebsocketService extends WebInterfaceBase {
       } else {
         this.status = 'error'
         eventBus.emit('Main.Services.WebsocketService.error', new Error('EADDRINUSE'))
+        eventBus.emit('Main.Services.WebsocketService.statusUpdate', 'error')
       }
     } else {
       console.log(error)
@@ -98,7 +105,7 @@ export class WebsocketService extends WebInterfaceBase {
 
   onListening () {
     this.status = 'ready'
-    eventBus.emit('Main.Services.WebsocektService.listening', this.port)
+    eventBus.emit('Main.Services.WebsocketService.statusUpdate', 'ready')
   }
 
   onUpgrade (request, socket, head) {
@@ -226,29 +233,41 @@ export class WebsocketService extends WebInterfaceBase {
         }
         if (this.handlerMap[message.type]) {
           try {
-            var promise
-            if (Array.isArray(message.data)) {
-              promise = this.handlerMap[message.type]({}, ...message.data)
-            } else {
-              promise = this.handlerMap[message.type]({}, message.data)
-            }
+            var promise = this.handlerMap[message.type](message.data)
             promise.then((...data) => {
-              if (socket.readyState === socket.OPEN) {
+              if (socket.readyState === OPEN) {
                 socket.send(JSON.stringify({
                   'type': message.type,
+                  'code': 0,
                   'data': data
                 }))
               }
-            }).catch((e) => {
+            }).catch((error) => {
               this.logger.error(`Get Error with ${JSON.stringify(message)} , ${JSON.stringify(error)}`)
-              socket.close(1011)
+              if (socket.readyState === OPEN) {
+                socket.send(JSON.stringify({
+                  'type': message.type,
+                  'code': -1,
+                  'data': error.message
+                }))
+              }
             })
           } catch (error) {
             this.logger.error(`Get Error with ${JSON.stringify(message)} , ${JSON.stringify(error)}`)
-            socket.close(1011)
+            if (socket.readyState === OPEN) {
+              socket.send(JSON.stringify({
+                'type': message.type,
+                'code': -1,
+                'data': error.message
+              }))
+            }
           }
         } else {
-          socket.close(1008)
+          socket.send(JSON.stringify({
+            'type': message.type,
+            'code': -1,
+            'msg': 'no such type'
+          }))
         }
         break
     }
@@ -259,7 +278,27 @@ export class WebsocketService extends WebInterfaceBase {
     this.logger.warn(`[${socket.key}]Unhandler Error`, error.toString())
   }
 
-  handle (name, handler) {}
+  handle (name, handler) {
+    this.handlerMap[name] = handler
+  }
 }
 
 export default new WebsocketService()
+
+/**
+ *
+ * @param {Server} server WS服务器
+ */
+function WSServerPatch (server) {
+  server.getConnectionsAsync = function () {
+    return new Promise((resolve, reject) => {
+      this.getConnections((error, count) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(count)
+        }
+      })
+    })
+  }
+}

@@ -9,12 +9,9 @@
           <div style="flex: 1;overflow: hidden;display: flex">
             <float-bar/>
             <Transition mode="out-in" name="list">
-
               <router-view style="height:492px"/>
-
             </Transition>
           </div>
-
         </div>
       </div>
     </div>
@@ -40,6 +37,13 @@
       return {
         locale: zhCN
       }
+    },
+    mounted () {
+      this.$main.getConfig('startWebsocketServiceAtStart').then((res) => {
+        if (res) {
+          this.$main.Services.WebsocketService.start()
+        }
+      }).catch(console.error)
     },
     computed: {
       modalVisible () {

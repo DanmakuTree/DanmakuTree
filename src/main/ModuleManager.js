@@ -126,6 +126,7 @@ export class ModuleManager extends WebInterfaceBase {
       this.installedModuleList.splice(index, 1)
       this.config.set('installedModuleList', JSON.stringify(this.installedModuleList))
       this.clearModuleConfig(moduleId)
+      this.clearModuleData(moduleId)
       eventBus.emit('Module.installListUpdate')
       return true
     }
