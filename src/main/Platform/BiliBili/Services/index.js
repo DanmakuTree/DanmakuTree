@@ -24,6 +24,7 @@ export class BiliBiliServices extends WebInterfaceBase {
 
   init () {
     this.StatisticsService.init()
+    this.HistoryService.init()
   }
 }
 
