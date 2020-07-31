@@ -116,6 +116,7 @@ export class API extends WebInterfaceBase {
   async setCookies (cookies) {
     this.cookies = cookies.map((e) => { return e.name + '=' + e.value }).join(';')
     this.uid = cookies.find((v) => { return v.name === 'DedeUserID' }).value
+    this.bili_jct = cookies.find((v) => { return v.name === 'bili_jct' }).value
     this.webAxios = createWebAxios(this.cookies)
     this.loginType = 'WEB'
     this.saveLoginInfo()
@@ -724,7 +725,7 @@ export class API extends WebInterfaceBase {
    * @param {Number} mode 模式（疑似无效
    */
   async sendRoomMessage (roomId, msg = '', color = 0xffffff, mode = 1) {
-    return this.webAxios.post('https://api.live.bilibili.com/msg/send', new URLSearchParams({
+    return (await this.webAxios.post('https://api.live.bilibili.com/msg/send', new URLSearchParams({
       'color': Number(Number(color).toString(10)),
       'fontsize': 25,
       mode,
@@ -734,7 +735,7 @@ export class API extends WebInterfaceBase {
       'bubble': 0,
       'csrf_token': this.bili_jct,
       'csrf': this.bili_jct
-    })).data
+    }))).data
   }
 
   /**
