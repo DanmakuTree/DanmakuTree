@@ -4,6 +4,7 @@
     "url": "https://github.com/DanmakuTree/DanmakuTree/issues"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.14.0",
     "ant-design-vue": "^1.6.2",
     "axios": "^0.19.2",
     "better-sqlite3": "^7.1.0",

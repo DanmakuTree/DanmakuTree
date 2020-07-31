@@ -10,6 +10,7 @@ import API from './plugins/API'
 import 'ant-design-vue/dist/antd.css'
 import './assets/style/iconfont/iconfont.css'
 import './assets/style/global.css'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import DanmakuMixin from './mixins/DanmakuMixin'
