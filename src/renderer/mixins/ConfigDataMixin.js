@@ -2,8 +2,9 @@ export function ConfigDataMixin (moduleId) {
   return {
     data () {
       return {
-        dModuleConfig: {},
-        dModuleData: {}
+        dModuleConfig: null,
+        dModuleData: null,
+        dConfigDataLoad: null
       }
     },
     watch: {
@@ -24,23 +25,50 @@ export function ConfigDataMixin (moduleId) {
         deep: true
       }
     },
-    mounted () {
+    created () {
+      var config = {}
+      var data = {}
+      var vm = this
+      function ProxiedItem (prototype = {}) {
+        return new Proxy(prototype, {
+          get: (target, name) => {
+            if (Object.keys(prototype).indexOf(name) === -1) {
+              return prototype[name]
+            }
+            if (typeof prototype[name] === 'object' || typeof prototype[name] === 'function') {
+              return ProxiedItem(prototype[name])
+            } else if (typeof prototype[name] !== 'undefined') {
+              return prototype[name]
+            } else {
+              return undefined
+            }
+          },
+          set: function (obj, prop, value) {
+            vm.$set(prototype, prop, value)
+            return true
+          }
+        })
+      };
+      this.dModuleConfig = ProxiedItem(config)
+      this.dModuleData = ProxiedItem(data)
       this.__onModuleConfigChange = (e) => {
         if (e.moduleId === moduleId) {
-          this.dModuleConfig = JSON.parse(e.config)
+          this.dModuleConfig = ProxiedItem(JSON.parse(e.config))
         }
       }
       this.__onModuleDataChange = (e) => {
         if (e.moduleId === moduleId) {
-          this.dModuleData = JSON.parse(e.data)
+          this.dModuleData = ProxiedItem(JSON.parse(e.data))
         }
       }
-      window.API.Module.getModuleConfig(moduleId).then((config) => {
-        this.dModuleConfig = config
-      })
-      window.API.Module.getModuleData(moduleId).then((data) => {
-        this.dModuleData = data
-      })
+      var promises = []
+      promises.push(window.API.Module.getModuleConfig(moduleId).then((newConfig) => {
+        this.dModuleConfig = ProxiedItem(newConfig)
+      }))
+      promises.push(window.API.Module.getModuleData(moduleId).then((newData) => {
+        this.dModuleData = ProxiedItem(newData)
+      }))
+      this.dConfigDataLoad = Promise.all(promises)
       window.API.event.on('Module.configChange', this.__onModuleConfigChange)
       window.API.event.on('Module.dataChange', this.__onModuleDataChange)
     },
@@ -48,6 +76,5 @@ export function ConfigDataMixin (moduleId) {
       window.API.event.removeListener('Module.configChange', this.__onModuleConfigChange)
       window.API.event.removeListener('Module.dataChange', this.__onModuleDataChange)
     }
-
   }
 }
