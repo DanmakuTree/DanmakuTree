@@ -23,6 +23,23 @@ function APIStructure (itemName) {
   })
 };
 class CurrentWindow {
+  constructor () {
+    currentWindow.on('move', () => {
+      try {
+        window.API.eventhandler('CurrentWindow.move', {})
+      } catch (error) {
+        console.log(error)
+      }
+    })
+    currentWindow.on('resize', () => {
+      try {
+        window.API.eventhandler('CurrentWindow.resize', {})
+      } catch (error) {
+        console.log(error)
+      }
+    })
+  }
+
   close () {
     currentWindow.close()
   }
