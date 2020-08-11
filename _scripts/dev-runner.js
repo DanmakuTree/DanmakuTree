@@ -13,6 +13,7 @@ const { spawn } = require('child_process')
 const mainConfig = require('./webpack.main.config')
 const rendererConfig = require('./webpack.renderer.config')
 const preloadConfig = require('./webpack.preload.config')
+const webConfig = require('./webpack.web.config')
 
 let electronProcess = null
 let manualRestart = null
@@ -109,9 +110,10 @@ function startMain() {
 }
 
 function startRenderer(callback) {
-  const webpackSetup = webpack([rendererConfig,preloadConfig])
+  const webpackSetup = webpack([rendererConfig,preloadConfig,webConfig])
 
   webpackSetup.compilers.forEach((compiler)=>{
+    
     const { name } = compiler
 
     compiler.hooks.afterEmit.tap('afterEmit', () => {

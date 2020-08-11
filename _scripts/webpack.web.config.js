@@ -14,9 +14,10 @@ const config = {
   mode: process.env.NODE_ENV,
   devtool: isDevMode ? '#cheap-module-eval-source-map' : false,
   entry: {
-    web: path.join(__dirname, '../src/renderer/main.js'),
+    web: path.join(__dirname, '../src/renderer/web.js'),
   },
   output: {
+    libraryTarget: 'umd',
     path: path.join(__dirname, '../dist/web'),
     filename: '[name].js',
   },
@@ -105,14 +106,13 @@ const config = {
   node: {
     __dirname: isDevMode,
     __filename: isDevMode,
-    fs: 'empty',
   },
   plugins: [
     // new WriteFilePlugin(),
     new HtmlWebpackPlugin({
-      excludeChunks: ['processTaskWorker'],
-      filename: 'index.html',
-      template: path.resolve(__dirname, '../src/index.ejs'),
+      filename: 'web.html',
+      template: path.resolve(__dirname, '../src/template.ejs'),
+      chunks: ['web'],
       nodeModules: false,
     }),
     new VueLoaderPlugin(),

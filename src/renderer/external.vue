@@ -94,6 +94,7 @@
       loadAsset () {
         this.computedComponent = async () => {
           return externalComponent(this.module.externalWindow, this.id, this.module.id, this.isDev).then((e) => {
+            console.log(e)
             if (this.module.externalWindowOption) {
               if (this.module.externalWindowOption.frameless) {
                 this.frameless = this.module.externalWindowOption.frameless
@@ -102,7 +103,7 @@
                 this.$currentWindow.setAlwaysonTop(true)
               }
             }
-            return e
+            return e.default
           }).catch((e) => {
             console.error(e)
             return fail
