@@ -1,0 +1,3 @@
+[submodule "src/main/Platform/AcFun/AcfunProtos"]
+	path = src/main/Platform/AcFun/AcfunProtos
+	url = git@github.com:DanmakuTree/AcfunProtos.git
