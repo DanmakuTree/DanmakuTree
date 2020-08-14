@@ -75,6 +75,10 @@ class CurrentWindow {
   setAlwaysonTop (flag) {
     return currentWindow.setAlwaysOnTop(flag, 'screen-saver')
   }
+
+  setOpacity (opacity) {
+    return currentWindow.setOpacity(opacity)
+  }
 }
 
 window.API = {
