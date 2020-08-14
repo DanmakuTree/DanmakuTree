@@ -98,10 +98,6 @@
               if (this.module.externalWindowOption.frameless) {
                 this.frameless = this.module.externalWindowOption.frameless
               }
-              if (this.module.externalWindowOption.transparent) {
-                this.transparent = this.module.externalWindowOption.transparent
-                this.$currentWindow.setOpacity(0.8)
-              }
               if (this.module.externalWindowOption.alwaysOnTop) {
                 this.$currentWindow.setAlwaysonTop(true)
               }
