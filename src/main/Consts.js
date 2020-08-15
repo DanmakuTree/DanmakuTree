@@ -13,7 +13,7 @@ export const gitVersion = {
 export const Backend = isDev ? 'http://127.0.0.1:8369' : 'https://api.r18g.fun/api'
 
 export const MainWindowPage = isDev ? 'http://localhost:9080/embed.html' : `file://${__dirname}/embed.html`
-export const ModuleWindowPage = isDev ? 'http://localhost:9080/externalWindow.html' : `file://${__dirname}/externalWindow/index.html`
+export const ModuleWindowPage = isDev ? 'http://localhost:9080/externalWindow.html' : `file://${__dirname}/externalWindow.html`
 
 app.setPath('userData', app.getPath('appData') + '/DanmakuTree')
 export const DataPath = app.getPath('userData')
