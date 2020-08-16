@@ -34,7 +34,7 @@ export class KVTable {
   get (key) {
     var stmt = this._dbConnection.prepare(`SELECT value FROM "main"."${this._tableName}" WHERE key=?`)
     var result = stmt.get(String(key))
-    if (!result) console.log(`"main"."${this._tableName}" does NOT exist the key ${key}. CHECK your requested key.`)
+    // if (!result) console.log(`"main"."${this._tableName}" does NOT exist the key ${key}. CHECK your requested key.`)
     return result ? result.value : undefined
   }
 
