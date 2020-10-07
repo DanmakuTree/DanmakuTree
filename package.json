@@ -121,5 +121,10 @@
     "mocker:debug": "cross-env NODE_ENV=development node --inspect -r esm",
     "mocker:clean": "git branch -D test-0"
   },
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "bit": {
+    "env": {},
+    "componentsDefaultDirectory": "components/{name}",
+    "packageManager": "npm"
+  }
 }
