@@ -12,6 +12,7 @@
     "lodash": "^4.17.20",
     "log4js": "^6.3.0",
     "mockjs": "^1.1.0",
+    "selfsigned": "^1.10.8",
     "sql-bricks-sqlite": "^0.1.0",
     "ts-event-bus": "github:DanmakuTree/ts-event-bus#v1.0.4",
     "uuid": "^8.1.0",
