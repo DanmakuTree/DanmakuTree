@@ -5,7 +5,7 @@ import { isDev } from '../../Consts'
 import BiliBiliConsts from './Consts'
 import { WebInterfaceBase } from '../../WebInterfaceBase'
 import { KVTable } from '../../KVTable'
-import { session } from 'electron'
+import { session } from '../../ElectronMock'
 // import { promises as fspromise } from 'fs'
 // const readFile = fspromise.readFile
 // const writeFile = fspromise.writeFile

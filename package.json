@@ -42,6 +42,7 @@
     "babel-preset-env": "^1.7.0",
     "chalk": "^4.0.0",
     "copy-webpack-plugin": "^6.0.3",
+    "cross-env": "^7.0.2",
     "css-loader": "^3.5.3",
     "deepmerge": "^4.2.2",
     "electron": "^8.3.1",
@@ -117,7 +118,7 @@
     "mocker:make": "git branch test-0 && git switch test-0",
     "mocker:folder": "shx mkdir -p DanmakuTree/config && shx mkdir -p DanmakuTree/data && shx mkdir -p DanmakuTree/log",
     "mocker:help": "echo Please run (in your command line): git cherry-pick (git merge-base master mocker)..mocker && echo HINT: Make sure you run mocker:folder before you run mocker:debug",
-    "mocker:debug": "node --inspect -r esm",
+    "mocker:debug": "cross-env NODE_ENV=development node --inspect -r esm",
     "mocker:clean": "git branch -D test-0"
   },
   "version": "0.0.1"
