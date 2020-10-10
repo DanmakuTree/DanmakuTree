@@ -1,6 +1,6 @@
 import path from 'path'
 import { version as ProgramVersion } from '../../package.json'
-import { app } from 'electron'
+import { app } from './ElectronMock'
 export const isDev = process.env.NODE_ENV === 'development'
 export const isDebug = process.argv.includes('--debug')
 export const version = ProgramVersion
