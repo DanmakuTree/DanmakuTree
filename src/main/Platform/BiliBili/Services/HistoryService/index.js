@@ -6,12 +6,14 @@ import { KVTable } from '../../../../KVTable'
 import { isInteger } from 'lodash'
 import { HistoryTable } from './HistoryTable'
 import { Query } from './Query'
+import { getLogger } from 'log4js'
 
 export class HistoryService extends WebInterfaceBase {
   constructor () {
     super()
     this.version = '0.0.1'
     this.store = null
+    this.logger = getLogger('HistoryService')
     this.roomMap = {}
     var methodList = ['init', 'onMessage', 'onConnect', 'onClose']
     methodList.forEach((e) => {
@@ -80,7 +82,8 @@ export class HistoryService extends WebInterfaceBase {
   }
 
   onConnect (roomId) {
-    console.log(`Room-${roomId} has connected. History Service of Room-${roomId} starts`)
+    // console.log(`Room-${roomId} has connected. History Service of Room-${roomId} starts`)
+    this.logger.info(`Room-${roomId} has connected. History Service of Room-${roomId} starts`)
     /* todo: check the roomId is shortID or normalID
     * tofix: if it is shortID, DanmakuService could not receive Danmu
     * these should be fixed together with HistoryService and DanmakuService
@@ -95,7 +98,8 @@ export class HistoryService extends WebInterfaceBase {
   }
 
   onClose (roomId) {
-    console.log(`Room-${roomId} has closed. History Service of Room-${roomId} stops`)
+    // console.log(`Room-${roomId} has closed. History Service of Room-${roomId} stops`)
+    this.logger.info(`Room-${roomId} has closed. History Service of Room-${roomId} stops`)
     delete this.roomMap[roomId]
   }
 }
