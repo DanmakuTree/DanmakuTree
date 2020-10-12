@@ -114,12 +114,10 @@
     "rebuild:electron": "run-s electron-builder-install electron-rebuild",
     "rebuild:node": "npm rebuild",
     "release": "run-s test build",
-    "mocker": "run-s mocker:make rebuild:node mocker:folder mocker:help",
-    "mocker:make": "git branch test-0 && git switch test-0",
+    "mocker": "run-s rebuild:node mocker:folder mocker:help",
     "mocker:folder": "shx mkdir -p DanmakuTree/config && shx mkdir -p DanmakuTree/data && shx mkdir -p DanmakuTree/log",
-    "mocker:help": "echo Please run (in your command line): git cherry-pick (git merge-base master mocker)..mocker && echo HINT: Make sure you run mocker:folder before you run mocker:debug",
-    "mocker:debug": "cross-env NODE_ENV=development node --inspect -r esm",
-    "mocker:clean": "git branch -D test-0"
+    "mocker:help": "echo Please run (in your command line): npm run mocker:debug",
+    "mocker:debug": "cross-env NODE_ENV=development node --inspect -r esm"
   },
   "version": "0.0.1"
 }
