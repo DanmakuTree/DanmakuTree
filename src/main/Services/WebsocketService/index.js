@@ -38,9 +38,9 @@ export class WebsocketService extends WebInterfaceBase {
     this.wss = new Server({ noServer: true })
     this.wss.on('connection', this.onConnection)
     eventBus.registerPublicEvent('Main.Services.WebsocketService.statusUpdate')
-    // not implement yet
-    // eventBus.registerPublicEvent('Main.Services.WebsocketService.clientJoin')
-    // eventBus.registerPublicEvent('Main.Services.WebsocketService.clientLeave')
+    // not implement yet // update 10/13
+    eventBus.registerPublicEvent('Main.Services.WebsocketService.clientJoin')
+    eventBus.registerPublicEvent('Main.Services.WebsocketService.clientLeave')
     eventBus.registerPublicEvent('Main.Services.WebsocketService.error')
     eventBus.onRaw('ALLPUBLIC', (e) => {
       if (this.status === 'ready') {
@@ -54,6 +54,7 @@ export class WebsocketService extends WebInterfaceBase {
       this.local = local
       this.portIndex = 0
       this.server.listen(portList[this.portIndex], this.local ? '127.0.0.1' : '0.0.0.0')
+      this.logger.info(`WS in Ready. WS starts with ${this.local ? '127.0.0.1' : '0.0.0.0'}:${portList[this.portIndex]}`)
     }
   }
 
@@ -62,6 +63,7 @@ export class WebsocketService extends WebInterfaceBase {
       this.server.close()
       eventBus.emit('Main.Services.WebsocketService.statusUpdate', 'prepare')
       this.status = 'prepare'
+      this.logger.info('WS in Prepare. WS stops.')
       return true
     }
     if (this.status === 'prepare') {
@@ -167,6 +169,7 @@ export class WebsocketService extends WebInterfaceBase {
   onConnection (socket, request) {
     var key = uuid()
     this.connections[key] = socket
+    eventBus.emit('Main.Services.WebsocketService.clientJoin', 'Join')
     socket.key = key
     socket.authed = false
     this.logger.info(`[${key}] `)
@@ -201,6 +204,7 @@ export class WebsocketService extends WebInterfaceBase {
     socket.removeAllListeners()
     socket.on('error', () => {})
     delete this.connections[socket.key]
+    eventBus.emit('Main.Services.WebsocketService.clientLeave', 'Leave')
   }
 
   /**

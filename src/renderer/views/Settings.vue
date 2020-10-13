@@ -60,6 +60,20 @@
           this.main.services.WebsocketService.port = res.port
           this.main.services.WebsocketService.status = res.status
         }).catch(console.error)
+      },
+      'Main.Services.WebsocketService.clientJoin' () {
+        this.$main.Services.WebsocketService.getStatus().then((res) => {
+          this.main.services.WebsocketService.count = res.count
+          this.main.services.WebsocketService.port = res.port
+          this.main.services.WebsocketService.status = res.status
+        }).catch(console.error)
+      },
+      'Main.Services.WebsocketService.clientLeave' () {
+        this.$main.Services.WebsocketService.getStatus().then((res) => {
+          this.main.services.WebsocketService.count = res.count
+          this.main.services.WebsocketService.port = res.port
+          this.main.services.WebsocketService.status = res.status
+        }).catch(console.error)
       }
     },
     watch: {
