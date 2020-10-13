@@ -74,6 +74,12 @@
         allModule: []
       }
     },
+    danmaku: {
+      'Module.installListUpdate' () {
+        this.displayModuleList = []
+        Promise.all([this.getInstalledModules()]).then(this.updateDisplayModuleList)
+      }
+    },
     mounted () {
       console.log(1)
       Promise.all([this.getAllModules(), this.getInstalledModules()]).then(this.updateDisplayModuleList)
