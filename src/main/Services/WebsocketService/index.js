@@ -115,7 +115,7 @@ export class WebsocketService extends WebInterfaceBase {
         this.wss.emit('connection', ws, request)
       })
     } else {
-      socket.destory()
+      socket.destroy()
     }
   }
 
