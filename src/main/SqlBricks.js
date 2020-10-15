@@ -1,5 +1,6 @@
 import flatten from './Utilities/flatten'
-var sql = require('sql-bricks-sqlite')
+var sql = require('sql-bricks-sqlite') // Todo: this should be removed.
+// instead, var sql = {} as an empty object to provide utility only.
 flatten(JSON)
 
 function split (obj, char = '$') {
