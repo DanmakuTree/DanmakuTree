@@ -26,7 +26,7 @@
       <p>版本号： {{about.version}}</p>
       <p>Git 版本号： {{about.GitVersion}}</p>
       <p>Git Hash： {{about.GitHash}}</p>
-      <p>Git 分支： {{about.GitVersion}}</p>
+      <p>Git 分支： {{about.GitBranch}}</p>
     </div>
   </div>
 </template>

@@ -5,9 +5,9 @@ export const isDev = process.env.NODE_ENV === 'development'
 export const isDebug = process.argv.includes('--debug')
 export const version = ProgramVersion
 export const gitVersion = {
-  'version': process.env.GIT_VERSION || 'UNKNOWN',
-  'hash': process.env.GIT_COMMITHASH || 'UNKNOWN',
-  'branch': process.env.GIT_BRANCH || 'UNKNOWN'
+  'version': process.env.GIT_VERSION || 'UNKNOWN VERSION',
+  'hash': process.env.GIT_COMMITHASH || 'UNKNOWN HASH',
+  'branch': process.env.GIT_BRANCH || 'UNKNOWN BRANCH'
 }
 
 export const Backend = isDev ? 'http://127.0.0.1:8369' : 'https://api.r18g.fun/api'
