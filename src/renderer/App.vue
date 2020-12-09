@@ -9,7 +9,7 @@
           <div style="flex: 1;overflow: hidden;display: flex">
             <float-bar/>
             <Transition mode="out-in" name="list">
-              <router-view style="height:492px"/>
+              <router-view :key="$route.fullPath" style="height:492px"/>
             </Transition>
           </div>
         </div>
