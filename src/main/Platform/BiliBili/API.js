@@ -1003,6 +1003,52 @@ export class API extends WebInterfaceBase {
     })).data
   }
 
+  /**
+   * 
+   * 获取房间当前留屏的SC（进入房间时通常会使用）
+   * 
+   * Example
+   * https://api.live.bilibili.com/av/v1/SuperChat/getMessageList?room_id=14052636&ruid=372984197&parent_area_id=9&area_id=371
+   * 
+   * @param {*} room_id ?room_id=14052636&ruid=372984197&parent_area_id=9&area_id=371
+   * @param {*} ruid 
+   * @param {*} parent_area_id 
+   * @param {*} area_id 
+   */
+  async getSuperChatMessageList (room_id, ruid, parent_area_id, area_id){
+    return (await this.webAxios.get('av/v1/SuperChat/getMessageList', {
+      params: {
+        room_id,
+        ruid,
+        parent_area_id,
+        area_id
+      }
+    })).data
+  }
+
+  /**
+   * 
+   * 获取房间的SC留言金额排行（可以打开查看的栏）
+   * 
+   * Example
+   * https://api.live.bilibili.com/av/v1/SuperChat/getRankMessageList?room_id=14052636&ruid=372984197&parent_area_id=9&area_id=371
+   * 
+   * @param {*} room_id ?room_id=14052636&ruid=372984197&parent_area_id=9&area_id=371
+   * @param {*} ruid 
+   * @param {*} parent_area_id 
+   * @param {*} area_id 
+   */
+  async getSuperChatRankMessageList (room_id, ruid, parent_area_id, area_id){
+    return (await this.webAxios.get('av/v1/SuperChat/getRankMessageList', {
+      params: {
+        room_id,
+        ruid,
+        parent_area_id,
+        area_id
+      }
+    })).data
+  }
+
   saveLoginInfo () {
     this.store.set('accessKey', JSON.stringify(this.accessKey))
     this.store.set('cookies', JSON.stringify(this.cookies))
