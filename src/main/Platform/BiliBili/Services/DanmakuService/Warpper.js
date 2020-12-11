@@ -110,6 +110,9 @@ export const defaultMap = {
           platformVIPLevel: (message.data.user_info.is_vip) ? 2 : ((message.data.user_info.is_svip) ? 1 : 0),
           title: message.data.user_info.title,
           medal: ((medalInfo) => {
+            if (!medalInfo) {
+              return undefined
+            }
             if (typeof medalInfo !== 'object') {
               return undefined
             } else {
