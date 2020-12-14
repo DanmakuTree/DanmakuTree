@@ -7,6 +7,7 @@ import { getLogger } from 'log4js'
 import { URLSearchParams } from 'url'
 import Database from 'better-sqlite3'
 import { KVTable } from './KVTable'
+import { createTrayIcon } from './TrayIcon'
 
 const internalModuleList = [
   '6d443ea8-54ba-4a27-be2e-c4ab474c3230', // 首页
@@ -34,6 +35,7 @@ export class ModuleManager extends WebInterfaceBase {
      */
     this.map = {}
     this.moduleWindows = {}
+    this.tray = null
     this.quitSign = false
     this.installedModuleList = []
     this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow',
@@ -44,17 +46,17 @@ export class ModuleManager extends WebInterfaceBase {
       'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit',
       'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'clearModuleConfig',
       'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList', 'getInternalModuleList', 'updateModuleData',
-      'getModuleData', 'clearModuleData']
+      'getModuleData', 'clearModuleData', 'getMainWindow']
     this.moduleList = []
     bindList.forEach((e) => {
       this[e] = this[e].bind(this)
     })
-    app.on('ready', () => {
-      this.createMainWindow()
+    app.on('ready', async () => {
+      await this.createMainWindow()
       if (isDev) {
         this.installDevTools()
       }
-
+      this.tray = createTrayIcon(this.getMainWindow)
       protocol.registerHttpProtocol('branch', (req, callback) => {
         // eslint-disable-next-line standard/no-callback-literal
         callback({
