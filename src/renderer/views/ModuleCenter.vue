@@ -1,12 +1,16 @@
 <template>
   <div class="container">
     <h2 class="h2">插件中心</h2>
+    <a-button @click="updateAllModuleList()">更新</a-button>
     <div class="module-list">
       <div class='module' v-for="Amodule in moduleList" :key="Amodule.id">
         <h3>{{Amodule.name}} <span>{{Amodule.version}}</span> </h3>
         <p>{{Amodule.description}}</p>
-        <a-button v-if="!isInstalled(Amodule.id)" type="primary" @click='install(Amodule.id)'>
+        <a-button v-if="!isInstalled(Amodule.id)&&!isInternal(Amodule.id)" type="primary" @click='install(Amodule.id)'>
           添加
+        </a-button>
+        <a-button v-if="isInternal(Amodule.id)" @click="install(Amodule.id)">
+          内部模块（已自动加载）
         </a-button>
         <a-button v-if="isInstalled(Amodule.id)" @click="uninstall(Amodule.id)">
           移除
@@ -25,7 +29,8 @@
       return {
         moduleId: 'b3a11260-c5e1-4edb-b7cc-23e8f6285f97',
         installedModuleList: [],
-        moduleList: []
+        moduleList: [],
+        internalModuleList: []
       }
     },
     mounted () {
@@ -33,6 +38,7 @@
         this.moduleList = data
       })
       this.loadInstallModuleList()
+      this.loadInternalModuleList()
     },
     methods: {
       install (id) {
@@ -71,6 +77,20 @@
       },
       isInstalled (id) {
         return this.installedModuleList.indexOf(id) !== -1
+      },
+      updateAllModuleList () {
+        console.log('updating all module list')
+        this.$module.getAllModuleList(true).then((data) => {
+          this.moduleList = data
+        })
+      },
+      loadInternalModuleList () {
+        return this.$module.getInternalModuleList().then((data) => {
+          this.internalModuleList = data
+        })
+      },
+      isInternal (id) {
+        return this.internalModuleList.indexOf(id) !== -1
       }
     }
   }

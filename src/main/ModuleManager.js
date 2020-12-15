@@ -135,8 +135,8 @@ export class ModuleManager extends WebInterfaceBase {
     return false
   }
 
-  async getAllModuleList () {
-    if (isDev || this.moduleList.length === 0) {
+  async getAllModuleList (update = false) {
+    if (isDev || this.moduleList.length === 0 || update) {
       var data = (await this.axios.get('module/list', {
         params: {
           version: version
