@@ -51,6 +51,11 @@ export function createTrayIcon (getMainWindow) {
   }
 
   tray.firstBoot = true
+  tray.doubleClick = {
+    clicks: 0,
+    delay: 8000,
+    timer: null
+  }
 
   tray.toggleWindowVisibility = () => {
     tray.firstBoot = false
@@ -68,6 +73,19 @@ export function createTrayIcon (getMainWindow) {
       }
     }
     tray.updateContextMenu()
+  }
+
+  tray.onClick = () => {
+    tray.doubleClick.clicks++
+    if (tray.doubleClick.clicks === 1) {
+      tray.doubleClick.timer = setTimeout(function () {
+        tray.doubleClick.clicks = 0
+      }, tray.doubleClick.delay)
+    } else {
+      clearTimeout(tray.doubleClick.timer)
+      tray.toggleWindowVisibility()
+      tray.doubleClick.clicks = 0
+    }
   }
 
   tray.showWindow = () => {
@@ -146,7 +164,7 @@ export function createTrayIcon (getMainWindow) {
     })
   }
 
-  tray.on('click', tray.showWindow)
+  tray.on('click', tray.onClick)
 
   tray.setToolTip('DanmakuTree Desktop')
   tray.updateContextMenu()
