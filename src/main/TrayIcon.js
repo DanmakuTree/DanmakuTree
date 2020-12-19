@@ -146,7 +146,7 @@ export function createTrayIcon (getMainWindow) {
     })
   }
 
-  tray.on('click', tray.showWindow)
+  tray.on('click', tray.toggleWindowVisibility)
 
   tray.setToolTip('DanmakuTree Desktop')
   tray.updateContextMenu()
