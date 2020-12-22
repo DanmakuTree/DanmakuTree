@@ -39,11 +39,11 @@ export class ModuleManager extends WebInterfaceBase {
     this.quitSign = false
     this.installedModuleList = []
     this.available.push('getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'createModuleExternalWindow',
-      'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule',
+      'getModuleWindows', 'closeModuleWindows', 'toggleModuleWindowVisibility', 'getModuleWindowVisibility', 'forcecloseModuleWindows', 'getInstalledModuleList', 'installModule',
       'uninstallModule', 'updateModuleConfig', 'clearModuleConfig', 'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList',
       'getInternalModuleList', 'updateModuleData', 'getModuleData', 'clearModuleData')
     var bindList = ['getAllModuleList', 'getModuleConfig', 'getModuleInfo', 'sendToMainWindow', 'webviewInspector',
-      'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'forcecloseModuleWindows', 'onMainQuit',
+      'createModuleExternalWindow', 'getModuleWindows', 'closeModuleWindows', 'toggleModuleWindowVisibility', 'getModuleWindowVisibility', 'forcecloseModuleWindows', 'onMainQuit',
       'getInstalledModuleList', 'installModule', 'uninstallModule', 'updateModuleConfig', 'clearModuleConfig',
       'requestQuickLink', 'getQuickLinkList', 'updateQuickLinkList', 'getInternalModuleList', 'updateModuleData',
       'getModuleData', 'clearModuleData', 'getMainWindow']
@@ -436,6 +436,41 @@ export class ModuleManager extends WebInterfaceBase {
       if (window) {
         window.close()
         return true
+      }
+    }
+    return false
+  }
+
+  async toggleModuleWindowVisibility (moduleId, id) {
+    if (this.moduleWindows[moduleId]) {
+      /**
+       * @type {BrowserWindow}
+       */
+      var window = this.moduleWindows[moduleId].find((e) => {
+        return e.id === id
+      })
+      if (window) {
+        if (window.isVisible()) {
+          window.hide()
+        } else {
+          window.show()
+        }
+        return true
+      }
+    }
+    return false
+  }
+
+  async getModuleWindowVisibility (moduleId, id) {
+    if (this.moduleWindows[moduleId]) {
+      /**
+       * @type {BrowserWindow}
+       */
+      var window = this.moduleWindows[moduleId].find((e) => {
+        return e.id === id
+      })
+      if (window) {
+        return { isVisible: window.isVisible() }
       }
     }
     return false
