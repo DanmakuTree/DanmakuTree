@@ -28,7 +28,7 @@ export class API extends WebInterfaceBase {
       'getAreaList', 'getMyChooseArea', 'getCoverList', 'setCover', 'getTitleList', 'getMyInfo', 'getReleation',
       'getLiverCustomTags', 'setLiverCustomTags', 'updateRoomInfo', 'getUserInfoNav', 'getFollowingList', 'getFollowersList',
       'setRoomTitle', 'setRoomArea', 'startLive', 'stopLive', 'getUserCard', 'getUserLiveCard', 'getInfoByRoom', 'getRoomInfoByUid',
-      'getDanmuConf', 'getRtmpStream', 'getInfoByUser', 'getRoomGiftList', 'getGiftConfig', 'getWebServerRank',
+      'getDanmuConf', 'getRtmpStream', 'getInfoByUser', 'getRoomGiftList', 'getGiftConfig', 'getWebSevenRank',
       'getWebGuardRank', 'getWebMedalRank', 'getRoomInfo', 'getRoomAdminByRoom', 'getRoomAdminByAnchor', 'sendRoomMessage', 'blockRoomUser',
       'removeRoomBlockUserByUid', 'getRoomAdminByUid', 'getBlockUserListBySearch', 'addRoomAdmin', 'removeRoomAdmin',
       'getDanmuReportReasonList', 'reportDanmaku', 'getSuperChatReportReasonList', 'reportSuperChatMessage', 'removeSuperChatMessage', 'setDanmuColor',
@@ -394,7 +394,7 @@ export class API extends WebInterfaceBase {
    * @param {Number} roomid 房间号
    * @param {Number} anchorUid 主播UID
    */
-  async getWebServerRank (roomid, anchorUid) {
+  async getWebSevenRank (roomid, anchorUid) {
     return (await this.webAxios.get('/rankdb/v1/RoomRank/webSevenRank', {
       params: {
         roomid: roomid,
