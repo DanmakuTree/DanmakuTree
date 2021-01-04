@@ -98,9 +98,9 @@ export class API extends WebInterfaceBase {
       this.cookies = loginRes.data.cookie_info.cookies.map((e) => { return e.name + '=' + e.value }).join(';')
       this.bili_jct = loginRes.data.cookie_info.cookies.find((v) => { return v.name === 'bili_jct' }).value
       this.uid = loginRes.data.token_info.mid
-      this.cookies.forEach((e) => {
-        e.name = e.name_jct
-      })
+      // this.cookies.forEach((e) => {
+      //   e.name = e.name_jct
+      // })
       this.webAxios = createWebAxios(this.cookies)
       this.loginType = 'MOBILE'
       loginRes.data = {}
