@@ -6,7 +6,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
     "ant-design-vue": "^1.6.2",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "better-sqlite3": "^7.1.0",
     "echarts": "^4.8.0",
     "lodash": "^4.17.20",
