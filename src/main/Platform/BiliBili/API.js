@@ -6,6 +6,7 @@ import BiliBiliConsts from './Consts'
 import { WebInterfaceBase } from '../../WebInterfaceBase'
 import { KVTable } from '../../KVTable'
 import { session } from '../../ElectronMock'
+import { bvidToAid } from './bvid'
 // import { promises as fspromise } from 'fs'
 // const readFile = fspromise.readFile
 // const writeFile = fspromise.writeFile
@@ -1047,6 +1048,28 @@ export class API extends WebInterfaceBase {
         area_id: areaId
       }
     })).data
+  }
+
+  /**
+   * 根据BV号删除主站视频投稿的方法
+   *
+   * @param {*} bvid 视频的BV号,例如: 'BV19a4y1n7fj'
+   *
+   * 手机端接口测试成功; WEB端经过测试,需要通过gt验证,可能无法在WEB下进行删除
+   */
+  async deleteVideoPost (bvid) {
+    const data = {
+      aid: bvidToAid(bvid)
+    }
+    if (this.loginType === 'MOBILE') {
+      data.access_key = this.accessKey
+      data.build = 4700011
+      return (await this.mobileAxios.post('https://member.bilibili.com/x/app/archive/delete', sign(data, BiliBiliConsts.appkey, BiliBiliConsts.secret, BiliBiliConsts.platform))).data
+    } else {
+      data.platform = 'pc'
+      data.csrf_token = this.bili_jct
+      return (await this.mainWebAxios.post('https://member.bilibili.com/x/app/archive/delete', new URLSearchParams(data))).data
+    }
   }
 
   saveLoginInfo () {
