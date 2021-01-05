@@ -33,7 +33,8 @@ export class API extends WebInterfaceBase {
       'getWebGuardRank', 'getWebMedalRank', 'getRoomInfo', 'getRoomAdminByRoom', 'getRoomAdminByAnchor', 'sendRoomMessage', 'blockRoomUser',
       'removeRoomBlockUserByUid', 'getRoomAdminByUid', 'getBlockUserListBySearch', 'addRoomAdmin', 'removeRoomAdmin',
       'getDanmuReportReasonList', 'reportDanmaku', 'getSuperChatReportReasonList', 'reportSuperChatMessage', 'removeSuperChatMessage', 'setDanmuColor',
-      'setDanmuMode', 'updateDanmuConf', 'getRoomNews', 'updateRoomNews', 'getDanmuConfig', 'getSuperChatConfig', 'getSuperChatMessageInfo']
+      'setDanmuMode', 'updateDanmuConf', 'getRoomNews', 'updateRoomNews', 'getDanmuConfig', 'getSuperChatConfig', 'getSuperChatMessageInfo',
+      'getSuperChatMessageList', 'getSuperChatRankMessageList', 'deleteVideoPost']
     methodList.forEach((e) => {
       this[e] = this[e].bind(this)
       this.available.push(e)
