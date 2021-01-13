@@ -71,7 +71,7 @@ if (!_selfCheck()) {
   throw new Error('self check failed')
 }
 
-module.exports = {
+export {
   aidToBvid,
   bvidToAid
 }
