@@ -9,7 +9,7 @@
     "axios": "^0.21.1",
     "better-sqlite3": "^7.1.0",
     "echarts": "^4.8.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "log4js": "^6.3.0",
     "mockjs": "^1.1.0",
     "selfsigned": "^1.10.8",
