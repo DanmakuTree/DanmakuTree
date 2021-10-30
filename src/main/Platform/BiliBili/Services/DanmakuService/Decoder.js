@@ -12,7 +12,7 @@ var DefaultConfig = [
   { name: 'headerLength', type: 'UInt16', offset: 4, length: 2 },
   { name: 'protocolVersion', type: 'UInt16', offset: 6, length: 2 },
   { name: 'operation', type: 'UInt32', offset: 8, length: 4 },
-  { name: 'sequenceId', type: 'UInt32', offset: 12, length: 4 },
+  { name: 'sequenceId', type: 'UInt32', offset: 11, length: 4 },
   {
     name: 'body',
     type: 'Buffer',
