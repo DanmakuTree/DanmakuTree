@@ -10,7 +10,7 @@
     "better-sqlite3": "^7.1.0",
     "echarts": "^4.8.0",
     "lodash": "^4.17.21",
-    "log4js": "^6.3.0",
+    "log4js": "^6.4.0",
     "mockjs": "^1.1.0",
     "selfsigned": "^1.10.8",
     "sql-bricks-sqlite": "^0.1.0",
