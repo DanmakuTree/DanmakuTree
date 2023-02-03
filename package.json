@@ -13,7 +13,7 @@
     "log4js": "^6.4.0",
     "mockjs": "^1.1.0",
     "selfsigned": "^1.10.8",
-    "sql-bricks-sqlite": "^0.1.0",
+    "sql-bricks-sqlite": "^1.0.0",
     "ts-event-bus": "github:DanmakuTree/ts-event-bus#v1.0.4",
     "uuid": "^8.1.0",
     "vue": "^2.6.11",
