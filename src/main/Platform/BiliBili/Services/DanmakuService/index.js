@@ -36,7 +36,7 @@ export class DanmakuService extends WebInterfaceBase {
     var connection = new RoomConnection(roomId)
     this.listen(connection)
     this.rooms.push(connection)
-    API.getDanmuConf(roomId).then((res) => {
+    API.getDanmuInfo(roomId).then((res) => {
       if (res.code === 0) {
         var address = `wss://${res.data.host_server_list[0].host}:${res.data.host_server_list[0].wss_port}/sub`
         connection.connect(roomId, API.uid, res.data.token, address)
@@ -127,7 +127,7 @@ export class DanmakuService extends WebInterfaceBase {
           var target = this.reconnectList.shift()
           var connection = this.rooms.find((v) => { return v.roomId === target })
           if (connection != null && connection.status === 'waitConfig' && !connection.shouldClose) {
-            API.getDanmuConf(target).then((res) => {
+            API.getDanmuInfo(target).then((res) => {
               if (res.code === 0) {
                 if (connection.status === 'waitConfig' && !connection.shouldClose) {
                   var address = `wss://${res.data.host_server_list[0].host}:${res.data.host_server_list[0].wss_port}/sub`

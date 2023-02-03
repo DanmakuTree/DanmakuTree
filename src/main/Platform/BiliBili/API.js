@@ -29,7 +29,7 @@ export class API extends WebInterfaceBase {
       'getAreaList', 'getMyChooseArea', 'getCoverList', 'setCover', 'getTitleList', 'getMyInfo', 'getReleation',
       'getLiverCustomTags', 'setLiverCustomTags', 'updateRoomInfo', 'getUserInfoNav', 'getFollowingList', 'getFollowersList',
       'setRoomTitle', 'setRoomArea', 'startLive', 'stopLive', 'getUserCard', 'getUserLiveCard', 'getInfoByRoom', 'getRoomInfoByUid',
-      'getDanmuConf', 'getRtmpStream', 'getInfoByUser', 'getRoomGiftList', 'getGiftConfig', 'getWebSevenRank',
+      'getDanmuInfo', 'getRtmpStream', 'getInfoByUser', 'getRoomGiftList', 'getGiftConfig', 'getWebSevenRank',
       'getWebGuardRank', 'getWebMedalRank', 'getRoomInfo', 'getRoomAdminByRoom', 'getRoomAdminByAnchor', 'sendRoomMessage', 'blockRoomUser',
       'removeRoomBlockUserByUid', 'getRoomAdminByUid', 'getBlockUserListBySearch', 'addRoomAdmin', 'removeRoomAdmin',
       'getDanmuReportReasonList', 'reportDanmaku', 'getSuperChatReportReasonList', 'reportSuperChatMessage', 'removeSuperChatMessage', 'setDanmuColor',
@@ -654,19 +654,23 @@ export class API extends WebInterfaceBase {
   /**
    * 获取弹幕链接设置
    * web接口，支持app，但应用困难
-   * @param {Number} roomId 房间号
-   * @param {String} platform 平台
-   * @param {String} player 播放器
+   * @param {Number} roomId 房间号  // not used anymore
+   * @param {String} platform 平台 // not used anymore
+   * @param {String} player 播放器 // not used anymore
+   *
+   * @param {Number} roomId as id
+   * In the future, clients of this api should use `res.data.host_list` to find the wss port
+   * However, here we provide utility access to `res.data.host_server_list` the same as `res.data.host_list`
    */
-  async getDanmuConf (roomId, platform = 'pc', player = 'web') {
+  async getDanmuInfo (roomId) {
     const data = {
-      room_id: roomId,
-      platform: platform,
-      player
+      id: roomId
     }
-    return (await this.webAxios.get('/room/v1/Danmu/getConf', {
+    var res = (await this.webAxios.get('/xlive/web-room/v1/index/getDanmuInfo', {
       params: new URLSearchParams(data)
     })).data
+    res.data.host_server_list = res.data.host_list
+    return res
   }
 
   /**

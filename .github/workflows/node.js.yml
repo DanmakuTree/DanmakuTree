@@ -47,7 +47,7 @@ jobs:
 # -a---           5/27/2020 10:12 AM            350 latest.yml
     # ubuntu-latest artifacts, include:  
       # Run ls build
-      # DanmakuTree-0.0.1.AppImage       √
+      # DanmakuTree-0.0.1.AppImage       x
       # danmaku-tree-0.0.1.7z            √
       # danmaku-tree_0.0.1_amd64.deb
       # latest-linux.yml
@@ -62,7 +62,7 @@ jobs:
       # .exe for windows                 √
           # DanmakuTree 0.0.1.exe        .
           # DanmakuTree Setup 0.0.1.exe  x
-      # .AppImage for ubuntu             √
+      # .AppImage for ubuntu             x
           # DanmakuTree-0.0.1.AppImage   .
     - name: Upload .7z file (if any exists)
       uses: actions/upload-artifact@v2
@@ -81,9 +81,9 @@ jobs:
       with:
         name: ${{ matrix.os }}.exe
         path: build/*.exe    # TODO: should exclude the setup .exe
-    - name: Upload .AppImage file (if any exists)
-      if: ${{ runner.os == 'Linux' }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ matrix.os }}.AppImage
-        path: build/*.AppImage  
+    # - name: Upload .AppImage file (if any exists)
+    #   if: ${{ runner.os == 'Linux' }}
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: ${{ matrix.os }}.AppImage
+    #     path: build/*.AppImage  
