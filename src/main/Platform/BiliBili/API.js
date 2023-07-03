@@ -15,7 +15,7 @@ export class API extends WebInterfaceBase {
     super()
     this.version = '0.9.2'
     this.accessKey = ''
-    this.uid = 0
+    this.uid = 9099524
     this.bili_jct = ''
     this.cookies = null
     this.mobileAxios = createMobileAxios()
