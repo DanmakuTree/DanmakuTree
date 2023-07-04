@@ -43,8 +43,7 @@ export class RoomConnection extends EventEmitter {
       uid: parseInt(uid),
       roomid: roomId,
       protover: 2,
-      platform: 'web',
-      clientver: '1.11.0',
+      platform: 'danmukun',
       type: 2,
       key: token
     }
